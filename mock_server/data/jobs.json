@@ -1,0 +1,78 @@
+[
+  {
+    "job_number": "ORD-001",
+    "job_priority": 1,
+    "job_status": 0,
+    "job_date": "290426",
+    "job_time": "0800",
+    "positions": [
+      {
+        "article_number": "ART-001",
+        "operation": "+",
+        "nominal_quantity": 10.0,
+        "actual_quantity": 0.0,
+        "container_size": 1,
+        "position_status": 0
+      }
+    ]
+  },
+  {
+    "job_number": "ORD-002",
+    "job_priority": 2,
+    "job_status": 1,
+    "job_date": "290426",
+    "job_time": "0900",
+    "positions": [
+      {
+        "article_number": "ART-002",
+        "operation": "-",
+        "nominal_quantity": 5.0,
+        "actual_quantity": 0.0,
+        "container_size": 2,
+        "position_status": 0
+      },
+      {
+        "article_number": "ART-003",
+        "operation": "-",
+        "nominal_quantity": 20.0,
+        "actual_quantity": 0.0,
+        "container_size": 1,
+        "position_status": 0
+      }
+    ]
+  },
+  {
+    "job_number": "ORD-003",
+    "job_priority": 1,
+    "job_status": 3,
+    "job_date": "280426",
+    "job_time": "1430",
+    "positions": [
+      {
+        "article_number": "ART-001",
+        "operation": "+",
+        "nominal_quantity": 50.0,
+        "actual_quantity": 50.0,
+        "container_size": 1,
+        "position_status": 1
+      }
+    ]
+  },
+  {
+    "job_number": "ORD-004",
+    "job_priority": 3,
+    "job_status": 3,
+    "job_date": "280426",
+    "job_time": "1600",
+    "positions": [
+      {
+        "article_number": "ART-002",
+        "operation": "+",
+        "nominal_quantity": 40.0,
+        "actual_quantity": 15.0,
+        "container_size": 2,
+        "position_status": 1
+      }
+    ]
+  }
+]

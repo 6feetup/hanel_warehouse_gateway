@@ -1,0 +1,11 @@
+services:
+  hanel-mock:
+    build: ./mock_server
+    ports:
+      - "8080:8080"
+    environment:
+      AUTO_COMPLETE_SECONDS: "10"
+      MOCK_DATA_DIR: /app/data
+    volumes:
+      - ./mock_server/data:/app/data
+    restart: unless-stopped
