@@ -1,0 +1,83 @@
+"""Test per i dataclass pubblici di hanel_warehouse_gateway."""
+
+from __future__ import annotations
+
+from hanel_warehouse_gateway import (
+    MovementLine,
+    MovementLineResult,
+    MovementResult,
+    StockRecord,
+)
+
+
+class TestMovementLine:
+    def test_instantiation(self) -> None:
+        line = MovementLine(
+            article_number="ART001", operation="+", nominal_quantity=10.0
+        )
+        assert line.article_number == "ART001"
+        assert line.operation == "+"
+        assert line.nominal_quantity == 10.0
+
+
+class TestMovementLineResult:
+    def test_instantiation(self) -> None:
+        result = MovementLineResult(
+            article_number="ART001",
+            operation="+",
+            nominal_quantity=10.0,
+            actual_quantity=8.0,
+            container_size=1,
+            position_status=1,
+        )
+        assert result.actual_quantity == 8.0
+        assert result.position_status == 1
+
+
+class TestMovementResult:
+    def test_default_positions_empty(self) -> None:
+        result = MovementResult(
+            job_number="ORD001",
+            job_priority=1,
+            job_status=3,
+            job_date="010124",
+            job_time="1430",
+        )
+        assert result.positions == []
+
+    def test_with_positions(self) -> None:
+        line = MovementLineResult(
+            article_number="ART001",
+            operation="+",
+            nominal_quantity=5.0,
+            actual_quantity=5.0,
+            container_size=1,
+            position_status=1,
+        )
+        result = MovementResult(
+            job_number="ORD001",
+            job_priority=1,
+            job_status=3,
+            job_date="010124",
+            job_time="1430",
+            positions=[line],
+        )
+        assert len(result.positions) == 1
+
+
+class TestStockRecord:
+    def test_instantiation(self) -> None:
+        record = StockRecord(
+            article_number="ART001",
+            article_name="Vite M6",
+            lift_number=1,
+            shelf_number=3,
+            compartment_number=2,
+            compartment_depth_number=1,
+            container_size=1,
+            fifo=0,
+            inventory_at_storage_location=50.0,
+            minimum_inventory=10.0,
+        )
+        assert record.article_number == "ART001"
+        assert record.inventory_at_storage_location == 50.0
