@@ -1,0 +1,74 @@
+[
+  {
+    "article_number": "ART-001",
+    "article_name": "Vite M6x20",
+    "lift_number": 1,
+    "shelf_number": 12,
+    "compartment_number": 3,
+    "compartment_depth_number": 1,
+    "container_size": 1,
+    "fifo": 1,
+    "inventory_at_storage_location": 150.0,
+    "minimum_inventory": 20.0
+  },
+  {
+    "article_number": "ART-001",
+    "article_name": "Vite M6x20",
+    "lift_number": 1,
+    "shelf_number": 15,
+    "compartment_number": 1,
+    "compartment_depth_number": 1,
+    "container_size": 1,
+    "fifo": 2,
+    "inventory_at_storage_location": 80.0,
+    "minimum_inventory": 20.0
+  },
+  {
+    "article_number": "ART-002",
+    "article_name": "Dado M6",
+    "lift_number": 1,
+    "shelf_number": 8,
+    "compartment_number": 2,
+    "compartment_depth_number": 1,
+    "container_size": 2,
+    "fifo": 1,
+    "inventory_at_storage_location": 15.0,
+    "minimum_inventory": 30.0
+  },
+  {
+    "article_number": "ART-002",
+    "article_name": "Dado M6",
+    "lift_number": 0,
+    "shelf_number": 0,
+    "compartment_number": 0,
+    "compartment_depth_number": 0,
+    "container_size": 0,
+    "fifo": 0,
+    "inventory_at_storage_location": 0.0,
+    "minimum_inventory": 30.0
+  },
+  {
+    "article_number": "ART-003",
+    "article_name": "Rondella M6",
+    "lift_number": 1,
+    "shelf_number": 4,
+    "compartment_number": 5,
+    "compartment_depth_number": 1,
+    "container_size": 1,
+    "fifo": 1,
+    "inventory_at_storage_location": 500.0,
+    "minimum_inventory": 50.0
+  },
+  {
+    "article_number": "ART-003",
+    "article_name": "Rondella M6",
+    "lift_number": 1,
+    "shelf_number": 4,
+    "compartment_number": 5,
+    "compartment_depth_number": 2,
+    "container_size": 1,
+    "fifo": 2,
+    "inventory_at_storage_location": 300.0,
+    "minimum_inventory": 50.0
+  }
+]
