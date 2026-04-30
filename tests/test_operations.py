@@ -148,6 +148,27 @@ class TestRegisterArticle:
         assert "N" * 40 in envelope
         assert "N" * 41 not in envelope
 
+    def test_test_mode_prepends_prefix(self) -> None:
+        xml = _fixture("sendAPDReqV01_success.xml")
+        ops, transport = _make_operations(xml, test_mode=True, test_prefix="TEST_")
+        ops.register_article("ART001", "Bolt M6")
+        envelope, _ = transport.post.call_args[0]
+        assert "TEST_ART001" in envelope
+
+    def test_test_mode_false_no_prefix(self) -> None:
+        xml = _fixture("sendAPDReqV01_success.xml")
+        ops, transport = _make_operations(xml, test_mode=False)
+        ops.register_article("ART001", "Bolt M6")
+        envelope, _ = transport.post.call_args[0]
+        assert "ART001" in envelope
+        assert "TEST_ART001" not in envelope
+
+    def test_test_mode_prefix_counts_toward_length_limit(self) -> None:
+        ops, transport = _make_operations(test_mode=True, test_prefix="TEST_")
+        with pytest.raises(HanelGatewayValidationError):
+            ops.register_article("A" * 36, "Valid Name")
+        transport.post.assert_not_called()
+
 
 class TestCancelOrder:
     @responses_lib.activate
