@@ -162,15 +162,18 @@ class TestCancelOrder:
         assert result is True
 
     @responses_lib.activate
-    def test_returns_false_on_failure(self) -> None:
+    def test_raises_application_error_on_nonzero_return_value(self) -> None:
         responses_lib.add(
             responses_lib.POST,
             _ENDPOINT,
             body=_fixture("response_delete_job_error.xml"),
             status=200,
         )
-        result = _ops(_config()).cancel_order("ORD-003")
-        assert result is False
+        with pytest.raises(HanelGatewayApplicationError) as exc_info:
+            _ops(_config()).cancel_order("ORD-003")
+        exc = exc_info.value
+        assert exc.operation == "deleteJobReqV01"
+        assert exc.return_value != 0
 
     @responses_lib.activate
     def test_envelope_contains_order_number(self) -> None:
@@ -418,6 +421,64 @@ class TestGetCompletedMovements:
         ops, _ = _make_operations(_fixture("soap_fault.xml"))
         with pytest.raises(HanelGatewaySoapFaultError):
             ops.get_completed_movements()
+
+
+class TestGetAllOrders:
+    def test_returns_list_of_movement_results(self) -> None:
+        xml = _fixture("read_jobs_response_mode0.xml")
+        ops, _ = _make_operations(xml)
+        results = ops.get_all_orders()
+        assert isinstance(results, list)
+        assert all(isinstance(r, MovementResult) for r in results)
+
+    def test_returns_correct_number_of_results(self) -> None:
+        xml = _fixture("read_jobs_response_mode0.xml")
+        ops, _ = _make_operations(xml)
+        results = ops.get_all_orders()
+        assert len(results) == 3
+
+    def test_envelope_contains_mode_0(self) -> None:
+        xml = _fixture("read_jobs_response_mode0.xml")
+        ops, transport = _make_operations(xml)
+        ops.get_all_orders()
+        envelope, _ = transport.post.call_args[0]
+        assert "<xsd:mode>0</xsd:mode>" in envelope
+
+    def test_calls_read_all_jobs_operation(self) -> None:
+        xml = _fixture("read_jobs_response_mode0.xml")
+        ops, transport = _make_operations(xml)
+        ops.get_all_orders()
+        _, operation = transport.post.call_args[0]
+        assert operation == "readAllJobsReqV01"
+
+    def test_maps_job_number(self) -> None:
+        xml = _fixture("read_jobs_response_mode0.xml")
+        ops, _ = _make_operations(xml)
+        results = ops.get_all_orders()
+        assert results[0].job_number == "ORD-001"
+        assert results[1].job_number == "ORD-002"
+        assert results[2].job_number == "ORD-003"
+
+    def test_maps_positions_to_movement_line_results(self) -> None:
+        xml = _fixture("read_jobs_response_mode0.xml")
+        ops, _ = _make_operations(xml)
+        results = ops.get_all_orders()
+        assert all(
+            isinstance(p, MovementLineResult) for r in results for p in r.positions
+        )
+
+    def test_includes_queued_and_in_progress_orders(self) -> None:
+        xml = _fixture("read_jobs_response_mode0.xml")
+        ops, _ = _make_operations(xml)
+        results = ops.get_all_orders()
+        statuses = {r.job_status for r in results}
+        assert 0 in statuses
+        assert 1 in statuses
+
+    def test_soap_fault_propagates(self) -> None:
+        ops, _ = _make_operations(_fixture("soap_fault.xml"))
+        with pytest.raises(HanelGatewaySoapFaultError):
+            ops.get_all_orders()
 
 
 class TestGetInventory:

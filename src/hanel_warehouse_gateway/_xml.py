@@ -12,6 +12,19 @@ import xml.etree.ElementTree as ET
 from .exceptions import HanelGatewayParseError, HanelGatewaySoapFaultError
 
 _NS_SOAP = "http://schemas.xmlsoap.org/soap/envelope/"
+_NS_MAIN = "http://main.jws.com.hanel.de"
+_NS_XSD = "http://main.jws.com.hanel.de/xsd"
+
+_NAMESPACES: dict[str, str] = {
+    "soapenv": _NS_SOAP,
+    "main": _NS_MAIN,
+    "xsd": _NS_XSD,
+}
+
+
+def _namespaces(namespace_xsd: str) -> dict[str, str]:
+    """Return the namespace dict for find()/findall(), honoring config override."""
+    return {**_NAMESPACES, "xsd": namespace_xsd}
 
 
 def _xml_escape(value: str) -> str:
@@ -134,7 +147,7 @@ def build_cancel_order_envelope(
     """Build the SOAP envelope for deleteJobReqV01."""
     job_number_escaped = _xml_escape(job_number)
     return (
-        f'<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"'
+        f'<soapenv:Envelope xmlns:soapenv="{_NS_SOAP}"'
         f' xmlns:main="{namespace_main}" xmlns:xsd="{namespace_xsd}">'
         "<soapenv:Header/>"
         "<soapenv:Body>"
@@ -164,7 +177,9 @@ def parse_return_value(xml_text: str, operation: str, namespace_xsd: str) -> int
             timestamp=datetime.datetime.utcnow().isoformat(),
         ) from exc
 
-    fault = root.find(f".//{{{_NS_SOAP}}}Fault")
+    ns = _namespaces(namespace_xsd)
+
+    fault = root.find(".//soapenv:Fault", ns)
     if fault is not None:
         fault_code = fault.findtext("faultcode") or ""
         fault_string = fault.findtext("faultstring") or ""
@@ -177,7 +192,7 @@ def parse_return_value(xml_text: str, operation: str, namespace_xsd: str) -> int
             fault_code=fault_code,
         )
 
-    el = root.find(f".//{{{namespace_xsd}}}returnValue")
+    el = root.find(".//xsd:returnValue", ns)
     if el is None or el.text is None:
         raise HanelGatewayParseError(
             message=f"returnValue not found in response for {operation}",
@@ -202,7 +217,9 @@ def parse_movement_results(
             timestamp=datetime.datetime.utcnow().isoformat(),
         ) from exc
 
-    fault = root.find(f".//{{{_NS_SOAP}}}Fault")
+    ns = _namespaces(namespace_xsd)
+
+    fault = root.find(".//soapenv:Fault", ns)
     if fault is not None:
         fault_code = fault.findtext("faultcode") or ""
         fault_string = fault.findtext("faultstring") or ""
@@ -215,31 +232,32 @@ def parse_movement_results(
             fault_code=fault_code,
         )
 
-    ns = namespace_xsd
     results = []
-    for job_el in root.findall(f".//{{{ns}}}job"):
+    for job_el in root.findall(".//xsd:job", ns):
         positions = []
-        for pos_el in job_el.findall(f"{{{ns}}}JobPosition"):
+        for pos_el in job_el.findall("xsd:JobPosition", ns):
             positions.append({
-                "article_number": pos_el.findtext(f"{{{ns}}}articleNumber") or "",
-                "operation": pos_el.findtext(f"{{{ns}}}operation") or "",
+                "article_number": pos_el.findtext("xsd:articleNumber", "", ns),
+                "operation": pos_el.findtext("xsd:operation", "", ns),
                 "nominal_quantity": float(
-                    pos_el.findtext(f"{{{ns}}}nominalQuantity") or 0
+                    pos_el.findtext("xsd:nominalQuantity", "0", ns)
                 ),
                 "actual_quantity": float(
-                    pos_el.findtext(f"{{{ns}}}actualQuantity") or 0
+                    pos_el.findtext("xsd:actualQuantity", "0", ns)
                 ),
-                "container_size": int(pos_el.findtext(f"{{{ns}}}containerSize") or 0),
+                "container_size": int(
+                    pos_el.findtext("xsd:containerSize", "0", ns)
+                ),
                 "position_status": int(
-                    pos_el.findtext(f"{{{ns}}}positionStatus") or 0
+                    pos_el.findtext("xsd:positionStatus", "0", ns)
                 ),
             })
         results.append({
-            "job_number": job_el.findtext(f"{{{ns}}}jobNumber") or "",
-            "job_priority": int(job_el.findtext(f"{{{ns}}}jobPriority") or 0),
-            "job_status": int(job_el.findtext(f"{{{ns}}}jobStatus") or 0),
-            "job_date": job_el.findtext(f"{{{ns}}}jobDate") or "",
-            "job_time": job_el.findtext(f"{{{ns}}}jobTime") or "",
+            "job_number": job_el.findtext("xsd:jobNumber", "", ns),
+            "job_priority": int(job_el.findtext("xsd:jobPriority", "0", ns)),
+            "job_status": int(job_el.findtext("xsd:jobStatus", "0", ns)),
+            "job_date": job_el.findtext("xsd:jobDate", "", ns),
+            "job_time": job_el.findtext("xsd:jobTime", "", ns),
             "positions": positions,
         })
     return results

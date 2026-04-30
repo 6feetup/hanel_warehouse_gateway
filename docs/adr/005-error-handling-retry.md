@@ -33,6 +33,9 @@ class HanelGatewayApplicationError(HanelGatewayError):
 class HanelGatewayValidationError(HanelGatewayError):
     """Invalid input detected before sending. No HTTP call is made."""
     def __init__(self, …, field: str, value: str): ...
+
+class HanelGatewayParseError(HanelGatewayError):
+    """Response could not be parsed (malformed XML or missing expected element). No retry."""
 ```
 
 All exceptions include: `message`, `operation`, `detail`, `timestamp` (ISO 8601).
@@ -64,6 +67,10 @@ After an HTTP response is received:
 ### SOAP fault detection
 
 XML parsing checks for the presence of the `<soapenv:Fault>` tag before looking for `returnValue`. If present: `HanelGatewaySoapFaultError`.
+
+### Parse errors
+
+If the response body is not well-formed XML, or if the expected element (e.g. `returnValue`) is missing from a non-Fault envelope, the parser raises `HanelGatewayParseError`. This is distinct from `HanelGatewaySoapFaultError` (a valid SOAP Fault) and from `HanelGatewayApplicationError` (`returnValue` present but non-zero). No retry is performed.
 
 ### Application codes
 
