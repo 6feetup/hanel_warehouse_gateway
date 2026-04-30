@@ -1,0 +1,7 @@
+{
+  "order_number": "ORD-CLI-002",
+  "positions": [
+    {"article_number": "ART-001", "operation": "+", "nominal_quantity": 5.0},
+    {"article_number": "ART-002", "operation": "-", "nominal_quantity": 2.0}
+  ]
+}
