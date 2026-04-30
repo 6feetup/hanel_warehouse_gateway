@@ -26,7 +26,7 @@ The `src/` layout prevents the package from being importable directly from the p
 hanel_warehouse_gateway/           ← repository root
 ├── src/
 │   └── hanel_warehouse_gateway/
-│       ├── __init__.py            ← exposes only HanelWarehouseGateway and public dataclasses
+│       ├── __init__.py            ← exposes HanelWarehouseGateway, GatewayConfig, public dataclasses, exceptions
 │       ├── gateway.py             ← Layer 3: HanelWarehouseGateway (public interface)
 │       ├── operations.py          ← Layer 2: SOAP operation mapping
 │       ├── transport.py           ← Layer 1: HTTP/SOAP client, retry, timeout
@@ -68,4 +68,4 @@ hanel_warehouse_gateway/           ← repository root
 
 - Editable mode installation required for development: `uv sync`
 - The package is importable only after installation, not directly from `src/`
-- `__init__.py` exposes exclusively `HanelWarehouseGateway`, the public dataclasses, and the exceptions — nothing from `_xml.py` or the internal layers
+- `__init__.py` exposes exclusively `HanelWarehouseGateway`, `GatewayConfig`, the public dataclasses (`MovementLine`, `MovementLineResult`, `MovementResult`, `StockRecord`), and the exception hierarchy — nothing from `_xml.py` or the internal layers. `GatewayConfig` is part of the public surface because callers must construct it (typically via `GatewayConfig.from_env()`) to instantiate the gateway.

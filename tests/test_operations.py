@@ -160,15 +160,18 @@ class TestCancelOrder:
         assert result is True
 
     @responses_lib.activate
-    def test_returns_false_on_failure(self) -> None:
+    def test_raises_application_error_on_nonzero_return_value(self) -> None:
         responses_lib.add(
             responses_lib.POST,
             _ENDPOINT,
             body=_fixture("response_delete_job_error.xml"),
             status=200,
         )
-        result = _ops(_config()).cancel_order("ORD-003")
-        assert result is False
+        with pytest.raises(HanelGatewayApplicationError) as exc_info:
+            _ops(_config()).cancel_order("ORD-003")
+        exc = exc_info.value
+        assert exc.operation == "deleteJobReqV01"
+        assert exc.return_value != 0
 
     @responses_lib.activate
     def test_envelope_contains_order_number(self) -> None:

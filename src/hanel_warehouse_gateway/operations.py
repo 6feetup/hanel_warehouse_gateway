@@ -224,19 +224,40 @@ class SoapOperations:
 
     def cancel_order(self, order_number: str) -> bool:
         """Cancel an order from the queue (deleteJobReqV01)."""
-        op = "deleteJobReqV01"
+        operation = "deleteJobReqV01"
         if self._config.test_mode:
             order_number = f"{self._config.test_prefix}{order_number}"
         order_number = _validate_field_length(
-            order_number, "job_number", op, self._config
+            order_number, "job_number", operation, self._config
         )
+
+        logger.info(
+            "cancel_order: initiating %s for job_number=%r",
+            operation,
+            order_number,
+        )
+
         envelope = _xml.build_cancel_order_envelope(
             job_number=order_number,
             namespace_main=self._config.namespace_main,
             namespace_xsd=self._config.namespace_xsd,
         )
-        xml_response = self._transport.post(envelope, op)
+        xml_response = self._transport.post(envelope, operation)
         return_value = _xml.parse_return_value(
-            xml_response, op, self._config.namespace_xsd
+            xml_response, operation, self._config.namespace_xsd
         )
-        return return_value == 0
+        if return_value != 0:
+            raise HanelGatewayApplicationError(
+                message=f"{operation} returned error code {return_value}",
+                operation=operation,
+                detail=f"returnValue={return_value}",
+                timestamp=datetime.datetime.utcnow().isoformat(),
+                return_value=return_value,
+            )
+
+        logger.info(
+            "cancel_order: %s succeeded for job_number=%r",
+            operation,
+            order_number,
+        )
+        return True
