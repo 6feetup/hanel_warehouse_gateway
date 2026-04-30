@@ -277,7 +277,9 @@ def parse_stock_records(
             timestamp=datetime.datetime.utcnow().isoformat(),
         ) from exc
 
-    fault = root.find(f".//{{{_NS_SOAP}}}Fault")
+    ns = _namespaces(namespace_xsd)
+
+    fault = root.find(".//soapenv:Fault", ns)
     if fault is not None:
         fault_code = fault.findtext("faultcode") or ""
         fault_string = fault.findtext("faultstring") or ""
@@ -290,27 +292,26 @@ def parse_stock_records(
             fault_code=fault_code,
         )
 
-    ns = namespace_xsd
     results = []
-    for rec_el in root.findall(f".//{{{ns}}}articleMasterDataRecord"):
+    for rec_el in root.findall(".//xsd:articleMasterDataRecord", ns):
         results.append({
-            "article_number": rec_el.findtext(f"{{{ns}}}articleNumber") or "",
-            "article_name": rec_el.findtext(f"{{{ns}}}articleName") or "",
-            "lift_number": int(rec_el.findtext(f"{{{ns}}}liftNumber") or 0),
-            "shelf_number": int(rec_el.findtext(f"{{{ns}}}shelfNumber") or 0),
+            "article_number": rec_el.findtext("xsd:articleNumber", "", ns),
+            "article_name": rec_el.findtext("xsd:articleName", "", ns),
+            "lift_number": int(rec_el.findtext("xsd:liftNumber", "0", ns)),
+            "shelf_number": int(rec_el.findtext("xsd:shelfNumber", "0", ns)),
             "compartment_number": int(
-                rec_el.findtext(f"{{{ns}}}compartmentNumber") or 0
+                rec_el.findtext("xsd:compartmentNumber", "0", ns)
             ),
             "compartment_depth_number": int(
-                rec_el.findtext(f"{{{ns}}}compartmentDepthNumber") or 0
+                rec_el.findtext("xsd:compartmentDepthNumber", "0", ns)
             ),
-            "container_size": int(rec_el.findtext(f"{{{ns}}}containerSize") or 0),
-            "fifo": int(rec_el.findtext(f"{{{ns}}}fifo") or 0),
+            "container_size": int(rec_el.findtext("xsd:containerSize", "0", ns)),
+            "fifo": int(rec_el.findtext("xsd:fifo", "0", ns)),
             "inventory_at_storage_location": float(
-                rec_el.findtext(f"{{{ns}}}inventoryAtStorageLocation") or 0
+                rec_el.findtext("xsd:inventoryAtStorageLocation", "0", ns)
             ),
             "minimum_inventory": float(
-                rec_el.findtext(f"{{{ns}}}minimumInventory") or 0
+                rec_el.findtext("xsd:minimumInventory", "0", ns)
             ),
         })
     return results
