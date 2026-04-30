@@ -14,7 +14,11 @@ from hanel_warehouse_gateway.exceptions import (
     HanelGatewaySoapFaultError,
     HanelGatewayValidationError,
 )
-from hanel_warehouse_gateway.models import MovementLine, MovementLineResult, MovementResult
+from hanel_warehouse_gateway.models import (
+    MovementLine,
+    MovementLineResult,
+    MovementResult,
+)
 from hanel_warehouse_gateway.operations import SoapOperations
 from hanel_warehouse_gateway.transport import SoapTransport
 
