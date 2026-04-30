@@ -23,8 +23,11 @@ tests/
 ├── test_transport.py
 └── test_operations.py
 docs/
+├── index.md         ← quick start for integrators (MkDocs home)
 ├── requirements.md  ← full technical specification (read before implementing)
-└── adr/             ← Architecture Decision Records (001–013)
+├── scripts.md       ← CLI tool and e2e testing guide
+├── api/             ← API reference pages (rendered via mkdocstrings)
+└── adr/             ← Architecture Decision Records (001–014)
 ```
 
 ## Development commands
@@ -47,6 +50,12 @@ uv run mypy src/hanel_warehouse_gateway/
 
 # Lint
 uv run ruff check src/ tests/
+
+# Serve documentation locally (http://127.0.0.1:8000)
+uv run mkdocs serve
+
+# Build static documentation (output in site/)
+uv run mkdocs build
 ```
 
 ## Configuration (main parameters)
@@ -112,6 +121,7 @@ Static parameters with defaults (can be passed as overrides):
 | [011](docs/adr/011-claude-commands.md) | Slash commands in `.claude/commands/` |
 | [012](docs/adr/012-development-workflow.md) | Workflow for common changes |
 | [013](docs/adr/013-uv-package-manager.md) | `uv` as official package manager |
+| [014](docs/adr/014-documentation-toolchain.md) | MkDocs + mkdocstrings for API docs |
 
 ## Available slash commands
 
