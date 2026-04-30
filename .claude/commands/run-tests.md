@@ -1,14 +1,14 @@
-# /run-tests — Esegui la suite di test con coverage
+# /run-tests — Run the test suite with coverage
 
-Esegue i test del modulo `hanel_warehouse_gateway` e mostra un report di coverage.
+Runs the `hanel_warehouse_gateway` module tests and shows a coverage report.
 
-## Utilizzo
+## Usage
 
 ```
 /run-tests
 ```
 
-Oppure per un modulo specifico:
+Or for a specific module:
 
 ```
 /run-tests transport
@@ -16,41 +16,41 @@ Oppure per un modulo specifico:
 
 ## Workflow
 
-### Step 1 — Verifica prerequisiti
+### Step 1 — Check prerequisites
 
-Controlla che:
-- Il package sia installato in editable mode (`pip show hanel-warehouse-gateway`)
-- `pytest`, `pytest-cov` e `responses` siano installati
+Verify that:
+- The package is installed in editable mode (`pip show hanel-warehouse-gateway`)
+- `pytest`, `pytest-cov` and `responses` are installed
 
-Se mancano: suggerisce `pip install -e ".[dev]"`.
+If missing: suggest `pip install -e ".[dev]"`.
 
-### Step 2 — Esecuzione test
+### Step 2 — Run tests
 
 ```bash
 pytest tests/ --tb=short -q --cov=src/hanel_warehouse_gateway --cov-report=term-missing
 ```
 
-Per un modulo specifico (es. `transport`):
+For a specific module (e.g. `transport`):
 
 ```bash
 pytest tests/test_transport.py --tb=short -v --cov=src/hanel_warehouse_gateway/transport --cov-report=term-missing
 ```
 
-### Step 3 — Analisi risultati
+### Step 3 — Analyse results
 
-Mostra:
-- Numero test: passati / falliti / skippati
-- Coverage per file (con righe non coperte)
-- Coverage totale vs soglia (80%)
+Show:
+- Test count: passed / failed / skipped
+- Coverage per file (with uncovered lines)
+- Total coverage vs threshold (80%)
 
 ### Step 4 — Triage failures
 
-Per ogni test fallito:
-- Mostra il nome del test e il motivo del fallimento
-- Identifica se è un regression test o un test nuovo
-- Suggerisce dove guardare per la correzione
+For each failing test:
+- Show the test name and reason for failure
+- Identify whether it is a regression test or a new test
+- Suggest where to look for the fix
 
-### Step 5 — Report finale
+### Step 5 — Final report
 
 ```
 ## Test Results — <timestamp>
@@ -61,18 +61,18 @@ Coverage:
   config.py          95%
   exceptions.py      100%
   models.py          100%
-  _xml.py            87%   ← righe 45-48, 92
-  transport.py       78%   ← righe 112-120 (retry path)
+  _xml.py            87%   ← lines 45-48, 92
+  transport.py       78%   ← lines 112-120 (retry path)
   operations.py      82%
   gateway.py         90%
-  TOTALE:            88%   ✅ (soglia: 80%)
+  TOTAL:             88%   ✅ (threshold: 80%)
 
 Failures:
-  [lista test falliti con contesto]
+  [list of failing tests with context]
 ```
 
-## Note
+## Notes
 
-- La soglia minima di coverage è 80% (configurata in `pyproject.toml`)
-- I test non devono richiedere connettività al t-Server
-- Se un test fallisce per motivi ambientali (dipendenza mancante), segnalarlo separatamente dai failure reali
+- The minimum coverage threshold is 80% (configured in `pyproject.toml`)
+- Tests must not require connectivity to the t-Server
+- If a test fails for environmental reasons (missing dependency), report it separately from real failures

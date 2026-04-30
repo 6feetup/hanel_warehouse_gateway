@@ -1,39 +1,39 @@
-# ADR-003 — Gestione configurazione
+# ADR-003 — Configuration management
 
-**Status:** Accettato
+**Status:** Accepted
 
-## Contesto
+## Context
 
-Il modulo deve essere configurabile senza modifiche al codice. L'interfaccia pubblica accetta un `dict` come da §2 dei requisiti. Internamente è necessario validare e normalizzare i parametri in modo robusto.
+The module must be configurable without code changes. The public interface accepts a `dict` as per §2 of the requirements. Internally, parameters must be validated and normalised robustly.
 
-## Classificazione dei parametri
+## Parameter classification
 
-I parametri sono divisi in tre categorie con origine distinta:
+Parameters are divided into three categories with distinct origins:
 
-| Categoria | Parametri | Origine |
+| Category | Parameters | Origin |
 |---|---|---|
-| **Volatili / ambiente** | `endpoint_url`, `test_mode`, `test_prefix` | Variabile d'ambiente (`.env`) |
-| **Secret** | *(credenziali future, es. API key, password)* | Variabile d'ambiente (`.env`) |
-| **Statici / strutturali** | tutti gli altri | Dict passato dal chiamante o valori di default |
+| **Volatile / environment** | `endpoint_url`, `test_mode`, `test_prefix` | Environment variable (`.env`) |
+| **Secrets** | *(future credentials, e.g. API key, password)* | Environment variable (`.env`) |
+| **Static / structural** | all others | Dict passed by the caller or default values |
 
-I parametri volatili e i secret non devono mai essere hardcoded nel codice sorgente o in file committati. Vengono letti da variabili d'ambiente, che in sviluppo sono caricate da un file `.env` (non committato).
+Volatile parameters and secrets must never be hardcoded in source code or committed files. They are read from environment variables, which in development are loaded from a `.env` file (not committed).
 
-## Opzioni valutate
+## Options evaluated
 
-| Opzione | Pro | Contro |
+| Option | Pros | Cons |
 |---|---|---|
-| Plain `dict` | Zero overhead | Nessuna validazione, nessun type checking, errori silenziosi |
-| `pydantic.BaseModel` | Validazione potente, coercizione tipi, errori chiari | Dipendenza esterna non necessaria |
-| `dataclasses` stdlib + `__post_init__` | Validazione esplicita, zero dipendenze, type hints nativi | Coercizione manuale dei tipi |
-| `TypedDict` | Type hints senza overhead runtime | Nessuna validazione runtime |
+| Plain `dict` | Zero overhead | No validation, no type checking, silent errors |
+| `pydantic.BaseModel` | Powerful validation, type coercion, clear errors | Unnecessary external dependency |
+| `dataclasses` stdlib + `__post_init__` | Explicit validation, zero dependencies, native type hints | Manual type coercion |
+| `TypedDict` | Type hints without runtime overhead | No runtime validation |
 
-## Decisione
+## Decision
 
-Adottiamo un **`@dataclass` `GatewayConfig`** (stdlib) con validazione in `__post_init__`. L'interfaccia pubblica `HanelWarehouseGateway(config: dict)` converte il dict in `GatewayConfig` all'inizializzazione.
+We adopt a **`@dataclass` `GatewayConfig`** (stdlib) with validation in `__post_init__`. The public interface `HanelWarehouseGateway(config: dict)` converts the dict into a `GatewayConfig` at initialisation.
 
-I parametri volatili e i secret vengono letti da variabili d'ambiente tramite **`python-dotenv`**, che carica automaticamente il file `.env` alla radice del progetto se presente. `python-dotenv` è l'unica dipendenza esterna aggiuntiva consentita oltre a `requests`.
+Volatile parameters and secrets are read from environment variables via **`python-dotenv`**, which automatically loads the `.env` file at the project root if present. `python-dotenv` is the only additional external dependency permitted alongside `requests`.
 
-## Parametri
+## Parameters
 
 ```python
 @dataclass
@@ -48,59 +48,59 @@ class GatewayConfig:
     test_prefix: str = "TEST_"
     log_level: str = "INFO"
     log_soap_payloads: bool = False
-    validation_truncate: bool = False  # vedi ADR-008
+    validation_truncate: bool = False  # see ADR-008
 ```
 
-Il parametro `validation_truncate` è aggiunto rispetto ai requisiti originali (vedi ADR-008).
+The `validation_truncate` parameter is an addition to the original requirements (see ADR-008).
 
-## Comportamento di validazione
+## Validation behaviour
 
-`__post_init__` verifica:
-- `endpoint_url` non vuoto e inizia con `http://` o `https://`
+`__post_init__` verifies:
+- `endpoint_url` is non-empty and starts with `http://` or `https://`
 - `timeout_seconds` > 0
 - `retry_attempts` >= 1
 - `retry_delay_seconds` >= 0
-- `log_level` è uno tra `DEBUG`, `INFO`, `WARNING`, `ERROR`
+- `log_level` is one of `DEBUG`, `INFO`, `WARNING`, `ERROR`
 
-Gli errori di configurazione sollevano `ValueError` con messaggio esplicito (non `HanelGatewayValidationError`, che è riservato alla validazione dei dati di business pre-invio).
+Configuration errors raise `ValueError` with an explicit message (not `HanelGatewayValidationError`, which is reserved for business data validation before sending).
 
-## File .env
+## .env file
 
-In sviluppo, i parametri volatili e i secret sono definiti in un file `.env` alla radice del progetto:
+In development, volatile parameters and secrets are defined in a `.env` file at the project root:
 
 ```dotenv
-# .env — NON committare questo file
+# .env — DO NOT commit this file
 HANEL_ENDPOINT_URL=http://192.168.1.100:8080/HanelService
 HANEL_TEST_MODE=false
 HANEL_TEST_PREFIX=TEST_
-# Esempio secret futuro:
+# Future secret example:
 # HANEL_API_KEY=...
 ```
 
-Il file `.env` **non deve essere committato**. Il repository include un `.env.example` committato con valori placeholder come riferimento:
+The `.env` file **must not be committed**. The repository includes a committed `.env.example` with placeholder values as a reference:
 
 ```dotenv
-# .env.example — copia in .env e compila con i valori reali
+# .env.example — copy to .env and fill in the real values
 HANEL_ENDPOINT_URL=http://<host>:<port>/HanelService
 HANEL_TEST_MODE=false
 HANEL_TEST_PREFIX=TEST_
 ```
 
-Il `.gitignore` deve contenere la riga `.env`.
+`.gitignore` must contain the line `.env`.
 
-## Costruzione da variabili d'ambiente + dict
+## Construction from environment variables + dict
 
-`GatewayConfig` offre un factory method `from_env()` che:
-1. Carica il file `.env` tramite `python-dotenv` (se presente)
-2. Legge le variabili d'ambiente con prefisso `HANEL_`
-3. Accetta un dict opzionale per i parametri statici (override o valori aggiuntivi)
-4. I valori del dict hanno precedenza sulle variabili d'ambiente
+`GatewayConfig` provides a factory method `from_env()` that:
+1. Loads the `.env` file via `python-dotenv` (if present)
+2. Reads environment variables with the `HANEL_` prefix
+3. Accepts an optional dict for static parameters (overrides or additional values)
+4. Dict values take precedence over environment variables
 
 ```python
 @classmethod
 def from_env(cls, overrides: dict | None = None) -> "GatewayConfig":
     from dotenv import load_dotenv
-    load_dotenv()  # no-op se .env non esiste
+    load_dotenv()  # no-op if .env does not exist
     env_values = {
         "endpoint_url": os.getenv("HANEL_ENDPOINT_URL"),
         "test_mode": os.getenv("HANEL_TEST_MODE", "false").lower() == "true",
@@ -118,29 +118,29 @@ def from_dict(cls, d: dict) -> "GatewayConfig":
     return cls(**filtered)
 ```
 
-Le chiavi sconosciute vengono ignorate con un log `WARNING`, per consentire forward compatibility se il chiamante passa parametri aggiuntivi.
+Unknown keys are silently ignored with a `WARNING` log, to allow forward compatibility if the caller passes additional parameters.
 
-## Uso tipico
+## Typical usage
 
 ```python
-# Sviluppo: legge da .env
+# Development: reads from .env
 client = HanelWarehouseGateway(GatewayConfig.from_env())
 
-# Produzione: variabili d'ambiente iniettate dall'orchestratore (Docker, k8s…)
+# Production: environment variables injected by the orchestrator (Docker, k8s…)
 client = HanelWarehouseGateway(GatewayConfig.from_env())
 
-# Test: override esplicito senza .env
+# Tests: explicit override without .env
 client = HanelWarehouseGateway(GatewayConfig.from_env({
     "endpoint_url": "http://mock-server/",
     "test_mode": True,
 }))
 ```
 
-## Conseguenze
+## Consequences
 
-- `endpoint_url`, `test_mode`, `test_prefix` non compaiono mai in file committati
-- I secret futuri seguono lo stesso pattern senza modifiche architetturali
-- `python-dotenv` è la seconda (e ultima) dipendenza esterna di produzione consentita
-- Aggiungere un parametro volatile richiede: aggiungere la variabile d'ambiente in `.env.example`, aggiornare `from_env()`, aggiornare questo ADR e `CLAUDE.md`
-- Errori di configurazione emergono all'inizializzazione, non al primo utilizzo
-- Il codice interno usa sempre `GatewayConfig` tipizzato, mai dict raw
+- `endpoint_url`, `test_mode`, `test_prefix` never appear in committed files
+- Future secrets follow the same pattern without architectural changes
+- `python-dotenv` is the second (and last) permitted production external dependency
+- Adding a volatile parameter requires: adding the environment variable to `.env.example`, updating `from_env()`, updating this ADR and `CLAUDE.md`
+- Configuration errors surface at initialisation, not at first use
+- Internal code always uses the typed `GatewayConfig`, never a raw dict

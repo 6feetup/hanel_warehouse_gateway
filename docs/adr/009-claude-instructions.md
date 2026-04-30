@@ -1,33 +1,33 @@
-# ADR-009 — CLAUDE.md: istruzioni operative per agenti Claude
+# ADR-009 — CLAUDE.md: operational instructions for Claude agents
 
-**Status:** Accettato
+**Status:** Accepted
 
-## Contesto
+## Context
 
-Più agenti Claude Code possono lavorare su questo repository in sessioni diverse. Senza un file `CLAUDE.md` alla radice, ogni agente deve ricavare il contesto da zero esplorando i file. Un `CLAUDE.md` ben strutturato riduce l'esplorazione iniziale e previene errori ricorrenti.
+Multiple Claude Code agents may work on this repository across different sessions. Without a `CLAUDE.md` file at the root, each agent must derive context from scratch by exploring files. A well-structured `CLAUDE.md` reduces initial exploration and prevents recurring mistakes.
 
-## Decisione
+## Decision
 
-Creare `CLAUDE.md` alla radice del repository con le informazioni operative essenziali per agenti Claude che lavorano su questo progetto.
+Create `CLAUDE.md` at the repository root with the essential operational information for Claude agents working on this project.
 
-## Contenuto obbligatorio di CLAUDE.md
+## Required content of CLAUDE.md
 
-1. **Descrizione** — scopo del modulo in 2-3 righe
-2. **Struttura directory** — responsabilità di ogni file (derivata da ADR-001)
-3. **Comandi di sviluppo** — install, test, lint, type check
-4. **Vincoli critici** — regole che non devono essere violate senza un nuovo ADR
-5. **Riferimenti ADR** — link agli ADR principali con una riga di descrizione ciascuno
+1. **Description** — module purpose in 2-3 lines
+2. **Directory structure** — responsibility of each file (derived from ADR-001)
+3. **Development commands** — install, test, lint, type check
+4. **Critical constraints** — rules that must not be violated without a new ADR
+5. **ADR references** — links to the key ADRs with a one-line description each
 
-## Vincoli critici da includere
+## Critical constraints to include
 
-- Non aggiungere dipendenze esterne senza un ADR (zeep, lxml, pydantic, structlog sono esplicitamente escluse)
-- Non modificare l'interfaccia pubblica di `HanelWarehouseGateway` senza un ADR
-- Non aggiungere handler al logger (libreria: NullHandler only)
-- I template XML vivono in `_xml.py` — non dispersi in altri file
-- `__init__.py` espone solo: `HanelWarehouseGateway`, i dataclass pubblici, le eccezioni
+- Do not add external dependencies without an ADR (zeep, lxml, pydantic, structlog are explicitly excluded)
+- Do not modify the public interface of `HanelWarehouseGateway` without an ADR
+- Do not add handlers to the logger (library: NullHandler only)
+- XML templates live in `_xml.py` — not scattered across other files
+- `__init__.py` exposes only: `HanelWarehouseGateway`, the public dataclasses, the exceptions
 
-## Conseguenze
+## Consequences
 
-- Gli agenti Claude hanno istruzioni operative chiare senza dover leggere tutti gli ADR
-- I vincoli critici prevengono derive architetturali nelle sessioni automatizzate
-- `CLAUDE.md` deve essere aggiornato quando cambia struttura, comandi, o vincoli
+- Claude agents have clear operational instructions without having to read all ADRs
+- Critical constraints prevent architectural drift in automated sessions
+- `CLAUDE.md` must be updated whenever structure, commands, or constraints change

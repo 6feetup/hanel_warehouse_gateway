@@ -1,6 +1,6 @@
 """Layer 1 — SOAP Transport.
 
-Esegue HTTP POST con retry su errori di rete. Non interpreta il contenuto XML.
+Performs HTTP POST with retry on network errors. Does not interpret XML content.
 """
 
 from __future__ import annotations
@@ -13,27 +13,27 @@ logger = logging.getLogger(__name__)
 
 
 class SoapTransport:
-    """Client HTTP per le chiamate SOAP al t-Server Hanel.
+    """HTTP client for SOAP calls to the Hanel t-Server.
 
-    Gestisce retry automatici su errori di rete. Non esegue retry su
-    errori HTTP (4xx/5xx) o fault SOAP.
+    Handles automatic retries on network errors. Does not retry on
+    HTTP errors (4xx/5xx) or SOAP faults.
     """
 
     def __init__(self, config: GatewayConfig) -> None:
         self._config = config
 
     def post(self, envelope: str, operation: str) -> str:
-        """Esegue un HTTP POST con l'envelope SOAP fornito.
+        """Perform an HTTP POST with the provided SOAP envelope.
 
         Args:
-            envelope: Stringa XML dell'envelope SOAP da inviare.
-            operation: Nome dell'operazione SOAP (usato in log ed eccezioni).
+            envelope: XML string of the SOAP envelope to send.
+            operation: SOAP operation name (used in logs and exceptions).
 
         Returns:
-            Stringa XML della risposta HTTP (body grezzo).
+            XML string of the raw HTTP response body.
 
         Raises:
-            HanelGatewayNetworkError: Se tutti i tentativi di retry falliscono.
-            HanelGatewayHttpError: Se la risposta ha status code non 2xx.
+            HanelGatewayNetworkError: If all retry attempts are exhausted.
+            HanelGatewayHttpError: If the response has a non-2xx status code.
         """
         raise NotImplementedError

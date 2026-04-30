@@ -1,14 +1,14 @@
-# /check-adr — Verifica coerenza ADR vs codice
+# /check-adr — Verify ADR consistency vs code
 
-Esegue un audit di coerenza tra le decisioni architetturali documentate in `docs/adr/` e il codice attuale in `src/`.
+Runs a consistency audit between the architectural decisions documented in `docs/adr/` and the current code in `src/`.
 
-## Utilizzo
+## Usage
 
 ```
 /check-adr
 ```
 
-Oppure per un ADR specifico:
+Or for a specific ADR:
 
 ```
 /check-adr 002
@@ -16,43 +16,43 @@ Oppure per un ADR specifico:
 
 ## Workflow
 
-### Step 1 — Lettura ADR
+### Step 1 — Read ADRs
 
-Leggi tutti i file in `docs/adr/` (o solo quello specificato).
+Read all files in `docs/adr/` (or only the one specified).
 
-### Step 2 — Lettura codice
+### Step 2 — Read code
 
-Per ogni ADR, leggi i file sorgente rilevanti:
+For each ADR, read the relevant source files:
 
-| ADR | File da leggere |
-|-----|-----------------|
-| 001 | `pyproject.toml`, struttura directory |
-| 002 | `transport.py`, `pyproject.toml` (dipendenze) |
+| ADR | Files to read |
+|-----|---------------|
+| 001 | `pyproject.toml`, directory structure |
+| 002 | `transport.py`, `pyproject.toml` (dependencies) |
 | 003 | `config.py`, `gateway.py` |
 | 004 | `_xml.py` |
 | 005 | `exceptions.py`, `transport.py` |
-| 006 | `__init__.py`, tutti i file (cerca `print()`, `addHandler`) |
-| 007 | `tests/` (cerca `requests.post` non mockato) |
-| 008 | `operations.py` (cerca validazione lunghezza) |
+| 006 | `__init__.py`, all files (search for `print()`, `addHandler`) |
+| 007 | `tests/` (search for unmocked `requests.post`) |
+| 008 | `operations.py` (search for length validation) |
 
-### Step 3 — Classificazione
+### Step 3 — Classification
 
-Per ogni punto verificato:
-- ✅ **Allineato** — il codice rispecchia la decisione
-- ⚠️ **Deriva** — divergenza rilevata, potenzialmente giustificata
-- ❌ **Contraddizione** — violazione esplicita della decisione
+For each verified point:
+- ✅ **Aligned** — the code reflects the decision
+- ⚠️ **Drift** — deviation detected, potentially justified
+- ❌ **Contradiction** — explicit violation of the decision
 
 ### Step 4 — Report
 
-Produce il report strutturato (vedi formato nell'agente `adr-reviewer`).
+Produce the structured report (see format in the `adr-reviewer` agent).
 
-### Step 5 — Suggerimenti
+### Step 5 — Suggestions
 
-Per ogni deriva o contraddizione, propone:
-- Se il codice è corretto e l'ADR è obsoleto → suggerisce aggiornamento ADR
-- Se il codice diverge senza giustificazione → suggerisce correzione del codice
+For each drift or contradiction, propose:
+- If the code is correct and the ADR is outdated → suggest updating the ADR
+- If the code deviates without justification → suggest fixing the code
 
-## Note
+## Notes
 
-- Questo comando è read-only: non modifica file
-- Per modifiche usa `/new-operation` o agisci manualmente seguendo ADR-012
+- This command is read-only: it does not modify files
+- For changes use `/new-operation` or act manually following ADR-012

@@ -1,9 +1,9 @@
-"""hanel_warehouse_gateway — Gateway Python per il magazzino automatico Hanel.
+"""hanel_warehouse_gateway — Python gateway for the Hanel automatic warehouse.
 
-Espone esclusivamente l'interfaccia pubblica: classe principale, dataclass
-pubblici e gerarchia di eccezioni.
+Exposes only the public interface: main class, public dataclasses,
+and exception hierarchy.
 
-Uso tipico:
+Typical usage:
     from hanel_warehouse_gateway import HanelWarehouseGateway, GatewayConfig
 
     config = GatewayConfig.from_env()

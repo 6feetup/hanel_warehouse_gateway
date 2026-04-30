@@ -1,41 +1,41 @@
-# ADR-001 — Packaging e struttura del modulo Python
+# ADR-001 — Python module packaging and structure
 
-**Status:** Accettato
+**Status:** Accepted
 
-## Contesto
+## Context
 
-Il progetto è un modulo Python autonomo che espone un'interfaccia per comunicare con il magazzino automatico Hanel via SOAP. Prima di scrivere codice è necessario stabilire la struttura di packaging e la disposizione dei file sorgente.
+The project is a standalone Python module that exposes an interface for communicating with the Hanel automatic warehouse via SOAP. Before writing code, the packaging structure and source file layout must be established.
 
-## Opzioni valutate
+## Options evaluated
 
-| Opzione | Pro | Contro |
+| Option | Pros | Cons |
 |---|---|---|
-| `setup.py` legacy | Familiare, universalmente supportato | Deprecato, non standard PEP 621 |
-| `setup.cfg` | Separazione config da codice | Semi-legacy, soppiantato da pyproject.toml |
-| `pyproject.toml` (PEP 517/621) | Standard moderno, supportato da pip/build/hatch/uv | Nessuno rilevante |
+| `setup.py` legacy | Familiar, universally supported | Deprecated, not PEP 621 standard |
+| `setup.cfg` | Separation of config from code | Semi-legacy, superseded by pyproject.toml |
+| `pyproject.toml` (PEP 517/621) | Modern standard, supported by pip/build/hatch/uv | None relevant |
 
-## Decisione
+## Decision
 
-Adottiamo **`pyproject.toml`** con layout `src/` (PEP 517/621).
+We adopt **`pyproject.toml`** with a `src/` layout (PEP 517/621).
 
-Il layout `src/` evita che il package sia importabile direttamente dalla radice del progetto durante lo sviluppo, forzando l'installazione in editable mode (`pip install -e .`) e riducendo i falsi positivi nei test.
+The `src/` layout prevents the package from being importable directly from the project root during development, enforcing installation in editable mode (`pip install -e .`) and reducing false positives in tests.
 
-## Struttura directory
+## Directory structure
 
 ```
-hanel_warehouse_gateway/           ← radice del repository
+hanel_warehouse_gateway/           ← repository root
 ├── src/
 │   └── hanel_warehouse_gateway/
-│       ├── __init__.py            ← espone solo HanelWarehouseGateway e i dataclass pubblici
-│       ├── gateway.py             ← Layer 3: HanelWarehouseGateway (interfaccia pubblica)
-│       ├── operations.py          ← Layer 2: mapping operazioni SOAP
-│       ├── transport.py           ← Layer 1: client HTTP/SOAP, retry, timeout
-│       ├── models.py              ← dataclass: MovementLine, MovementResult, StockRecord…
-│       ├── exceptions.py          ← gerarchia HanelGatewayError
-│       ├── config.py              ← GatewayConfig dataclass + validazione
-│       └── _xml.py                ← helper privato: costruzione envelope + parsing risposta
+│       ├── __init__.py            ← exposes only HanelWarehouseGateway and public dataclasses
+│       ├── gateway.py             ← Layer 3: HanelWarehouseGateway (public interface)
+│       ├── operations.py          ← Layer 2: SOAP operation mapping
+│       ├── transport.py           ← Layer 1: HTTP/SOAP client, retry, timeout
+│       ├── models.py              ← dataclasses: MovementLine, MovementResult, StockRecord…
+│       ├── exceptions.py          ← HanelGatewayError hierarchy
+│       ├── config.py              ← GatewayConfig dataclass + validation
+│       └── _xml.py                ← private helper: envelope construction + response parsing
 ├── tests/
-│   ├── fixtures/                  ← XML di risposta per i test
+│   ├── fixtures/                  ← XML response files for tests
 │   ├── test_config.py
 │   ├── test_exceptions.py
 │   ├── test_models.py
@@ -52,20 +52,20 @@ hanel_warehouse_gateway/           ← radice del repository
     └── commands/
 ```
 
-## Responsabilità dei file
+## File responsibilities
 
-| File | Responsabilità |
+| File | Responsibility |
 |---|---|
-| `gateway.py` | Unico punto di contatto per il chiamante; delega a `operations.py` |
-| `operations.py` | Costruisce la chiamata SOAP specifica, deserializza la risposta |
-| `transport.py` | Esegue HTTP POST, gestisce retry e timeout, logga payload |
-| `models.py` | Definisce tutti i dataclass pubblici e interni |
-| `exceptions.py` | Definisce la gerarchia di eccezioni |
-| `config.py` | Valida e normalizza la configurazione in ingresso |
-| `_xml.py` | Template f-string degli envelope + funzioni di parsing ElementTree |
+| `gateway.py` | Single point of contact for the caller; delegates to `operations.py` |
+| `operations.py` | Builds the specific SOAP call, deserialises the response |
+| `transport.py` | Executes HTTP POST, handles retry and timeout, logs payloads |
+| `models.py` | Defines all public and internal dataclasses |
+| `exceptions.py` | Defines the exception hierarchy |
+| `config.py` | Validates and normalises incoming configuration |
+| `_xml.py` | f-string envelope templates + ElementTree parsing functions |
 
-## Conseguenze
+## Consequences
 
-- Installazione in editable mode richiesta per sviluppo: `pip install -e ".[dev]"`
-- Il package è importabile solo dopo installazione, non direttamente da `src/`
-- `__init__.py` espone esclusivamente `HanelWarehouseGateway`, i dataclass pubblici e le eccezioni — niente di `_xml.py` o dei layer interni
+- Editable mode installation required for development: `pip install -e ".[dev]"`
+- The package is importable only after installation, not directly from `src/`
+- `__init__.py` exposes exclusively `HanelWarehouseGateway`, the public dataclasses, and the exceptions — nothing from `_xml.py` or the internal layers

@@ -1,49 +1,49 @@
-# /soap-fixture — Genera fixture XML per operazioni SOAP
+# /soap-fixture — Generate XML fixtures for SOAP operations
 
-Genera file XML di risposta plausibili da usare come fixture nei test del modulo `hanel_warehouse_gateway`.
+Generates plausible XML response files to use as fixtures in the `hanel_warehouse_gateway` module tests.
 
-## Utilizzo
+## Usage
 
 ```
 /soap-fixture <operation_name>
 ```
 
-Esempio: `/soap-fixture sendJobsReqV01`
+Example: `/soap-fixture sendJobsReqV01`
 
-Oppure senza argomenti per scegliere interattivamente.
+Or without arguments to choose interactively.
 
-## Operazioni supportate
+## Supported operations
 
-| Operazione SOAP | Metodo Python | Fixture da generare |
-|-----------------|---------------|---------------------|
+| SOAP operation | Python method | Fixtures to generate |
+|----------------|---------------|----------------------|
 | `sendAPDReqV01` | `register_article` | ok, error |
 | `sendJobsReqV01` | `send_movement_order` | ok, error |
-| `readAllJobsReqV01` (mode=0) | `get_all_orders` | ok con più ordini, vuoto |
-| `readAllJobsReqV01` (mode=1) | `get_completed_movements` | ok con più ordini completati, vuoto |
-| `readAllAMDReqV01` | `get_inventory` | ok con più record, vuoto |
+| `readAllJobsReqV01` (mode=0) | `get_all_orders` | ok with multiple orders, empty |
+| `readAllJobsReqV01` (mode=1) | `get_completed_movements` | ok with multiple completed orders, empty |
+| `readAllAMDReqV01` | `get_inventory` | ok with multiple records, empty |
 | `deleteJobReqV01` | `cancel_order` | ok, error |
 
 ## Workflow
 
-### Step 1 — Lettura requisiti
+### Step 1 — Read requirements
 
-Leggi la sezione corrispondente in `docs/requirements.md` per la struttura della risposta attesa.
+Read the corresponding section in `docs/requirements.md` for the expected response structure.
 
-### Step 2 — Generazione fixture
+### Step 2 — Generate fixtures
 
-Per ogni operazione, genera **tre fixture**:
+For each operation, generate **three fixtures**:
 
-1. **`response_<op>_ok.xml`** — risposta happy path con `returnValue` = 0 e dati plausibili
-2. **`response_<op>_error.xml`** — risposta con `returnValue` != 0 (es. 1 o -1) e messaggio di errore
-3. **`response_soap_fault.xml`** — se non esiste già, genera una volta sola
+1. **`response_<op>_ok.xml`** — happy path response with `returnValue` = 0 and plausible data
+2. **`response_<op>_error.xml`** — response with `returnValue` != 0 (e.g. 1 or -1) and error message
+3. **`response_soap_fault.xml`** — if it does not already exist, generate once only
 
-Per le operazioni che restituiscono liste (`readAllJobsReqV01`, `readAllAMDReqV01`):
-- Fixture ok con almeno 2 elementi
-- Fixture `_empty.xml` con lista vuota
+For operations that return lists (`readAllJobsReqV01`, `readAllAMDReqV01`):
+- Ok fixture with at least 2 elements
+- `_empty.xml` fixture with an empty list
 
-### Step 3 — Salvataggio
+### Step 3 — Save
 
-Salva le fixture in `tests/fixtures/` con naming:
+Save fixtures in `tests/fixtures/` with naming:
 - `response_send_apd_ok.xml`
 - `response_send_apd_error.xml`
 - `response_send_jobs_ok.xml`
@@ -56,13 +56,13 @@ Salva le fixture in `tests/fixtures/` con naming:
 - `response_delete_job_error.xml`
 - `response_soap_fault.xml`
 
-### Step 4 — Riepilogo
+### Step 4 — Summary
 
-Elenca i file creati e indica quali test possono usarli.
+List the files created and indicate which tests can use them.
 
-## Nota sui namespace
+## Namespace note
 
-Le fixture devono usare i namespace corretti:
+Fixtures must use the correct namespaces:
 - `xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"`
 - `xmlns:main="http://main.jws.com.hanel.de"`
 - `xmlns:xsd="http://main.jws.com.hanel.de/xsd"`

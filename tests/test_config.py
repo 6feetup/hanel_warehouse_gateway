@@ -1,4 +1,4 @@
-"""Test per GatewayConfig di hanel_warehouse_gateway."""
+"""Tests for GatewayConfig of hanel_warehouse_gateway."""
 
 from __future__ import annotations
 

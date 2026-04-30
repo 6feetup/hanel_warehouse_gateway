@@ -1,47 +1,47 @@
-# ADR-005 — Gestione errori e strategia di retry
+# ADR-005 — Error handling and retry strategy
 
-**Status:** Accettato
+**Status:** Accepted
 
-## Contesto
+## Context
 
-Il modulo interagisce con un sistema esterno (t-Server Hanel) soggetto a errori di rete, errori HTTP, fault SOAP e codici applicativi di errore. La specifica §5 definisce la gerarchia di eccezioni e le regole di retry. Questo ADR formalizza le scelte implementative.
+The module interacts with an external system (Hanel t-Server) subject to network errors, HTTP errors, SOAP faults, and application-level error codes. Specification §5 defines the exception hierarchy and retry rules. This ADR formalises the implementation choices.
 
-## Decisione
+## Decision
 
-### Gerarchia di eccezioni
+### Exception hierarchy
 
 ```python
 class HanelGatewayError(Exception):
-    """Base exception. Tutti gli errori del modulo ereditano da questa."""
+    """Base exception. All module errors inherit from this."""
     def __init__(self, message: str, operation: str, detail: str, timestamp: str): ...
 
 class HanelGatewayNetworkError(HanelGatewayError):
-    """Errore di rete dopo esaurimento di tutti i tentativi di retry."""
+    """Network error after all retry attempts are exhausted."""
 
 class HanelGatewayHttpError(HanelGatewayError):
-    """Risposta HTTP con status code non 2xx. Nessun retry."""
+    """HTTP response with a non-2xx status code. No retry."""
     def __init__(self, …, http_status: int): ...
 
 class HanelGatewaySoapFaultError(HanelGatewayError):
-    """Fault SOAP presente nell'envelope di risposta. Nessun retry."""
+    """SOAP fault present in the response envelope. No retry."""
     def __init__(self, …, fault_string: str, fault_code: str): ...
 
 class HanelGatewayApplicationError(HanelGatewayError):
-    """returnValue != 0 nella risposta. Nessun retry."""
+    """returnValue != 0 in the response. No retry."""
     def __init__(self, …, return_value: int): ...
 
 class HanelGatewayValidationError(HanelGatewayError):
-    """Input non valido rilevato prima dell'invio. Nessuna chiamata HTTP."""
+    """Invalid input detected before sending. No HTTP call is made."""
     def __init__(self, …, field: str, value: str): ...
 ```
 
-Tutte le eccezioni includono: `message`, `operation`, `detail`, `timestamp` (ISO 8601).
+All exceptions include: `message`, `operation`, `detail`, `timestamp` (ISO 8601).
 
-### Strategia di retry
+### Retry strategy
 
-Il retry si applica **esclusivamente** agli errori di rete (`requests.ConnectionError`, `requests.Timeout`). Non si applica a errori HTTP, SOAP fault o errori applicativi.
+Retry applies **exclusively** to network errors (`requests.ConnectionError`, `requests.Timeout`). It does not apply to HTTP errors, SOAP faults, or application errors.
 
-Algoritmo implementato in `transport.py`:
+Algorithm implemented in `transport.py`:
 
 ```python
 for attempt in range(1, config.retry_attempts + 1):
@@ -51,27 +51,27 @@ for attempt in range(1, config.retry_attempts + 1):
     except (requests.ConnectionError, requests.Timeout) as exc:
         if attempt == config.retry_attempts:
             raise HanelGatewayNetworkError(…) from exc
-        logger.warning("Retry %d/%d per operazione %s: %s", attempt, config.retry_attempts, operation, exc)
+        logger.warning("Retry %d/%d for operation %s: %s", attempt, config.retry_attempts, operation, exc)
         time.sleep(config.retry_delay_seconds)
 ```
 
-### Classificazione errori HTTP
+### HTTP error classification
 
-Dopo una risposta HTTP ricevuta:
-- Status 200 → prosegue con parsing XML
-- Status 4xx/5xx → `HanelGatewayHttpError` immediato, nessun retry
+After an HTTP response is received:
+- Status 200 → proceeds with XML parsing
+- Status 4xx/5xx → immediate `HanelGatewayHttpError`, no retry
 
-### Rilevamento SOAP Fault
+### SOAP fault detection
 
-Il parsing XML verifica la presenza del tag `<soapenv:Fault>` prima di cercare il `returnValue`. Se presente: `HanelGatewaySoapFaultError`.
+XML parsing checks for the presence of the `<soapenv:Fault>` tag before looking for `returnValue`. If present: `HanelGatewaySoapFaultError`.
 
-### Codici applicativi
+### Application codes
 
-`returnValue == 0` → successo.
-`returnValue != 0` → `HanelGatewayApplicationError` con il valore raw e il messaggio di risposta. Il modulo non interpreta né mappa i codici di errore Hanel (la documentazione non li elenca; vedere §5.4 dei requisiti).
+`returnValue == 0` → success.
+`returnValue != 0` → `HanelGatewayApplicationError` with the raw value and the response message. The module does not interpret or map Hanel error codes (the documentation does not list them; see §5.4 of the requirements).
 
-## Conseguenze
+## Consequences
 
-- Il chiamante può intercettare `HanelGatewayError` per gestire tutti gli errori in modo uniforme, oppure le sottoclassi per gestione differenziata
-- La finestra di attesa massima è `retry_attempts * retry_delay_seconds` secondi
-- Il `returnValue` raw è sempre incluso nell'eccezione per facilitare la diagnosi futura
+- The caller can catch `HanelGatewayError` to handle all errors uniformly, or catch subclasses for differentiated handling
+- The maximum wait window is `retry_attempts * retry_delay_seconds` seconds
+- The raw `returnValue` is always included in the exception to facilitate future diagnosis
