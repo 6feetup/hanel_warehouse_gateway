@@ -130,12 +130,18 @@ class TestSendAPD:
 
 class TestSendJobs:
     def test_send_job_returns_0(self):
-        resp = send_jobs("JOB-TEST", [{"article_number": "ART-001", "operation": "+", "nominal_quantity": 5.0}])
+        lines = [
+            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 5.0}
+        ]
+        resp = send_jobs("JOB-TEST", lines)
         assert resp.status_code == 200
         assert get_return_value(resp.text) == 0
 
     def test_new_job_has_status_0(self):
-        send_jobs("JOB-TEST", [{"article_number": "ART-001", "operation": "+", "nominal_quantity": 5.0}])
+        lines = [
+            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 5.0}
+        ]
+        send_jobs("JOB-TEST", lines)
         state = requests.get(f"{BASE_URL}/admin/state").json()
         assert state["jobs"]["JOB-TEST"]["job_status"] == 0
 
@@ -170,22 +176,40 @@ class TestReadAllJobs:
         assert len(jobs) == 2
 
     def test_new_job_appears_in_mode_0(self):
-        send_jobs("JOB-NEW", [{"article_number": "ART-001", "operation": "+", "nominal_quantity": 1.0}])
+        lines = [
+            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 1.0}
+        ]
+        send_jobs("JOB-NEW", lines)
         root = ET.fromstring(read_jobs(0).text)
-        job_numbers = [j.findtext(f"{{{NS_XSD}}}jobNumber") for j in root.findall(f".//{{{NS_XSD}}}job")]
+        job_numbers = [
+            j.findtext(f"{{{NS_XSD}}}jobNumber")
+            for j in root.findall(f".//{{{NS_XSD}}}job")
+        ]
         assert "JOB-NEW" in job_numbers
 
     def test_new_job_not_in_mode_1(self):
-        send_jobs("JOB-NEW", [{"article_number": "ART-001", "operation": "+", "nominal_quantity": 1.0}])
+        lines = [
+            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 1.0}
+        ]
+        send_jobs("JOB-NEW", lines)
         root = ET.fromstring(read_jobs(1).text)
-        job_numbers = [j.findtext(f"{{{NS_XSD}}}jobNumber") for j in root.findall(f".//{{{NS_XSD}}}job")]
+        job_numbers = [
+            j.findtext(f"{{{NS_XSD}}}jobNumber")
+            for j in root.findall(f".//{{{NS_XSD}}}job")
+        ]
         assert "JOB-NEW" not in job_numbers
 
     def test_after_complete_all_appears_in_mode_1(self):
-        send_jobs("JOB-NEW", [{"article_number": "ART-001", "operation": "+", "nominal_quantity": 1.0}])
+        lines = [
+            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 1.0}
+        ]
+        send_jobs("JOB-NEW", lines)
         requests.post(f"{BASE_URL}/admin/complete-all")
         root = ET.fromstring(read_jobs(1).text)
-        job_numbers = [j.findtext(f"{{{NS_XSD}}}jobNumber") for j in root.findall(f".//{{{NS_XSD}}}job")]
+        job_numbers = [
+            j.findtext(f"{{{NS_XSD}}}jobNumber")
+            for j in root.findall(f".//{{{NS_XSD}}}job")
+        ]
         assert "JOB-NEW" in job_numbers
 
 
@@ -223,7 +247,10 @@ class TestDeleteJob:
     def test_deleted_job_no_longer_appears(self):
         delete_job("ORD-001")
         root = ET.fromstring(read_jobs(0).text)
-        job_numbers = [j.findtext(f"{{{NS_XSD}}}jobNumber") for j in root.findall(f".//{{{NS_XSD}}}job")]
+        job_numbers = [
+            j.findtext(f"{{{NS_XSD}}}jobNumber")
+            for j in root.findall(f".//{{{NS_XSD}}}job")
+        ]
         assert "ORD-001" not in job_numbers
 
     def test_delete_completed_job_returns_1(self):
@@ -260,7 +287,10 @@ class TestAdmin:
         assert len(state["articles"]) == 3
 
     def test_complete_all_completes_pending_jobs(self):
-        send_jobs("JOB-PEND", [{"article_number": "ART-001", "operation": "+", "nominal_quantity": 2.0}])
+        lines = [
+            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 2.0}
+        ]
+        send_jobs("JOB-PEND", lines)
         resp = requests.post(f"{BASE_URL}/admin/complete-all")
         assert resp.status_code == 200
         assert "JOB-PEND" in resp.json()["completed"]
