@@ -14,6 +14,7 @@ from hanel_warehouse_gateway.exceptions import (
     HanelGatewaySoapFaultError,
     HanelGatewayValidationError,
 )
+from hanel_warehouse_gateway.models import MovementLineResult, MovementResult
 from hanel_warehouse_gateway.operations import SoapOperations
 from hanel_warehouse_gateway.transport import SoapTransport
 
@@ -213,3 +214,59 @@ class TestCancelOrder:
         payload = responses_lib.calls[0].request.body.decode("utf-8")
         assert "X" * 40 in payload
         assert "X" * 41 not in payload
+
+
+class TestGetCompletedMovements:
+    def test_returns_list_of_movement_results(self) -> None:
+        xml = _fixture("read_jobs_response_mode1.xml")
+        ops, _ = _make_operations(xml)
+        results = ops.get_completed_movements()
+        assert isinstance(results, list)
+        assert all(isinstance(r, MovementResult) for r in results)
+
+    def test_returns_correct_number_of_results(self) -> None:
+        xml = _fixture("read_jobs_response_mode1.xml")
+        ops, _ = _make_operations(xml)
+        results = ops.get_completed_movements()
+        assert len(results) == 2
+
+    def test_envelope_contains_mode_1(self) -> None:
+        xml = _fixture("read_jobs_response_mode1.xml")
+        ops, transport = _make_operations(xml)
+        ops.get_completed_movements()
+        envelope, _ = transport.post.call_args[0]
+        assert "<xsd:mode>1</xsd:mode>" in envelope
+
+    def test_calls_read_all_jobs_operation(self) -> None:
+        xml = _fixture("read_jobs_response_mode1.xml")
+        ops, transport = _make_operations(xml)
+        ops.get_completed_movements()
+        _, operation = transport.post.call_args[0]
+        assert operation == "readAllJobsReqV01"
+
+    def test_maps_job_number(self) -> None:
+        xml = _fixture("read_jobs_response_mode1.xml")
+        ops, _ = _make_operations(xml)
+        results = ops.get_completed_movements()
+        assert results[0].job_number == "ORD-003"
+        assert results[1].job_number == "ORD-004"
+
+    def test_maps_positions_to_movement_line_results(self) -> None:
+        xml = _fixture("read_jobs_response_mode1.xml")
+        ops, _ = _make_operations(xml)
+        results = ops.get_completed_movements()
+        assert all(
+            isinstance(p, MovementLineResult) for r in results for p in r.positions
+        )
+
+    def test_maps_actual_quantity(self) -> None:
+        xml = _fixture("read_jobs_response_mode1.xml")
+        ops, _ = _make_operations(xml)
+        results = ops.get_completed_movements()
+        assert results[1].positions[0].actual_quantity == 15.0
+        assert results[1].positions[0].nominal_quantity == 40.0
+
+    def test_soap_fault_propagates(self) -> None:
+        ops, _ = _make_operations(_fixture("soap_fault.xml"))
+        with pytest.raises(HanelGatewaySoapFaultError):
+            ops.get_completed_movements()

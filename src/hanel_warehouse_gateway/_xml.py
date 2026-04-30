@@ -72,7 +72,20 @@ def build_read_jobs_envelope(
 
     mode=0: all orders, mode=1: completed only.
     """
-    raise NotImplementedError
+    return (
+        f'<soapenv:Envelope xmlns:soapenv="{_NS_SOAP}"'
+        f' xmlns:main="{namespace_main}"'
+        f' xmlns:xsd="{namespace_xsd}">'
+        f"<soapenv:Header/>"
+        f"<soapenv:Body>"
+        f"<main:readAllJobsReqV01>"
+        f"<main:param>"
+        f"<xsd:mode>{mode}</xsd:mode>"
+        f"</main:param>"
+        f"</main:readAllJobsReqV01>"
+        f"</soapenv:Body>"
+        f"</soapenv:Envelope>"
+    )
 
 
 def build_get_inventory_envelope(namespace_main: str) -> str:
@@ -142,9 +155,61 @@ def parse_return_value(xml_text: str, operation: str, namespace_xsd: str) -> int
     return int(el.text)
 
 
-def parse_movement_results(xml_text: str) -> list[dict[str, object]]:
+def parse_movement_results(
+    xml_text: str, operation: str, namespace_xsd: str
+) -> list[dict[str, object]]:
     """Extract the list of movement orders from a readAllJobsReqV01 response."""
-    raise NotImplementedError
+    try:
+        root = ET.fromstring(xml_text)
+    except ET.ParseError as exc:
+        raise HanelGatewayParseError(
+            message=f"Malformed XML in response for {operation}",
+            operation=operation,
+            detail=str(exc),
+            timestamp=datetime.datetime.utcnow().isoformat(),
+        ) from exc
+
+    fault = root.find(f".//{{{_NS_SOAP}}}Fault")
+    if fault is not None:
+        fault_code = fault.findtext("faultcode") or ""
+        fault_string = fault.findtext("faultstring") or ""
+        raise HanelGatewaySoapFaultError(
+            message=f"SOAP fault in {operation}: {fault_string}",
+            operation=operation,
+            detail=fault_string,
+            timestamp=datetime.datetime.utcnow().isoformat(),
+            fault_string=fault_string,
+            fault_code=fault_code,
+        )
+
+    ns = namespace_xsd
+    results = []
+    for job_el in root.findall(f".//{{{ns}}}job"):
+        positions = []
+        for pos_el in job_el.findall(f"{{{ns}}}JobPosition"):
+            positions.append({
+                "article_number": pos_el.findtext(f"{{{ns}}}articleNumber") or "",
+                "operation": pos_el.findtext(f"{{{ns}}}operation") or "",
+                "nominal_quantity": float(
+                    pos_el.findtext(f"{{{ns}}}nominalQuantity") or 0
+                ),
+                "actual_quantity": float(
+                    pos_el.findtext(f"{{{ns}}}actualQuantity") or 0
+                ),
+                "container_size": int(pos_el.findtext(f"{{{ns}}}containerSize") or 0),
+                "position_status": int(
+                    pos_el.findtext(f"{{{ns}}}positionStatus") or 0
+                ),
+            })
+        results.append({
+            "job_number": job_el.findtext(f"{{{ns}}}jobNumber") or "",
+            "job_priority": int(job_el.findtext(f"{{{ns}}}jobPriority") or 0),
+            "job_status": int(job_el.findtext(f"{{{ns}}}jobStatus") or 0),
+            "job_date": job_el.findtext(f"{{{ns}}}jobDate") or "",
+            "job_time": job_el.findtext(f"{{{ns}}}jobTime") or "",
+            "positions": positions,
+        })
+    return results
 
 
 def parse_stock_records(xml_text: str) -> list[dict[str, object]]:
