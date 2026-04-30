@@ -1,0 +1,48 @@
+site_name: Hanel Warehouse Gateway
+site_description: Python SOAP gateway for the Hanel automatic warehouse
+docs_dir: docs
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - content.code.copy
+  palette:
+    - scheme: default
+      primary: indigo
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            show_source: false
+            show_root_heading: true
+            show_root_full_path: false
+            docstring_style: google
+            members_order: source
+            show_signature_annotations: true
+            separate_signature: true
+
+nav:
+  - Home: index.md
+  - API Reference:
+    - Gateway: api/gateway.md
+    - Models: api/models.md
+    - Exceptions: api/exceptions.md
+    - Configuration: api/config.md
+  - Scripts & E2E Testing: scripts.md
+  - Architecture Decisions:
+    - ADR-001 Packaging: adr/001-packaging-structure.md
+    - ADR-002 SOAP Transport: adr/002-soap-transport.md
+    - ADR-003 Configuration: adr/003-configuration.md
+    - ADR-004 XML Construction: adr/004-xml-construction-parsing.md
+    - ADR-005 Error Handling: adr/005-error-handling-retry.md
+    - ADR-006 Logging: adr/006-logging.md
+    - ADR-007 Testing Strategy: adr/007-testing-strategy.md
+    - ADR-008 Input Validation: adr/008-input-validation.md
+    - ADR-014 Documentation: adr/014-documentation-toolchain.md
