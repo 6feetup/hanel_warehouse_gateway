@@ -57,7 +57,7 @@ class HanelWarehouseGateway:
         Returns:
             True if the operation succeeded (returnValue == 0).
         """
-        raise NotImplementedError
+        return self._operations.send_movement_order(order_number, positions)
 
     def get_completed_movements(self) -> list[MovementResult]:
         """Retrieve completed orders from the warehouse.

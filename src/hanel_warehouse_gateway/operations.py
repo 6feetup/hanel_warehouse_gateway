@@ -96,7 +96,91 @@ class SoapOperations:
         self, order_number: str, positions: list[MovementLine]
     ) -> bool:
         """Send a movement order to the warehouse (sendJobsReqV01)."""
-        raise NotImplementedError
+        operation = "sendJobsReqV01"
+
+        if not positions:
+            raise HanelGatewayValidationError(
+                message="positions list must not be empty",
+                operation=operation,
+                detail="at least one MovementLine is required",
+                timestamp=datetime.datetime.utcnow().isoformat(),
+                field="positions",
+                value="[]",
+            )
+
+        for i, pos in enumerate(positions):
+            if pos.operation not in ("+", "-"):
+                raise HanelGatewayValidationError(
+                    message=f"invalid operation in position {i}: {pos.operation!r}",
+                    operation=operation,
+                    detail="operation must be '+' (pick) or '-' (load)",
+                    timestamp=datetime.datetime.utcnow().isoformat(),
+                    field=f"positions[{i}].operation",
+                    value=str(pos.operation),
+                )
+            if pos.nominal_quantity <= 0:
+                raise HanelGatewayValidationError(
+                    message=f"nominal_quantity must be > 0 in position {i}",
+                    operation=operation,
+                    detail=f"got: {pos.nominal_quantity}",
+                    timestamp=datetime.datetime.utcnow().isoformat(),
+                    field=f"positions[{i}].nominal_quantity",
+                    value=str(pos.nominal_quantity),
+                )
+
+        if self._config.test_mode:
+            order_number = f"{self._config.test_prefix}{order_number}"
+
+        job_number = _validate_field_length(
+            order_number, "job_number", operation, self._config
+        )
+
+        positions_dicts: list[dict[str, object]] = []
+        for i, pos in enumerate(positions):
+            field_name = f"positions[{i}].article_number"
+            article_number = _validate_field_length(
+                pos.article_number, field_name, operation, self._config
+            )
+            positions_dicts.append({
+                "article_number": article_number,
+                "operation": pos.operation,
+                "nominal_quantity": pos.nominal_quantity,
+            })
+
+        logger.info(
+            "send_movement_order: initiating %s for job_number=%r with %d position(s)",
+            operation,
+            job_number,
+            len(positions),
+        )
+
+        envelope = _xml.build_send_movement_order_envelope(
+            job_number,
+            positions_dicts,
+            self._config.namespace_main,
+            self._config.namespace_xsd,
+        )
+
+        raw = self._transport.post(envelope, operation)
+
+        return_value = _xml.parse_return_value(
+            raw, operation, self._config.namespace_xsd
+        )
+        if return_value != 0:
+            raise HanelGatewayApplicationError(
+                message=f"{operation} returned error code {return_value}",
+                operation=operation,
+                detail=f"returnValue={return_value}",
+                timestamp=datetime.datetime.utcnow().isoformat(),
+                return_value=return_value,
+            )
+
+        logger.info(
+            "send_movement_order: %s succeeded for job_number=%r",
+            operation,
+            job_number,
+        )
+        return True
 
     def get_completed_movements(self) -> list[MovementResult]:
         """Retrieve completed orders (readAllJobsReqV01, mode=1)."""
