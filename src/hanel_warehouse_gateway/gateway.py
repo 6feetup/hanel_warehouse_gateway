@@ -65,7 +65,7 @@ class HanelWarehouseGateway:
         If actual_quantity < nominal_quantity in a line, stock was
         insufficient: handling is the caller's responsibility.
         """
-        raise NotImplementedError
+        return self._operations.get_completed_movements()
 
     def get_all_orders(self) -> list[MovementResult]:
         """Retrieve all orders currently in the warehouse queue."""

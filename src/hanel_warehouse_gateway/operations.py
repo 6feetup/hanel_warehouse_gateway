@@ -13,7 +13,7 @@ import logging
 from . import _xml
 from .config import GatewayConfig
 from .exceptions import HanelGatewayApplicationError, HanelGatewayValidationError
-from .models import MovementLine, MovementResult, StockRecord
+from .models import MovementLine, MovementLineResult, MovementResult, StockRecord
 from .transport import SoapTransport
 
 logger = logging.getLogger(__name__)
@@ -184,7 +184,35 @@ class SoapOperations:
 
     def get_completed_movements(self) -> list[MovementResult]:
         """Retrieve completed orders (readAllJobsReqV01, mode=1)."""
-        raise NotImplementedError
+        operation = "readAllJobsReqV01"
+        logger.info("get_completed_movements: initiating %s (mode=1)", operation)
+        envelope = _xml.build_read_jobs_envelope(
+            mode=1,
+            namespace_main=self._config.namespace_main,
+            namespace_xsd=self._config.namespace_xsd,
+        )
+        raw = self._transport.post(envelope, operation)
+        raw_jobs = _xml.parse_movement_results(
+            raw, operation, self._config.namespace_xsd
+        )
+        results = [
+            MovementResult(
+                job_number=str(job["job_number"]),
+                job_priority=int(job["job_priority"]),  # type: ignore[call-overload]
+                job_status=int(job["job_status"]),  # type: ignore[call-overload]
+                job_date=str(job["job_date"]),
+                job_time=str(job["job_time"]),
+                positions=[
+                    MovementLineResult(**pos)
+                    for pos in job["positions"]  # type: ignore[attr-defined]
+                ],
+            )
+            for job in raw_jobs
+        ]
+        logger.info(
+            "get_completed_movements: %s returned %d results", operation, len(results)
+        )
+        return results
 
     def get_all_orders(self) -> list[MovementResult]:
         """Retrieve all queued orders (readAllJobsReqV01, mode=0)."""
