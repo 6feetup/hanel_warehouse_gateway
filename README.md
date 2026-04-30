@@ -123,6 +123,35 @@ except HanelGatewayApplicationError as e:
     print(f"t-Server returned error code {e.return_value}")
 ```
 
+## Release process
+
+Releases are automated via [release-please](https://github.com/googleapis/release-please) and triggered by merging commits into `main`.
+
+### Commit convention
+
+All commits must follow the [Conventional Commits](https://www.conventionalcommits.org/) format. The commit type determines the version bump:
+
+| Prefix | Version bump | When to use |
+|---|---|---|
+| `fix:` | patch (0.1.0 → 0.1.1) | Bug fix |
+| `feat:` | minor (0.1.0 → 0.2.0) | New operation or feature |
+| `feat!:` or footer `BREAKING CHANGE:` | major (0.1.0 → 1.0.0) | Incompatible public API change |
+| `chore:`, `docs:`, `test:`, `refactor:`, `ci:` | none | Everything else |
+
+The `commitlint` CI check enforces this format on every PR.
+
+### How a release works
+
+1. Merge one or more conventional commits into `main`.
+2. The **Release Please** workflow opens (or updates) a "Release PR" automatically, with the computed version and a generated `CHANGELOG.md`.
+3. Review and optionally edit the changelog text in the PR.
+4. Merge the Release PR.
+5. Release Please creates the git tag and the GitHub Release; a second CI job builds the wheel and sdist and attaches them as release assets.
+
+### One-time repository setup
+
+In **Settings → Actions → General**, enable _"Allow GitHub Actions to create and approve pull requests"_ — required for Release Please to open its PR.
+
 ## Running tests
 
 ```bash
