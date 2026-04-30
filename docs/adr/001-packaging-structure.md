@@ -18,7 +18,7 @@ The project is a standalone Python module that exposes an interface for communic
 
 We adopt **`pyproject.toml`** with a `src/` layout (PEP 517/621).
 
-The `src/` layout prevents the package from being importable directly from the project root during development, enforcing installation in editable mode (`pip install -e .`) and reducing false positives in tests.
+The `src/` layout prevents the package from being importable directly from the project root during development, enforcing installation via `uv sync` and reducing false positives in tests.
 
 ## Directory structure
 
@@ -66,6 +66,6 @@ hanel_warehouse_gateway/           ← repository root
 
 ## Consequences
 
-- Editable mode installation required for development: `pip install -e ".[dev]"`
+- Editable mode installation required for development: `uv sync`
 - The package is importable only after installation, not directly from `src/`
 - `__init__.py` exposes exclusively `HanelWarehouseGateway`, the public dataclasses, and the exceptions — nothing from `_xml.py` or the internal layers

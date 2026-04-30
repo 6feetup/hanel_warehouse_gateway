@@ -19,21 +19,21 @@ Or for a specific module:
 ### Step 1 — Check prerequisites
 
 Verify that:
-- The package is installed in editable mode (`pip show hanel-warehouse-gateway`)
+- The package is installed in editable mode (`uv pip show hanel-warehouse-gateway`)
 - `pytest`, `pytest-cov` and `responses` are installed
 
-If missing: suggest `pip install -e ".[dev]"`.
+If missing: suggest `uv sync`.
 
 ### Step 2 — Run tests
 
 ```bash
-pytest tests/ --tb=short -q --cov=src/hanel_warehouse_gateway --cov-report=term-missing
+uv run pytest tests/ --ignore=tests/test_mock_server.py --tb=short -q --cov=src/hanel_warehouse_gateway --cov-report=term-missing
 ```
 
 For a specific module (e.g. `transport`):
 
 ```bash
-pytest tests/test_transport.py --tb=short -v --cov=src/hanel_warehouse_gateway/transport --cov-report=term-missing
+uv run pytest tests/test_transport.py --tb=short -v --cov=src/hanel_warehouse_gateway/transport --cov-report=term-missing
 ```
 
 ### Step 3 — Analyse results
