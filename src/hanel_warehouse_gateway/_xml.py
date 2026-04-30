@@ -128,7 +128,15 @@ def build_read_jobs_envelope(
 
 def build_get_inventory_envelope(namespace_main: str) -> str:
     """Build the SOAP envelope for readAllAMDReqV01."""
-    raise NotImplementedError
+    return (
+        f'<soapenv:Envelope xmlns:soapenv="{_NS_SOAP}"'
+        f' xmlns:main="{namespace_main}">'
+        f"<soapenv:Header/>"
+        f"<soapenv:Body>"
+        f"<main:readAllAMDReqV01/>"
+        f"</soapenv:Body>"
+        f"</soapenv:Envelope>"
+    )
 
 
 def build_cancel_order_envelope(
@@ -255,6 +263,55 @@ def parse_movement_results(
     return results
 
 
-def parse_stock_records(xml_text: str) -> list[dict[str, object]]:
+def parse_stock_records(
+    xml_text: str, operation: str, namespace_xsd: str
+) -> list[dict[str, object]]:
     """Extract the list of stock records from a readAllAMDReqV01 response."""
-    raise NotImplementedError
+    try:
+        root = ET.fromstring(xml_text)
+    except ET.ParseError as exc:
+        raise HanelGatewayParseError(
+            message=f"Malformed XML in response for {operation}",
+            operation=operation,
+            detail=str(exc),
+            timestamp=datetime.datetime.utcnow().isoformat(),
+        ) from exc
+
+    ns = _namespaces(namespace_xsd)
+
+    fault = root.find(".//soapenv:Fault", ns)
+    if fault is not None:
+        fault_code = fault.findtext("faultcode") or ""
+        fault_string = fault.findtext("faultstring") or ""
+        raise HanelGatewaySoapFaultError(
+            message=f"SOAP fault in {operation}: {fault_string}",
+            operation=operation,
+            detail=fault_string,
+            timestamp=datetime.datetime.utcnow().isoformat(),
+            fault_string=fault_string,
+            fault_code=fault_code,
+        )
+
+    results = []
+    for rec_el in root.findall(".//xsd:articleMasterDataRecord", ns):
+        results.append({
+            "article_number": rec_el.findtext("xsd:articleNumber", "", ns),
+            "article_name": rec_el.findtext("xsd:articleName", "", ns),
+            "lift_number": int(rec_el.findtext("xsd:liftNumber", "0", ns)),
+            "shelf_number": int(rec_el.findtext("xsd:shelfNumber", "0", ns)),
+            "compartment_number": int(
+                rec_el.findtext("xsd:compartmentNumber", "0", ns)
+            ),
+            "compartment_depth_number": int(
+                rec_el.findtext("xsd:compartmentDepthNumber", "0", ns)
+            ),
+            "container_size": int(rec_el.findtext("xsd:containerSize", "0", ns)),
+            "fifo": int(rec_el.findtext("xsd:fifo", "0", ns)),
+            "inventory_at_storage_location": float(
+                rec_el.findtext("xsd:inventoryAtStorageLocation", "0", ns)
+            ),
+            "minimum_inventory": float(
+                rec_el.findtext("xsd:minimumInventory", "0", ns)
+            ),
+        })
+    return results
