@@ -89,4 +89,4 @@ class HanelWarehouseGateway:
         Returns:
             True if the operation succeeded (returnValue == 0).
         """
-        raise NotImplementedError
+        return self._operations.cancel_order(order_number)

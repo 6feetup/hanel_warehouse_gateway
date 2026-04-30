@@ -5,9 +5,9 @@ Performs HTTP POST with retry on network errors. Does not interpret XML content.
 
 from __future__ import annotations
 
+import datetime
 import logging
 import time
-from datetime import datetime, timezone
 
 import requests
 
@@ -47,9 +47,9 @@ class SoapTransport:
         }
 
         if self._config.log_soap_payloads:
-            logger.debug("→ %s request:\n%s", operation, envelope)
+            logger.debug("Request [%s]: %s", operation, envelope)
 
-        last_exc: Exception | None = None
+        response: requests.Response | None = None
         for attempt in range(1, self._config.retry_attempts + 1):
             try:
                 response = requests.post(
@@ -58,23 +58,18 @@ class SoapTransport:
                     headers=headers,
                     timeout=self._config.timeout_seconds,
                 )
-                if self._config.log_soap_payloads:
-                    logger.debug("← %s response:\n%s", operation, response.text)
-                if not response.ok:
-                    raise HanelGatewayHttpError(
+                break
+            except (requests.ConnectionError, requests.Timeout) as exc:
+                if attempt == self._config.retry_attempts:
+                    raise HanelGatewayNetworkError(
                         message=(
-                            f"HTTP {response.status_code} for operation {operation}"
+                            f"Network error after {self._config.retry_attempts}"
+                            f" attempts for {operation}"
                         ),
                         operation=operation,
-                        detail=response.text[:500],
-                        timestamp=datetime.now(timezone.utc).isoformat(),
-                        http_status=response.status_code,
-                    )
-                return response.text
-            except (requests.ConnectionError, requests.Timeout) as exc:
-                last_exc = exc
-                if attempt == self._config.retry_attempts:
-                    break
+                        detail=str(exc),
+                        timestamp=datetime.datetime.utcnow().isoformat(),
+                    ) from exc
                 logger.warning(
                     "Retry %d/%d for operation %s: %s",
                     attempt,
@@ -84,12 +79,18 @@ class SoapTransport:
                 )
                 time.sleep(self._config.retry_delay_seconds)
 
-        raise HanelGatewayNetworkError(
-            message=(
-                f"Network error after {self._config.retry_attempts}"
-                f" attempt(s) for operation {operation}"
-            ),
-            operation=operation,
-            detail=str(last_exc),
-            timestamp=datetime.now(timezone.utc).isoformat(),
-        ) from last_exc
+        assert response is not None
+
+        if self._config.log_soap_payloads:
+            logger.debug("Response [%s]: %s", operation, response.text)
+
+        if not response.ok:
+            raise HanelGatewayHttpError(
+                message=f"HTTP {response.status_code} for operation {operation}",
+                operation=operation,
+                detail=response.text[:500],
+                timestamp=datetime.datetime.utcnow().isoformat(),
+                http_status=response.status_code,
+            )
+
+        return response.text

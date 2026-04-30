@@ -1,11 +1,12 @@
-"""Tests for SoapOperations.register_article (Layer 2)."""
+"""Tests for SoapOperations (Layer 2)."""
 
 from __future__ import annotations
 
-from pathlib import Path
+import pathlib
 from unittest.mock import MagicMock
 
 import pytest
+import responses as responses_lib
 
 from hanel_warehouse_gateway import GatewayConfig
 from hanel_warehouse_gateway.exceptions import (
@@ -14,8 +15,14 @@ from hanel_warehouse_gateway.exceptions import (
     HanelGatewayValidationError,
 )
 from hanel_warehouse_gateway.operations import SoapOperations
+from hanel_warehouse_gateway.transport import SoapTransport
 
-_FIXTURES = Path(__file__).parent / "fixtures"
+_ENDPOINT = "http://mock-hanel.test/HanelService"
+_FIXTURES = pathlib.Path(__file__).parent / "fixtures"
+
+
+def _fixture(name: str) -> str:
+    return (_FIXTURES / name).read_text(encoding="utf-8")
 
 
 def _make_operations(
@@ -31,37 +38,51 @@ def _make_operations(
     return SoapOperations(config, transport), transport
 
 
+def _config(**overrides: object) -> GatewayConfig:
+    defaults: dict[str, object] = {
+        "endpoint_url": _ENDPOINT,
+        "retry_attempts": 1,
+        "retry_delay_seconds": 0.0,
+    }
+    defaults.update(overrides)
+    return GatewayConfig(**defaults)  # type: ignore[arg-type]
+
+
+def _ops(config: GatewayConfig) -> SoapOperations:
+    return SoapOperations(config, SoapTransport(config))
+
+
 class TestRegisterArticle:
     def test_success_returns_true(self) -> None:
-        xml = (_FIXTURES / "sendAPDReqV01_success.xml").read_text()
+        xml = _fixture("sendAPDReqV01_success.xml")
         ops, transport = _make_operations(xml)
         result = ops.register_article("ART001", "Bolt M6")
         assert result is True
         transport.post.assert_called_once()
 
     def test_calls_correct_soap_operation(self) -> None:
-        xml = (_FIXTURES / "sendAPDReqV01_success.xml").read_text()
+        xml = _fixture("sendAPDReqV01_success.xml")
         ops, transport = _make_operations(xml)
         ops.register_article("ART001", "Bolt M6")
         _, call_operation = transport.post.call_args[0]
         assert call_operation == "sendAPDReqV01"
 
     def test_envelope_contains_article_number(self) -> None:
-        xml = (_FIXTURES / "sendAPDReqV01_success.xml").read_text()
+        xml = _fixture("sendAPDReqV01_success.xml")
         ops, transport = _make_operations(xml)
         ops.register_article("ART001", "Bolt M6")
         envelope, _ = transport.post.call_args[0]
         assert "ART001" in envelope
 
     def test_envelope_contains_article_name(self) -> None:
-        xml = (_FIXTURES / "sendAPDReqV01_success.xml").read_text()
+        xml = _fixture("sendAPDReqV01_success.xml")
         ops, transport = _make_operations(xml)
         ops.register_article("ART001", "Bolt M6")
         envelope, _ = transport.post.call_args[0]
         assert "Bolt M6" in envelope
 
     def test_application_error_raises(self) -> None:
-        xml = (_FIXTURES / "sendAPDReqV01_error.xml").read_text()
+        xml = _fixture("sendAPDReqV01_error.xml")
         ops, _ = _make_operations(xml)
         with pytest.raises(HanelGatewayApplicationError) as exc_info:
             ops.register_article("ART001", "Bolt M6")
@@ -69,7 +90,7 @@ class TestRegisterArticle:
         assert exc_info.value.operation == "sendAPDReqV01"
 
     def test_soap_fault_raises(self) -> None:
-        xml = (_FIXTURES / "soap_fault.xml").read_text()
+        xml = _fixture("soap_fault.xml")
         ops, _ = _make_operations(xml)
         with pytest.raises(HanelGatewaySoapFaultError) as exc_info:
             ops.register_article("ART001", "Bolt M6")
@@ -93,19 +114,19 @@ class TestRegisterArticle:
         transport.post.assert_not_called()
 
     def test_article_number_exactly_40_chars_is_valid(self) -> None:
-        xml = (_FIXTURES / "sendAPDReqV01_success.xml").read_text()
+        xml = _fixture("sendAPDReqV01_success.xml")
         ops, transport = _make_operations(xml)
         ops.register_article("A" * 40, "Valid Name")
         transport.post.assert_called_once()
 
     def test_article_name_exactly_40_chars_is_valid(self) -> None:
-        xml = (_FIXTURES / "sendAPDReqV01_success.xml").read_text()
+        xml = _fixture("sendAPDReqV01_success.xml")
         ops, transport = _make_operations(xml)
         ops.register_article("ART001", "N" * 40)
         transport.post.assert_called_once()
 
     def test_validation_truncate_article_number(self) -> None:
-        xml = (_FIXTURES / "sendAPDReqV01_success.xml").read_text()
+        xml = _fixture("sendAPDReqV01_success.xml")
         ops, transport = _make_operations(xml, validation_truncate=True)
         ops.register_article("A" * 41, "Valid Name")
         envelope, _ = transport.post.call_args[0]
@@ -113,9 +134,82 @@ class TestRegisterArticle:
         assert "A" * 41 not in envelope
 
     def test_validation_truncate_article_name(self) -> None:
-        xml = (_FIXTURES / "sendAPDReqV01_success.xml").read_text()
+        xml = _fixture("sendAPDReqV01_success.xml")
         ops, transport = _make_operations(xml, validation_truncate=True)
         ops.register_article("ART001", "N" * 41)
         envelope, _ = transport.post.call_args[0]
         assert "N" * 40 in envelope
         assert "N" * 41 not in envelope
+
+
+class TestCancelOrder:
+    @responses_lib.activate
+    def test_returns_true_on_success(self) -> None:
+        responses_lib.add(
+            responses_lib.POST,
+            _ENDPOINT,
+            body=_fixture("response_delete_job_ok.xml"),
+            status=200,
+        )
+        result = _ops(_config()).cancel_order("ORD-001")
+        assert result is True
+
+    @responses_lib.activate
+    def test_returns_false_on_failure(self) -> None:
+        responses_lib.add(
+            responses_lib.POST,
+            _ENDPOINT,
+            body=_fixture("response_delete_job_error.xml"),
+            status=200,
+        )
+        result = _ops(_config()).cancel_order("ORD-003")
+        assert result is False
+
+    @responses_lib.activate
+    def test_envelope_contains_order_number(self) -> None:
+        responses_lib.add(
+            responses_lib.POST,
+            _ENDPOINT,
+            body=_fixture("response_delete_job_ok.xml"),
+            status=200,
+        )
+        _ops(_config()).cancel_order("ORD-001")
+        payload = responses_lib.calls[0].request.body.decode("utf-8")
+        assert "<xsd:jobNumber>ORD-001</xsd:jobNumber>" in payload
+
+    @responses_lib.activate
+    def test_test_mode_prepends_prefix(self) -> None:
+        responses_lib.add(
+            responses_lib.POST,
+            _ENDPOINT,
+            body=_fixture("response_delete_job_ok.xml"),
+            status=200,
+        )
+        _ops(_config(test_mode=True, test_prefix="TEST_")).cancel_order("ORD-001")
+        payload = responses_lib.calls[0].request.body.decode("utf-8")
+        assert "<xsd:jobNumber>TEST_ORD-001</xsd:jobNumber>" in payload
+
+    def test_order_number_over_40_chars_raises_validation_error(self) -> None:
+        with pytest.raises(HanelGatewayValidationError) as exc_info:
+            _ops(_config()).cancel_order("X" * 41)
+        exc = exc_info.value
+        assert exc.field == "job_number"
+        assert exc.operation == "deleteJobReqV01"
+
+    def test_test_mode_prefix_counts_toward_length_limit(self) -> None:
+        with pytest.raises(HanelGatewayValidationError):
+            _ops(_config(test_mode=True, test_prefix="TEST_")).cancel_order("X" * 36)
+
+    @responses_lib.activate
+    def test_validation_truncate_truncates_and_sends(self) -> None:
+        responses_lib.add(
+            responses_lib.POST,
+            _ENDPOINT,
+            body=_fixture("response_delete_job_ok.xml"),
+            status=200,
+        )
+        result = _ops(_config(validation_truncate=True)).cancel_order("X" * 41)
+        assert result is True
+        payload = responses_lib.calls[0].request.body.decode("utf-8")
+        assert "X" * 40 in payload
+        assert "X" * 41 not in payload

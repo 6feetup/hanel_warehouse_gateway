@@ -7,16 +7,12 @@ Does not make HTTP calls directly: delegates to SoapTransport.
 
 from __future__ import annotations
 
+import datetime
 import logging
-from datetime import datetime, timezone
 
 from . import _xml
 from .config import GatewayConfig
-from .exceptions import (
-    HanelGatewayApplicationError,
-    HanelGatewaySoapFaultError,
-    HanelGatewayValidationError,
-)
+from .exceptions import HanelGatewayApplicationError, HanelGatewayValidationError
 from .models import MovementLine, MovementResult, StockRecord
 from .transport import SoapTransport
 
@@ -30,13 +26,15 @@ def _validate_field_length(
     if len(value) <= 40:
         return value
     if config.validation_truncate:
-        logger.warning("Field '%s' truncated to 40 chars in '%s'", field, operation)
+        logger.warning(
+            "Field '%s' truncated to 40 chars in operation '%s'", field, operation
+        )
         return value[:40]
     raise HanelGatewayValidationError(
         message=f"Field '{field}' exceeds the 40-character limit",
         operation=operation,
         detail=f"Length: {len(value)}, value: {value!r}",
-        timestamp=datetime.now(timezone.utc).isoformat(),
+        timestamp=datetime.datetime.utcnow().isoformat(),
         field=field,
         value=value,
     )
@@ -75,25 +73,15 @@ class SoapOperations:
 
         raw = self._transport.post(envelope, operation)
 
-        fault = _xml.extract_soap_fault(raw)
-        if fault is not None:
-            fault_code, fault_string = fault
-            raise HanelGatewaySoapFaultError(
-                message=f"SOAP fault in {operation}: {fault_string}",
-                operation=operation,
-                detail=f"fault_code={fault_code!r}",
-                timestamp=datetime.now(timezone.utc).isoformat(),
-                fault_string=fault_string,
-                fault_code=fault_code,
-            )
-
-        return_value = _xml.parse_return_value(raw)
+        return_value = _xml.parse_return_value(
+            raw, operation, self._config.namespace_xsd
+        )
         if return_value != 0:
             raise HanelGatewayApplicationError(
                 message=f"{operation} returned error code {return_value}",
                 operation=operation,
                 detail=f"returnValue={return_value}",
-                timestamp=datetime.now(timezone.utc).isoformat(),
+                timestamp=datetime.datetime.utcnow().isoformat(),
                 return_value=return_value,
             )
 
@@ -124,4 +112,19 @@ class SoapOperations:
 
     def cancel_order(self, order_number: str) -> bool:
         """Cancel an order from the queue (deleteJobReqV01)."""
-        raise NotImplementedError
+        op = "deleteJobReqV01"
+        if self._config.test_mode:
+            order_number = f"{self._config.test_prefix}{order_number}"
+        order_number = _validate_field_length(
+            order_number, "job_number", op, self._config
+        )
+        envelope = _xml.build_cancel_order_envelope(
+            job_number=order_number,
+            namespace_main=self._config.namespace_main,
+            namespace_xsd=self._config.namespace_xsd,
+        )
+        xml_response = self._transport.post(envelope, op)
+        return_value = _xml.parse_return_value(
+            xml_response, op, self._config.namespace_xsd
+        )
+        return return_value == 0
