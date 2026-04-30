@@ -24,26 +24,29 @@ tests/
 └── test_operations.py
 docs/
 ├── requirements.md  ← full technical specification (read before implementing)
-└── adr/             ← Architecture Decision Records (001–012)
+└── adr/             ← Architecture Decision Records (001–013)
 ```
 
 ## Development commands
 
 ```bash
-# Install in editable mode with dev dependencies
-pip install -e ".[dev]"
+# Install all dependencies including dev tools
+uv sync
 
-# Run tests
-pytest tests/ --tb=short -q
+# Unit tests (no external dependencies)
+uv run pytest tests/ --ignore=tests/test_mock_server.py --tb=short -q
 
-# Run tests with coverage
-pytest tests/ --cov=src/hanel_warehouse_gateway --cov-report=term-missing
+# Unit tests with coverage
+uv run pytest tests/ --ignore=tests/test_mock_server.py --cov=src/hanel_warehouse_gateway --cov-report=term-missing
+
+# Integration tests against the mock server (requires: docker compose up --build)
+uv run pytest tests/test_mock_server.py --tb=short -q
 
 # Type checking
-mypy src/hanel_warehouse_gateway/
+uv run mypy src/hanel_warehouse_gateway/
 
 # Lint
-ruff check src/ tests/
+uv run ruff check src/ tests/
 ```
 
 ## Configuration (main parameters)
@@ -108,6 +111,7 @@ Static parameters with defaults (can be passed as overrides):
 | [010](docs/adr/010-claude-agents.md) | Specialized agents in `.claude/agents/` |
 | [011](docs/adr/011-claude-commands.md) | Slash commands in `.claude/commands/` |
 | [012](docs/adr/012-development-workflow.md) | Workflow for common changes |
+| [013](docs/adr/013-uv-package-manager.md) | `uv` as official package manager |
 
 ## Available slash commands
 

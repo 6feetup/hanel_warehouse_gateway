@@ -5,16 +5,17 @@ Python module for communicating with the Hanel automatic warehouse via SOAP. Exp
 ## Requirements
 
 - Python ≥ 3.10
+- [`uv`](https://docs.astral.sh/uv/) (install with `brew install uv` or `pip install uv`)
 - Dependencies: `requests`, `python-dotenv`
 
 ## Installation
 
 ```bash
-# Editable install with dev tools (recommended for development)
-pip install -e ".[dev]"
+# Install all dependencies including dev tools (recommended for development)
+uv sync
 
-# Production only
-pip install -e .
+# Production only (no dev dependencies)
+uv sync --no-dev
 ```
 
 ## Configuration
@@ -125,17 +126,20 @@ except HanelGatewayApplicationError as e:
 ## Running tests
 
 ```bash
-# Run all tests
-pytest tests/ --tb=short -q
+# Unit tests (no external dependencies)
+uv run pytest tests/ --ignore=tests/test_mock_server.py --tb=short -q
 
-# With coverage report
-pytest tests/ --cov=src/hanel_warehouse_gateway --cov-report=term-missing
+# Unit tests with coverage report
+uv run pytest tests/ --ignore=tests/test_mock_server.py --cov=src/hanel_warehouse_gateway --cov-report=term-missing
+
+# Integration tests against the mock server (requires: docker compose up --build)
+uv run pytest tests/test_mock_server.py --tb=short -q
 
 # Type checking
-mypy src/hanel_warehouse_gateway/
+uv run mypy src/hanel_warehouse_gateway/
 
 # Lint
-ruff check src/ tests/
+uv run ruff check src/ tests/
 ```
 
 ## Mock server
