@@ -7,13 +7,36 @@ Does not make HTTP calls directly: delegates to SoapTransport.
 
 from __future__ import annotations
 
+import datetime
 import logging
 
+from . import _xml
 from .config import GatewayConfig
+from .exceptions import HanelGatewayValidationError
 from .models import MovementLine, MovementResult, StockRecord
 from .transport import SoapTransport
 
 logger = logging.getLogger(__name__)
+
+
+def _validate_field_length(
+    value: str, field: str, operation: str, config: GatewayConfig
+) -> str:
+    if len(value) <= 40:
+        return value
+    if config.validation_truncate:
+        logger.warning(
+            "Field '%s' truncated to 40 chars in operation '%s'", field, operation
+        )
+        return value[:40]
+    raise HanelGatewayValidationError(
+        message=f"Field '{field}' exceeds the 40-character limit",
+        operation=operation,
+        detail=f"Length: {len(value)}, value: {value!r}",
+        timestamp=datetime.datetime.utcnow().isoformat(),
+        field=field,
+        value=value,
+    )
 
 
 class SoapOperations:
@@ -47,4 +70,17 @@ class SoapOperations:
 
     def cancel_order(self, order_number: str) -> bool:
         """Cancel an order from the queue (deleteJobReqV01)."""
-        raise NotImplementedError
+        op = "deleteJobReqV01"
+        order_number = _validate_field_length(
+            order_number, "job_number", op, self._config
+        )
+        if self._config.test_mode:
+            order_number = f"{self._config.test_prefix}{order_number}"
+        envelope = _xml.build_cancel_order_envelope(
+            job_number=order_number,
+            namespace_main=self._config.namespace_main,
+            namespace_xsd=self._config.namespace_xsd,
+        )
+        xml_response = self._transport.post(envelope, op)
+        return_value = _xml.parse_return_value(xml_response, op)
+        return return_value == 0

@@ -1,0 +1,10 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:xsd="http://main.jws.com.hanel.de/xsd">
+  <soapenv:Body>
+    <xsd:deleteJobReqV01Response>
+      <xsd:return>
+        <xsd:returnValue>1</xsd:returnValue>
+      </xsd:return>
+    </xsd:deleteJobReqV01Response>
+  </soapenv:Body>
+</soapenv:Envelope>
