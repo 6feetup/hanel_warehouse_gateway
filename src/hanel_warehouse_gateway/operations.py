@@ -71,16 +71,18 @@ class SoapOperations:
     def cancel_order(self, order_number: str) -> bool:
         """Cancel an order from the queue (deleteJobReqV01)."""
         op = "deleteJobReqV01"
+        if self._config.test_mode:
+            order_number = f"{self._config.test_prefix}{order_number}"
         order_number = _validate_field_length(
             order_number, "job_number", op, self._config
         )
-        if self._config.test_mode:
-            order_number = f"{self._config.test_prefix}{order_number}"
         envelope = _xml.build_cancel_order_envelope(
             job_number=order_number,
             namespace_main=self._config.namespace_main,
             namespace_xsd=self._config.namespace_xsd,
         )
         xml_response = self._transport.post(envelope, op)
-        return_value = _xml.parse_return_value(xml_response, op)
+        return_value = _xml.parse_return_value(
+            xml_response, op, self._config.namespace_xsd
+        )
         return return_value == 0

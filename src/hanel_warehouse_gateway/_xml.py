@@ -9,10 +9,9 @@ from __future__ import annotations
 import datetime
 import xml.etree.ElementTree as ET
 
-from .exceptions import HanelGatewaySoapFaultError
+from .exceptions import HanelGatewayParseError, HanelGatewaySoapFaultError
 
 _NS_SOAP = "http://schemas.xmlsoap.org/soap/envelope/"
-_NS_XSD = "http://main.jws.com.hanel.de/xsd"
 
 
 def build_register_article_envelope(
@@ -73,12 +72,21 @@ def build_cancel_order_envelope(
     )
 
 
-def parse_return_value(xml_text: str, operation: str) -> int:
+def parse_return_value(xml_text: str, operation: str, namespace_xsd: str) -> int:
     """Extract returnValue from a SOAP response envelope.
 
     Raises HanelGatewaySoapFaultError if a SOAP Fault is detected.
+    Raises HanelGatewayParseError if the response cannot be parsed.
     """
-    root = ET.fromstring(xml_text)
+    try:
+        root = ET.fromstring(xml_text)
+    except ET.ParseError as exc:
+        raise HanelGatewayParseError(
+            message=f"Malformed XML in response for {operation}",
+            operation=operation,
+            detail=str(exc),
+            timestamp=datetime.datetime.utcnow().isoformat(),
+        ) from exc
 
     fault = root.find(f".//{{{_NS_SOAP}}}Fault")
     if fault is not None:
@@ -93,9 +101,14 @@ def parse_return_value(xml_text: str, operation: str) -> int:
             fault_code=fault_code,
         )
 
-    el = root.find(f".//{{{_NS_XSD}}}returnValue")
+    el = root.find(f".//{{{namespace_xsd}}}returnValue")
     if el is None or el.text is None:
-        raise ValueError(f"returnValue not found in response for {operation}")
+        raise HanelGatewayParseError(
+            message=f"returnValue not found in response for {operation}",
+            operation=operation,
+            detail=xml_text[:500],
+            timestamp=datetime.datetime.utcnow().isoformat(),
+        )
     return int(el.text)
 
 

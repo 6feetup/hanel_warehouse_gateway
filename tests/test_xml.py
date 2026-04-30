@@ -10,7 +10,10 @@ from hanel_warehouse_gateway._xml import (
     build_cancel_order_envelope,
     parse_return_value,
 )
-from hanel_warehouse_gateway.exceptions import HanelGatewaySoapFaultError
+from hanel_warehouse_gateway.exceptions import (
+    HanelGatewayParseError,
+    HanelGatewaySoapFaultError,
+)
 
 _FIXTURES = pathlib.Path(__file__).parent / "fixtures"
 
@@ -52,16 +55,16 @@ class TestBuildCancelOrderEnvelope:
 class TestParseReturnValue:
     def test_ok_fixture_returns_zero(self) -> None:
         xml = _fixture("response_delete_job_ok.xml")
-        assert parse_return_value(xml, "deleteJobReqV01") == 0
+        assert parse_return_value(xml, "deleteJobReqV01", _NS_XSD) == 0
 
     def test_error_fixture_returns_one(self) -> None:
         xml = _fixture("response_delete_job_error.xml")
-        assert parse_return_value(xml, "deleteJobReqV01") == 1
+        assert parse_return_value(xml, "deleteJobReqV01", _NS_XSD) == 1
 
     def test_soap_fault_raises_soap_fault_error(self) -> None:
         xml = _fixture("response_soap_fault.xml")
         with pytest.raises(HanelGatewaySoapFaultError) as exc_info:
-            parse_return_value(xml, "deleteJobReqV01")
+            parse_return_value(xml, "deleteJobReqV01", _NS_XSD)
         exc = exc_info.value
         assert exc.fault_code == "env:Server"
         assert exc.fault_string == "Unknown operation"
@@ -72,4 +75,23 @@ class TestParseReturnValue:
 
         xml = _fixture("response_soap_fault.xml")
         with pytest.raises(HanelGatewayError):
-            parse_return_value(xml, "deleteJobReqV01")
+            parse_return_value(xml, "deleteJobReqV01", _NS_XSD)
+
+    def test_malformed_xml_raises_parse_error(self) -> None:
+        with pytest.raises(HanelGatewayParseError):
+            parse_return_value("<not-xml", "deleteJobReqV01", _NS_XSD)
+
+    def test_missing_return_value_raises_parse_error(self) -> None:
+        xml = "<root><other>1</other></root>"
+        with pytest.raises(HanelGatewayParseError):
+            parse_return_value(xml, "deleteJobReqV01", _NS_XSD)
+
+    def test_custom_namespace_xsd_is_honored(self) -> None:
+        xml = (
+            '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"'
+            ' xmlns:xsd="http://example.com/custom">'
+            "<soapenv:Body><xsd:return>"
+            "<xsd:returnValue>0</xsd:returnValue>"
+            "</xsd:return></soapenv:Body></soapenv:Envelope>"
+        )
+        assert parse_return_value(xml, "op", "http://example.com/custom") == 0

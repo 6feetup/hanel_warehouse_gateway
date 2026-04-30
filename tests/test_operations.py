@@ -88,6 +88,10 @@ class TestCancelOrder:
         assert exc.field == "job_number"
         assert exc.operation == "deleteJobReqV01"
 
+    def test_test_mode_prefix_counts_toward_length_limit(self) -> None:
+        with pytest.raises(HanelGatewayValidationError):
+            _ops(_config(test_mode=True, test_prefix="TEST_")).cancel_order("X" * 36)
+
     @responses_lib.activate
     def test_validation_truncate_truncates_and_sends(self) -> None:
         responses_lib.add(

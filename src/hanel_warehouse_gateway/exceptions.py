@@ -79,6 +79,10 @@ class HanelGatewayApplicationError(HanelGatewayError):
         self.return_value = return_value
 
 
+class HanelGatewayParseError(HanelGatewayError):
+    """Response could not be parsed (malformed XML or missing expected element)."""
+
+
 class HanelGatewayValidationError(HanelGatewayError):
     """Invalid input detected before sending. No HTTP call is made."""
 
