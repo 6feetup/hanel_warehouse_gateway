@@ -76,7 +76,7 @@ class HanelWarehouseGateway:
 
         Only mechanism to detect manual movements performed at the warehouse console.
         """
-        raise NotImplementedError
+        return self._operations.get_inventory()
 
     def cancel_order(self, order_number: str) -> bool:
         """Cancel an order from the warehouse queue.

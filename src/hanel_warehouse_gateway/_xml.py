@@ -115,7 +115,15 @@ def build_read_jobs_envelope(
 
 def build_get_inventory_envelope(namespace_main: str) -> str:
     """Build the SOAP envelope for readAllAMDReqV01."""
-    raise NotImplementedError
+    return (
+        f'<soapenv:Envelope xmlns:soapenv="{_NS_SOAP}"'
+        f' xmlns:main="{namespace_main}">'
+        f"<soapenv:Header/>"
+        f"<soapenv:Body>"
+        f"<main:readAllAMDReqV01/>"
+        f"</soapenv:Body>"
+        f"</soapenv:Envelope>"
+    )
 
 
 def build_cancel_order_envelope(
@@ -237,6 +245,54 @@ def parse_movement_results(
     return results
 
 
-def parse_stock_records(xml_text: str) -> list[dict[str, object]]:
+def parse_stock_records(
+    xml_text: str, operation: str, namespace_xsd: str
+) -> list[dict[str, object]]:
     """Extract the list of stock records from a readAllAMDReqV01 response."""
-    raise NotImplementedError
+    try:
+        root = ET.fromstring(xml_text)
+    except ET.ParseError as exc:
+        raise HanelGatewayParseError(
+            message=f"Malformed XML in response for {operation}",
+            operation=operation,
+            detail=str(exc),
+            timestamp=datetime.datetime.utcnow().isoformat(),
+        ) from exc
+
+    fault = root.find(f".//{{{_NS_SOAP}}}Fault")
+    if fault is not None:
+        fault_code = fault.findtext("faultcode") or ""
+        fault_string = fault.findtext("faultstring") or ""
+        raise HanelGatewaySoapFaultError(
+            message=f"SOAP fault in {operation}: {fault_string}",
+            operation=operation,
+            detail=fault_string,
+            timestamp=datetime.datetime.utcnow().isoformat(),
+            fault_string=fault_string,
+            fault_code=fault_code,
+        )
+
+    ns = namespace_xsd
+    results = []
+    for rec_el in root.findall(f".//{{{ns}}}articleMasterDataRecord"):
+        results.append({
+            "article_number": rec_el.findtext(f"{{{ns}}}articleNumber") or "",
+            "article_name": rec_el.findtext(f"{{{ns}}}articleName") or "",
+            "lift_number": int(rec_el.findtext(f"{{{ns}}}liftNumber") or 0),
+            "shelf_number": int(rec_el.findtext(f"{{{ns}}}shelfNumber") or 0),
+            "compartment_number": int(
+                rec_el.findtext(f"{{{ns}}}compartmentNumber") or 0
+            ),
+            "compartment_depth_number": int(
+                rec_el.findtext(f"{{{ns}}}compartmentDepthNumber") or 0
+            ),
+            "container_size": int(rec_el.findtext(f"{{{ns}}}containerSize") or 0),
+            "fifo": int(rec_el.findtext(f"{{{ns}}}fifo") or 0),
+            "inventory_at_storage_location": float(
+                rec_el.findtext(f"{{{ns}}}inventoryAtStorageLocation") or 0
+            ),
+            "minimum_inventory": float(
+                rec_el.findtext(f"{{{ns}}}minimumInventory") or 0
+            ),
+        })
+    return results

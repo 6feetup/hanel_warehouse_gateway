@@ -220,7 +220,30 @@ class SoapOperations:
 
     def get_inventory(self) -> list[StockRecord]:
         """Retrieve stock levels for all articles (readAllAMDReqV01)."""
-        raise NotImplementedError
+        operation = "readAllAMDReqV01"
+        logger.info("get_inventory: initiating %s", operation)
+        envelope = _xml.build_get_inventory_envelope(self._config.namespace_main)
+        raw = self._transport.post(envelope, operation)
+        raw_records = _xml.parse_stock_records(
+            raw, operation, self._config.namespace_xsd
+        )
+        results = [
+            StockRecord(
+                article_number=str(r["article_number"]),
+                article_name=str(r["article_name"]),
+                lift_number=int(r["lift_number"]),  # type: ignore[call-overload]
+                shelf_number=int(r["shelf_number"]),  # type: ignore[call-overload]
+                compartment_number=int(r["compartment_number"]),  # type: ignore[call-overload]
+                compartment_depth_number=int(r["compartment_depth_number"]),  # type: ignore[call-overload]
+                container_size=int(r["container_size"]),  # type: ignore[call-overload]
+                fifo=int(r["fifo"]),  # type: ignore[call-overload]
+                inventory_at_storage_location=float(r["inventory_at_storage_location"]),  # type: ignore[arg-type]
+                minimum_inventory=float(r["minimum_inventory"]),  # type: ignore[arg-type]
+            )
+            for r in raw_records
+        ]
+        logger.info("get_inventory: %s returned %d records", operation, len(results))
+        return results
 
     def cancel_order(self, order_number: str) -> bool:
         """Cancel an order from the queue (deleteJobReqV01)."""

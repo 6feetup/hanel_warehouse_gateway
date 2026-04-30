@@ -11,6 +11,7 @@ import responses as responses_lib
 from hanel_warehouse_gateway import GatewayConfig
 from hanel_warehouse_gateway.exceptions import (
     HanelGatewayApplicationError,
+    HanelGatewayParseError,
     HanelGatewaySoapFaultError,
     HanelGatewayValidationError,
 )
@@ -18,6 +19,7 @@ from hanel_warehouse_gateway.models import (
     MovementLine,
     MovementLineResult,
     MovementResult,
+    StockRecord,
 )
 from hanel_warehouse_gateway.operations import SoapOperations
 from hanel_warehouse_gateway.transport import SoapTransport
@@ -416,3 +418,72 @@ class TestGetCompletedMovements:
         ops, _ = _make_operations(_fixture("soap_fault.xml"))
         with pytest.raises(HanelGatewaySoapFaultError):
             ops.get_completed_movements()
+
+
+class TestGetInventory:
+    def test_returns_list_of_stock_records(self) -> None:
+        ops, _ = _make_operations(_fixture("read_inventory_response.xml"))
+        results = ops.get_inventory()
+        assert isinstance(results, list)
+        assert all(isinstance(r, StockRecord) for r in results)
+
+    def test_returns_correct_number_of_records(self) -> None:
+        ops, _ = _make_operations(_fixture("read_inventory_response.xml"))
+        results = ops.get_inventory()
+        assert len(results) == 2
+
+    def test_calls_correct_soap_operation(self) -> None:
+        ops, transport = _make_operations(_fixture("read_inventory_response.xml"))
+        ops.get_inventory()
+        _, operation = transport.post.call_args[0]
+        assert operation == "readAllAMDReqV01"
+
+    def test_envelope_has_no_parameters(self) -> None:
+        ops, transport = _make_operations(_fixture("read_inventory_response.xml"))
+        ops.get_inventory()
+        envelope, _ = transport.post.call_args[0]
+        assert "<main:param>" not in envelope
+
+    def test_maps_article_number(self) -> None:
+        ops, _ = _make_operations(_fixture("read_inventory_response.xml"))
+        results = ops.get_inventory()
+        assert results[0].article_number == "ART-001"
+        assert results[1].article_number == "ART-002"
+
+    def test_maps_article_name(self) -> None:
+        ops, _ = _make_operations(_fixture("read_inventory_response.xml"))
+        results = ops.get_inventory()
+        assert results[0].article_name == "Bolt M6"
+
+    def test_maps_numeric_fields(self) -> None:
+        ops, _ = _make_operations(_fixture("read_inventory_response.xml"))
+        results = ops.get_inventory()
+        assert results[0].lift_number == 1
+        assert results[0].shelf_number == 5
+        assert results[0].compartment_number == 12
+        assert results[0].compartment_depth_number == 3
+        assert results[0].container_size == 1
+        assert results[0].fifo == 0
+
+    def test_maps_float_fields(self) -> None:
+        ops, _ = _make_operations(_fixture("read_inventory_response.xml"))
+        results = ops.get_inventory()
+        assert results[0].inventory_at_storage_location == 250.0
+        assert results[0].minimum_inventory == 50.0
+
+    def test_zero_location_record(self) -> None:
+        ops, _ = _make_operations(_fixture("read_inventory_response.xml"))
+        results = ops.get_inventory()
+        assert results[1].lift_number == 0
+        assert results[1].shelf_number == 0
+        assert results[1].inventory_at_storage_location == 0.0
+
+    def test_soap_fault_propagates(self) -> None:
+        ops, _ = _make_operations(_fixture("soap_fault.xml"))
+        with pytest.raises(HanelGatewaySoapFaultError):
+            ops.get_inventory()
+
+    def test_malformed_xml_raises_parse_error(self) -> None:
+        ops, _ = _make_operations("NOT VALID XML<<<")
+        with pytest.raises(HanelGatewayParseError):
+            ops.get_inventory()
