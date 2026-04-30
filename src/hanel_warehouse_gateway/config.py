@@ -1,4 +1,4 @@
-"""Configurazione del modulo hanel_warehouse_gateway."""
+"""Configuration for the hanel_warehouse_gateway module."""
 
 from __future__ import annotations
 
@@ -13,19 +13,19 @@ _VALID_LOG_LEVELS = {"DEBUG", "INFO", "WARNING", "ERROR"}
 
 @dataclass
 class GatewayConfig:
-    """Configurazione completa del gateway Hanel.
+    """Full configuration for the Hanel gateway.
 
-    Usare GatewayConfig.from_env() per caricare da .env o variabili d'ambiente.
+    Use GatewayConfig.from_env() to load from .env or environment variables.
     """
 
-    # Parametro volatile — deve provenire dall'ambiente, non da codice committato
+    # Volatile parameter — must come from the environment, not committed code
     endpoint_url: str
 
-    # Namespace SOAP — valori fissi definiti dal protocollo Hanel
+    # SOAP namespaces — fixed values defined by the Hanel protocol
     namespace_main: str = "http://main.jws.com.hanel.de"
     namespace_xsd: str = "http://main.jws.com.hanel.de/xsd"
 
-    # Parametri statici con default
+    # Static parameters with defaults
     timeout_seconds: int = 30
     retry_attempts: int = 3
     retry_delay_seconds: float = 2.0
@@ -37,42 +37,42 @@ class GatewayConfig:
 
     def __post_init__(self) -> None:
         if not self.endpoint_url or not self.endpoint_url.strip():
-            raise ValueError("endpoint_url non può essere vuoto")
+            raise ValueError("endpoint_url cannot be empty")
         if not self.endpoint_url.startswith(("http://", "https://")):
             raise ValueError(
-                f"endpoint_url deve iniziare con http:// o https://, "
-                f"ricevuto: {self.endpoint_url!r}"
+                f"endpoint_url must start with http:// or https://, "
+                f"got: {self.endpoint_url!r}"
             )
         if self.timeout_seconds <= 0:
             raise ValueError(
-                f"timeout_seconds deve essere > 0, ricevuto: {self.timeout_seconds}"
+                f"timeout_seconds must be > 0, got: {self.timeout_seconds}"
             )
         if self.retry_attempts < 1:
             raise ValueError(
-                f"retry_attempts deve essere >= 1, ricevuto: {self.retry_attempts}"
+                f"retry_attempts must be >= 1, got: {self.retry_attempts}"
             )
         if self.retry_delay_seconds < 0:
             raise ValueError(
-                f"retry_delay_seconds deve essere >= 0, "
-                f"ricevuto: {self.retry_delay_seconds}"
+                f"retry_delay_seconds must be >= 0, "
+                f"got: {self.retry_delay_seconds}"
             )
         if self.log_level not in _VALID_LOG_LEVELS:
             raise ValueError(
-                f"log_level deve essere uno tra {sorted(_VALID_LOG_LEVELS)}, "
-                f"ricevuto: {self.log_level!r}"
+                f"log_level must be one of {sorted(_VALID_LOG_LEVELS)}, "
+                f"got: {self.log_level!r}"
             )
 
     @classmethod
     def from_env(cls, overrides: dict[str, object] | None = None) -> GatewayConfig:
-        """Costruisce GatewayConfig leggendo le variabili d'ambiente.
+        """Build a GatewayConfig by reading environment variables.
 
-        Carica automaticamente il file .env dalla directory corrente (no-op se
-        non esiste). Le variabili d'ambiente hanno prefisso HANEL_. Il dict
-        overrides, se fornito, ha precedenza su tutto.
+        Automatically loads the .env file from the current directory (no-op if
+        it does not exist). Environment variables use the HANEL_ prefix. The
+        overrides dict, if provided, takes precedence over everything else.
 
         Args:
-            overrides: Parametri che sovrascrivono quelli letti dall'ambiente.
-                Utile nei test per iniettare valori mock.
+            overrides: Parameters that override those read from the environment.
+                Useful in tests to inject mock values.
         """
         from dotenv import load_dotenv
 
@@ -99,12 +99,12 @@ class GatewayConfig:
 
     @classmethod
     def _from_dict(cls, d: dict[str, object]) -> GatewayConfig:
-        """Costruisce GatewayConfig da un dizionario, ignorando chiavi sconosciute."""
+        """Build a GatewayConfig from a dictionary, ignoring unknown keys."""
         known_keys = {f.name for f in fields(cls)}
         unknown = set(d.keys()) - known_keys
         if unknown:
             logger.warning(
-                "GatewayConfig: chiavi sconosciute ignorate: %s", sorted(unknown)
+                "GatewayConfig: unknown keys ignored: %s", sorted(unknown)
             )
         filtered = {k: v for k, v in d.items() if k in known_keys}
         return cls(**filtered)  # type: ignore[arg-type]

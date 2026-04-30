@@ -1,7 +1,7 @@
-"""Layer 3 — Interfaccia pubblica del modulo hanel_warehouse_gateway.
+"""Layer 3 — Public interface of the hanel_warehouse_gateway module.
 
-HanelWarehouseGateway è l'unico punto di contatto per il sistema chiamante.
-Nasconde completamente i dettagli SOAP, HTTP e XML.
+HanelWarehouseGateway is the single point of contact for the calling system.
+Completely hides SOAP, HTTP, and XML details.
 """
 
 from __future__ import annotations
@@ -17,15 +17,15 @@ logger = logging.getLogger(__name__)
 
 
 class HanelWarehouseGateway:
-    """Gateway per il magazzino automatico Hanel via SOAP.
+    """Gateway for the Hanel automatic warehouse via SOAP.
 
-    Il modulo non è thread-safe. In caso di chiamate concorrenti,
-    istanziare un client per thread.
+    The module is not thread-safe. For concurrent calls,
+    instantiate one client per thread.
 
     Example:
         config = GatewayConfig.from_env()
         gateway = HanelWarehouseGateway(config)
-        gateway.register_article("ART001", "Vite M6 inox")
+        gateway.register_article("ART001", "M6 stainless bolt")
     """
 
     def __init__(self, config: GatewayConfig) -> None:
@@ -34,59 +34,59 @@ class HanelWarehouseGateway:
         self._operations = SoapOperations(config, self._transport)
 
     def register_article(self, article_number: str, article_name: str) -> bool:
-        """Registra o aggiorna un articolo nell'anagrafica del magazzino.
+        """Register or update an article in the warehouse catalogue.
 
         Args:
-            article_number: Codice articolo univoco (max 40 chars alfanumerici).
-            article_name: Descrizione articolo (max 40 chars).
+            article_number: Unique article code (max 40 alphanumeric chars).
+            article_name: Article description (max 40 chars).
 
         Returns:
-            True se l'operazione è andata a buon fine (returnValue == 0).
+            True if the operation succeeded (returnValue == 0).
         """
         raise NotImplementedError
 
     def send_movement_order(
         self, order_number: str, positions: list[MovementLine]
     ) -> bool:
-        """Invia un ordine di movimento (prelievo o carico) al magazzino.
+        """Send a movement order (pick or load) to the warehouse.
 
         Args:
-            order_number: Identificativo ordine univoco (max 40 chars).
-            positions: Lista di righe di movimento (almeno un elemento).
+            order_number: Unique order identifier (max 40 chars).
+            positions: List of movement lines (at least one element).
 
         Returns:
-            True se l'operazione è andata a buon fine (returnValue == 0).
+            True if the operation succeeded (returnValue == 0).
         """
         raise NotImplementedError
 
     def get_completed_movements(self) -> list[MovementResult]:
-        """Recupera gli ordini completati dal magazzino.
+        """Retrieve completed orders from the warehouse.
 
-        Se actual_quantity < nominal_quantity in una riga, lo stock era
-        insufficiente: la gestione è responsabilità del chiamante.
+        If actual_quantity < nominal_quantity in a line, stock was
+        insufficient: handling is the caller's responsibility.
         """
         raise NotImplementedError
 
     def get_all_orders(self) -> list[MovementResult]:
-        """Recupera tutti gli ordini presenti nella coda del magazzino."""
+        """Retrieve all orders currently in the warehouse queue."""
         raise NotImplementedError
 
     def get_inventory(self) -> list[StockRecord]:
-        """Recupera i livelli di stock di tutti gli articoli nel magazzino.
+        """Retrieve stock levels for all articles in the warehouse.
 
-        Unico meccanismo per rilevare movimenti manuali eseguiti alla console.
+        Only mechanism to detect manual movements performed at the warehouse console.
         """
         raise NotImplementedError
 
     def cancel_order(self, order_number: str) -> bool:
-        """Cancella un ordine dalla coda del magazzino.
+        """Cancel an order from the warehouse queue.
 
-        Applicabile solo ad ordini non ancora processati (stato 0).
+        Applicable only to orders not yet processed (status 0).
 
         Args:
-            order_number: Identificativo dell'ordine da cancellare (max 40 chars).
+            order_number: Identifier of the order to cancel (max 40 chars).
 
         Returns:
-            True se l'operazione è andata a buon fine (returnValue == 0).
+            True if the operation succeeded (returnValue == 0).
         """
         raise NotImplementedError

@@ -1,4 +1,4 @@
-"""Test per i dataclass pubblici di hanel_warehouse_gateway."""
+"""Tests for the public dataclasses of hanel_warehouse_gateway."""
 
 from __future__ import annotations
 
@@ -69,7 +69,7 @@ class TestStockRecord:
     def test_instantiation(self) -> None:
         record = StockRecord(
             article_number="ART001",
-            article_name="Vite M6",
+            article_name="M6 Screw",
             lift_number=1,
             shelf_number=3,
             compartment_number=2,

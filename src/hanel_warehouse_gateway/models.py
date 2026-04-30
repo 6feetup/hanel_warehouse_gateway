@@ -1,4 +1,4 @@
-"""Dataclass pubblici del modulo hanel_warehouse_gateway."""
+"""Public dataclasses of the hanel_warehouse_gateway module."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 
 @dataclass
 class MovementLine:
-    """Singola riga di un ordine di movimento da inviare al magazzino."""
+    """Single line of a movement order to send to the warehouse."""
 
     article_number: str
     operation: str  # '+' = pick, '-' = load
@@ -16,9 +16,9 @@ class MovementLine:
 
 @dataclass
 class MovementLineResult:
-    """Risultato di una singola riga di movimento confermata dal magazzino.
+    """Result of a single movement line confirmed by the warehouse.
 
-    Se actual_quantity < nominal_quantity, lo stock era insufficiente.
+    If actual_quantity < nominal_quantity, stock was insufficient.
     """
 
     article_number: str
@@ -31,7 +31,7 @@ class MovementLineResult:
 
 @dataclass
 class MovementResult:
-    """Risultato completo di un ordine di movimento."""
+    """Complete result of a movement order."""
 
     job_number: str
     job_priority: int
@@ -43,9 +43,9 @@ class MovementResult:
 
 @dataclass
 class StockRecord:
-    """Livello di stock di un articolo in una specifica posizione fisica.
+    """Stock level of an article at a specific physical location.
 
-    Un articolo può apparire in più record se distribuito su più ubicazioni.
+    An article may appear in multiple records if distributed across several locations.
     """
 
     article_number: str

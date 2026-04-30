@@ -1,7 +1,7 @@
-"""Helper PRIVATO: costruzione envelope SOAP e parsing risposte XML.
+"""PRIVATE helper: SOAP envelope construction and XML response parsing.
 
-Modulo privato — non importare direttamente. Accesso tramite operations.py.
-I template XML usano f-string; il parsing usa xml.etree.ElementTree.
+Private module — do not import directly. Access via operations.py.
+XML templates use f-strings; parsing uses xml.etree.ElementTree.
 """
 
 from __future__ import annotations
@@ -13,7 +13,7 @@ def build_register_article_envelope(
     namespace_main: str,
     namespace_xsd: str,
 ) -> str:
-    """Costruisce l'envelope SOAP per sendAPDReqV01."""
+    """Build the SOAP envelope for sendAPDReqV01."""
     raise NotImplementedError
 
 
@@ -23,7 +23,7 @@ def build_send_movement_order_envelope(
     namespace_main: str,
     namespace_xsd: str,
 ) -> str:
-    """Costruisce l'envelope SOAP per sendJobsReqV01."""
+    """Build the SOAP envelope for sendJobsReqV01."""
     raise NotImplementedError
 
 
@@ -32,15 +32,15 @@ def build_read_jobs_envelope(
     namespace_main: str,
     namespace_xsd: str,
 ) -> str:
-    """Costruisce l'envelope SOAP per readAllJobsReqV01.
+    """Build the SOAP envelope for readAllJobsReqV01.
 
-    mode=0: tutti gli ordini, mode=1: solo completati.
+    mode=0: all orders, mode=1: completed only.
     """
     raise NotImplementedError
 
 
 def build_get_inventory_envelope(namespace_main: str) -> str:
-    """Costruisce l'envelope SOAP per readAllAMDReqV01."""
+    """Build the SOAP envelope for readAllAMDReqV01."""
     raise NotImplementedError
 
 
@@ -49,20 +49,20 @@ def build_cancel_order_envelope(
     namespace_main: str,
     namespace_xsd: str,
 ) -> str:
-    """Costruisce l'envelope SOAP per deleteJobReqV01."""
+    """Build the SOAP envelope for deleteJobReqV01."""
     raise NotImplementedError
 
 
 def parse_return_value(xml_text: str) -> int:
-    """Estrae returnValue da un envelope di risposta SOAP."""
+    """Extract returnValue from a SOAP response envelope."""
     raise NotImplementedError
 
 
 def parse_movement_results(xml_text: str) -> list[dict[str, object]]:
-    """Estrae la lista di ordini di movimento da una risposta readAllJobsReqV01."""
+    """Extract the list of movement orders from a readAllJobsReqV01 response."""
     raise NotImplementedError
 
 
 def parse_stock_records(xml_text: str) -> list[dict[str, object]]:
-    """Estrae la lista di record di stock da una risposta readAllAMDReqV01."""
+    """Extract the list of stock records from a readAllAMDReqV01 response."""
     raise NotImplementedError

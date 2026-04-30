@@ -1,60 +1,60 @@
-# ADR-008 — Comportamento validazione campi in input
+# ADR-008 — Input field validation behaviour
 
-**Status:** Accettato
+**Status:** Accepted
 
-## Contesto
+## Context
 
-La specifica §7 stabilisce che i campi `articleNumber` e `articleName` hanno un limite di 40 caratteri alfanumerici. Il comportamento in caso di violazione è configurabile: troncamento (con warning) oppure eccezione. È necessario formalizzare il default e il meccanismo di configurazione.
+Specification §7 states that the `articleNumber` and `articleName` fields have a limit of 40 alphanumeric characters. The behaviour on violation is configurable: truncation (with a warning) or an exception. The default and the configuration mechanism need to be formalised.
 
-## Decisione
+## Decision
 
-Il comportamento **default è `raise HanelGatewayValidationError`**.
+The **default behaviour is `raise HanelGatewayValidationError`**.
 
-Il troncamento silente è opt-in tramite `config["validation_truncate"] = True`.
+Silent truncation is opt-in via `config["validation_truncate"] = True`.
 
-## Razionale
+## Rationale
 
-Un troncamento silente nasconde un problema dati nel sistema chiamante. Un'eccezione forza il chiamante ad accorgersene immediatamente. Il default conservativo è preferibile; il chiamante può scegliere il troncamento consapevolmente.
+Silent truncation hides a data problem in the calling system. An exception forces the caller to notice it immediately. The conservative default is preferable; the caller can consciously choose truncation.
 
-## Parametro di configurazione
+## Configuration parameter
 
-| Parametro | Tipo | Default | Descrizione |
+| Parameter | Type | Default | Description |
 |---|---|---|---|
-| `validation_truncate` | `bool` | `False` | Se `True`, tronca a 40 chars e logga `WARNING` invece di sollevare eccezione |
+| `validation_truncate` | `bool` | `False` | If `True`, truncates to 40 chars and logs `WARNING` instead of raising an exception |
 
-Questo parametro è aggiunto a `GatewayConfig` (vedere ADR-003).
+This parameter is added to `GatewayConfig` (see ADR-003).
 
-## Campi soggetti a validazione
+## Fields subject to validation
 
-| Campo | Limite | Operazione |
+| Field | Limit | Operation |
 |---|---|---|
 | `article_number` | max 40 chars | `register_article`, `send_movement_order`, `cancel_order` |
 | `article_name` | max 40 chars | `register_article` |
 | `job_number` | max 40 chars | `send_movement_order`, `cancel_order` |
 
-## Implementazione
+## Implementation
 
-La validazione avviene in `operations.py` prima della costruzione dell'envelope, tramite una funzione helper:
+Validation occurs in `operations.py` before the envelope is built, via a helper function:
 
 ```python
 def _validate_field_length(value: str, field: str, operation: str, config: GatewayConfig) -> str:
     if len(value) <= 40:
         return value
     if config.validation_truncate:
-        logger.warning("Campo '%s' troncato a 40 chars in operazione '%s'", field, operation)
+        logger.warning("Field '%s' truncated to 40 chars in operation '%s'", field, operation)
         return value[:40]
     raise HanelGatewayValidationError(
-        message=f"Campo '{field}' supera il limite di 40 caratteri",
+        message=f"Field '{field}' exceeds the 40-character limit",
         operation=operation,
-        detail=f"Lunghezza: {len(value)}, valore: {value!r}",
+        detail=f"Length: {len(value)}, value: {value!r}",
         timestamp=datetime.utcnow().isoformat(),
         field=field,
         value=value,
     )
 ```
 
-## Conseguenze
+## Consequences
 
-- Per default, dati troppo lunghi producono un'eccezione immediata e tracciabile
-- Il chiamante che preferisce il troncamento deve dichiararlo esplicitamente nella configurazione
-- In modalità troncamento il log `WARNING` garantisce tracciabilità anche senza eccezione
+- By default, oversized data produces an immediate, traceable exception
+- Callers that prefer truncation must declare it explicitly in the configuration
+- In truncation mode the `WARNING` log ensures traceability even without an exception

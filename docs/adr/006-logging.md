@@ -1,24 +1,24 @@
-# ADR-006 — Strategia di logging
+# ADR-006 — Logging strategy
 
-**Status:** Accettato
+**Status:** Accepted
 
-## Contesto
+## Context
 
-Il modulo deve produrre log strutturati a tutti i livelli (trasporto, operazioni, interfaccia pubblica) come da §6 dei requisiti. È una libreria Python: le scelte di logging devono rispettare le best practice per librerie (non forzare configurazione sull'applicazione chiamante).
+The module must produce structured logs at all levels (transport, operations, public interface) as per §6 of the requirements. It is a Python library: logging choices must follow best practices for libraries (do not force configuration on the calling application).
 
-## Opzioni valutate
+## Options evaluated
 
-| Opzione | Pro | Contro |
+| Option | Pros | Cons |
 |---|---|---|
-| `logging` stdlib | Zero dipendenze, configurabile dal chiamante, standard Python | Formato JSON richiede formatter custom |
-| `structlog` | Log JSON nativi, contesto annidato, molto potente | Dipendenza esterna, overhead per questo use case |
-| `loguru` | API semplice, output colorato | Dipendenza esterna, comportamento diverso da stdlib |
+| `logging` stdlib | Zero dependencies, configurable by caller, Python standard | JSON format requires a custom formatter |
+| `structlog` | Native JSON logs, nested context, very powerful | External dependency, overhead for this use case |
+| `loguru` | Simple API, coloured output | External dependency, different behaviour from stdlib |
 
-## Decisione
+## Decision
 
-Adottiamo **`logging` stdlib**. Il modulo usa un singolo logger con nome `hanel_warehouse_gateway` e non aggiunge nessun handler di default.
+We adopt **`logging` stdlib**. The module uses a single logger named `hanel_warehouse_gateway` and adds no default handlers.
 
-## Regole implementative
+## Implementation rules
 
 ### Logger
 
@@ -27,54 +27,54 @@ import logging
 logger = logging.getLogger("hanel_warehouse_gateway")
 ```
 
-Ogni sotto-modulo usa lo stesso logger (non sotto-logger per modulo) per semplicità.
+Every sub-module uses the same logger (not per-module sub-loggers) for simplicity.
 
-### Livello
+### Level
 
-Il livello del logger è impostato in `GatewayConfig.from_dict()` in base a `config["log_level"]`:
+The logger level is set in `GatewayConfig.from_dict()` based on `config["log_level"]`:
 
 ```python
 logger.setLevel(getattr(logging, config.log_level, logging.INFO))
 ```
 
-### Nessun handler di default
+### No default handlers
 
-Le librerie Python non devono aggiungere handler. Il chiamante è responsabile della configurazione degli handler. Per evitare il messaggio "No handlers could be found", si aggiunge un `NullHandler`:
+Python libraries must not add handlers. The caller is responsible for configuring handlers. To avoid the "No handlers could be found" message, a `NullHandler` is added:
 
 ```python
 logging.getLogger("hanel_warehouse_gateway").addHandler(logging.NullHandler())
 ```
 
-Questo va in `src/hanel_warehouse_gateway/__init__.py`.
+This goes in `src/hanel_warehouse_gateway/__init__.py`.
 
-### Formato degli eventi
+### Event format
 
-I log includono sempre: `operation`, `duration_ms` (dove applicabile), `message`. Non si usa un formatter custom; il formato è delegato al chiamante.
+Logs always include: `operation`, `duration_ms` (where applicable), `message`. No custom formatter is used; the format is delegated to the caller.
 
-### Payload SOAP
+### SOAP payloads
 
-I payload XML (envelope in uscita e risposta in entrata) sono loggati **solo se**:
+XML payloads (outgoing envelope and incoming response) are logged **only if**:
 - `config.log_soap_payloads = True`
-- Il livello effettivo del logger è `DEBUG`
+- The effective logger level is `DEBUG`
 
 ```python
 if config.log_soap_payloads:
     logger.debug("SOAP request [%s]: %s", operation, envelope)
 ```
 
-## Eventi obbligatori
+## Required events
 
-| Evento | Livello | Dove |
+| Event | Level | Where |
 |---|---|---|
-| Chiamata SOAP avviata (operazione + params non sensibili) | `INFO` | `operations.py` |
-| Esito positivo (operazione + durata ms) | `INFO` | `operations.py` |
-| Retry in corso (tentativo N di M, motivo) | `WARNING` | `transport.py` |
-| Failure finale (tipo, operazione, dettaglio) | `ERROR` | `transport.py` / `operations.py` |
-| Envelope XML in uscita | `DEBUG` (solo se `log_soap_payloads`) | `transport.py` |
-| Envelope XML in entrata | `DEBUG` (solo se `log_soap_payloads`) | `transport.py` |
+| SOAP call started (operation + non-sensitive params) | `INFO` | `operations.py` |
+| Successful outcome (operation + duration ms) | `INFO` | `operations.py` |
+| Retry in progress (attempt N of M, reason) | `WARNING` | `transport.py` |
+| Final failure (type, operation, detail) | `ERROR` | `transport.py` / `operations.py` |
+| Outgoing XML envelope | `DEBUG` (only if `log_soap_payloads`) | `transport.py` |
+| Incoming XML envelope | `DEBUG` (only if `log_soap_payloads`) | `transport.py` |
 
-## Conseguenze
+## Consequences
 
-- Il chiamante configura handler, formatter e destinazione dei log senza modificare il modulo
-- I payload SOAP sono disabilitati per default (contengono dati di magazzino potenzialmente sensibili)
-- Aggiungere `structlog` in futuro non rompe l'interfaccia: basta sostituire il logger interno
+- The caller configures handlers, formatters, and log destinations without modifying the module
+- SOAP payloads are disabled by default (they contain potentially sensitive warehouse data)
+- Adding `structlog` in the future does not break the interface: just replace the internal logger

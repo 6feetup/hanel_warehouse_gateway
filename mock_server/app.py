@@ -72,7 +72,7 @@ def admin_state():
 @app.route("/admin/reset", methods=["POST"])
 def admin_reset():
     state.reset()
-    return jsonify({"status": "ok", "message": "Stato ripristinato ai dati iniziali"})
+    return jsonify({"status": "ok", "message": "State restored to initial data"})
 
 
 @app.route("/admin/complete-all", methods=["POST"])

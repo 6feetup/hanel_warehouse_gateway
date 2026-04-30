@@ -1,4 +1,4 @@
-"""Test per la gerarchia di eccezioni di hanel_warehouse_gateway."""
+"""Tests for the exception hierarchy of hanel_warehouse_gateway."""
 
 from __future__ import annotations
 

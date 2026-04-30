@@ -1,62 +1,62 @@
-# ADR-010 — Agenti Claude specializzati
+# ADR-010 — Specialized Claude agents
 
-**Status:** Accettato
+**Status:** Accepted
 
-## Contesto
+## Context
 
-Alcune attività ricorrenti nel ciclo di sviluppo di questo modulo richiedono conoscenza specifica del dominio SOAP, della struttura XML del t-Server e delle convenzioni del progetto. Gli agenti Claude specializzati in `.claude/agents/` possono eseguire questi task con contesto pre-caricato, riducendo le istruzioni da fornire ogni volta.
+Some recurring tasks in this module's development cycle require specific knowledge of the SOAP domain, the t-Server XML structure, and project conventions. Specialized Claude agents in `.claude/agents/` can execute these tasks with pre-loaded context, reducing the instructions needed each time.
 
-## Decisione
+## Decision
 
-Definire tre agenti specializzati in `.claude/agents/`:
+Define three specialized agents in `.claude/agents/`:
 
 ### `soap-tester`
 
 **File:** `.claude/agents/soap-tester.md`
 
-**Scopo:** genera test unitari e di integrazione per operazioni SOAP.
+**Purpose:** generates unit and integration tests for SOAP operations.
 
-**Capacità:**
-- Data un'operazione (es. `send_movement_order`), genera la fixture XML di risposta corrispondente in `tests/fixtures/`
-- Genera i test `test_xml.py` per `build_*` e `parse_*`
-- Genera i test `test_operations.py` con `responses` per mock HTTP
-- Verifica che i test coprono: caso happy path, `returnValue != 0`, SOAP fault, errore di rete
+**Capabilities:**
+- Given an operation (e.g. `send_movement_order`), generates the corresponding XML response fixture in `tests/fixtures/`
+- Generates `test_xml.py` tests for `build_*` and `parse_*`
+- Generates `test_operations.py` tests with `responses` for HTTP mocking
+- Verifies that tests cover: happy path, `returnValue != 0`, SOAP fault, network error
 
 ### `adr-reviewer`
 
 **File:** `.claude/agents/adr-reviewer.md`
 
-**Scopo:** verifica la coerenza tra gli ADR e il codice implementato.
+**Purpose:** verifies consistency between ADRs and the implemented code.
 
-**Capacità:**
-- Legge gli ADR e il codice sorgente
-- Segnala derive (es. dipendenza esterna aggiunta senza ADR, parametro di config non documentato)
-- Propone aggiornamenti agli ADR se il codice è evoluto in modo giustificato
+**Capabilities:**
+- Reads ADRs and source code
+- Reports drift (e.g. external dependency added without an ADR, undocumented config parameter)
+- Proposes ADR updates if the code has evolved in a justified way
 
 ### `integration-checker`
 
 **File:** `.claude/agents/integration-checker.md`
 
-**Scopo:** analizza l'impatto di una modifica all'interfaccia pubblica.
+**Purpose:** analyzes the impact of a change to the public interface.
 
-**Capacità:**
-- Data una modifica proposta alla firma di un metodo di `HanelWarehouseGateway`, valuta la compatibilità backward
-- Verifica che i dataclass pubblici non abbiano breaking changes
-- Verifica che le eccezioni introdotte siano sottoclassi di `HanelGatewayError`
+**Capabilities:**
+- Given a proposed change to a `HanelWarehouseGateway` method signature, evaluates backward compatibility
+- Verifies that public dataclasses have no breaking changes
+- Verifies that introduced exceptions are subclasses of `HanelGatewayError`
 
-## Struttura di ogni file agente
+## Structure of each agent file
 
 ```markdown
 ---
-name: <nome>
-description: <descrizione una riga>
+name: <name>
+description: <one-line description>
 ---
 
-<system prompt con contesto del progetto, vincoli, formato output atteso>
+<system prompt with project context, constraints, expected output format>
 ```
 
-## Conseguenze
+## Consequences
 
-- I task ricorrenti possono essere delegati agli agenti senza ripetere il contesto
-- Gli agenti usano solo strumenti di lettura e scrittura file — non eseguono comandi di sistema
-- La manutenzione degli agenti è responsabilità del team: aggiornare i file se cambia l'architettura
+- Recurring tasks can be delegated to agents without repeating context
+- Agents use only file read and write tools — they do not execute system commands
+- Agent maintenance is the team's responsibility: update the files if the architecture changes

@@ -1,67 +1,67 @@
-# ADR-012 — Workflow di sviluppo
+# ADR-012 — Development workflow
 
-**Status:** Accettato
+**Status:** Accepted
 
-## Contesto
+## Context
 
-Questo modulo è sviluppato con un mix di contributi umani e agenti Claude. Senza un workflow esplicito, le due modalità di lavoro possono produrre modifiche incoerenti (dipendenze aggiunte senza ADR, interfaccia pubblica cambiata senza bump di versione). Questo ADR definisce i workflow standard per le operazioni più comuni.
+This module is developed with a mix of human contributions and Claude agents. Without an explicit workflow, the two working modes can produce inconsistent changes (dependencies added without an ADR, public interface changed without a version bump). This ADR defines the standard workflows for the most common operations.
 
-## Workflow 1 — Aggiungere una nuova operazione SOAP
+## Workflow 1 — Adding a new SOAP operation
 
-1. Verificare che l'operazione non esista già (consultare `docs/requirements.md` §3 e `operations.py`)
-2. Se l'operazione introduce un nuovo pattern non coperto dagli ADR esistenti → creare un nuovo ADR
-3. Aggiungere i dataclass necessari in `models.py`
-4. Aggiungere il template envelope e la funzione di parsing in `_xml.py`
-5. Implementare la funzione in `operations.py`
-6. Esporre il metodo pubblico in `gateway.py`
-7. Creare la fixture XML in `tests/fixtures/`
-8. Scrivere i test in `test_xml.py` e `test_operations.py`
-9. Aggiornare `CLAUDE.md` se cambia la struttura o i comandi
+1. Verify the operation does not already exist (consult `docs/requirements.md` §3 and `operations.py`)
+2. If the operation introduces a new pattern not covered by existing ADRs → create a new ADR
+3. Add the required dataclasses in `models.py`
+4. Add the envelope template and parsing function in `_xml.py`
+5. Implement the function in `operations.py`
+6. Expose the public method in `gateway.py`
+7. Create the XML fixture in `tests/fixtures/`
+8. Write tests in `test_xml.py` and `test_operations.py`
+9. Update `CLAUDE.md` if the structure or commands change
 
-Alternativa rapida: usare il comando `/new-operation`.
+Quick alternative: use the `/new-operation` command.
 
-## Workflow 2 — Modificare l'interfaccia pubblica
+## Workflow 2 — Modifying the public interface
 
-L'interfaccia pubblica è `HanelWarehouseGateway` e i dataclass pubblici in `models.py`.
+The public interface is `HanelWarehouseGateway` and the public dataclasses in `models.py`.
 
-1. **Obbligatorio:** creare o aggiornare un ADR che documenta il motivo della modifica
-2. Modificare la firma del metodo o il dataclass
-3. Aggiornare i type hints e le docstring
-4. Eseguire bump di versione in `pyproject.toml` (minor per nuovi metodi, major per breaking changes)
-5. Aggiornare i test che dipendono dall'interfaccia modificata
-6. Aggiornare `CLAUDE.md` sezione comandi se cambia l'interfaccia pubblica
+1. **Required:** create or update an ADR documenting the reason for the change
+2. Modify the method signature or dataclass
+3. Update type hints and docstrings
+4. Bump the version in `pyproject.toml` (minor for new methods, major for breaking changes)
+5. Update tests that depend on the modified interface
+6. Update the `CLAUDE.md` commands section if the public interface changes
 
-## Workflow 3 — Aggiungere o modificare un parametro di configurazione
+## Workflow 3 — Adding or modifying a configuration parameter
 
-1. Aggiungere il campo in `GatewayConfig` (`config.py`) con tipo e default
-2. Aggiungere la validazione in `__post_init__` se necessaria
-3. Aggiornare ADR-003 con il nuovo parametro
-4. Aggiornare `CLAUDE.md` con il nuovo parametro
-5. Aggiungere test in `test_config.py`
+1. Add the field in `GatewayConfig` (`config.py`) with type and default
+2. Add validation in `__post_init__` if needed
+3. Update ADR-003 with the new parameter
+4. Update `CLAUDE.md` with the new parameter
+5. Add tests in `test_config.py`
 
-## Workflow 4 — Correggere un bug nel parsing XML
+## Workflow 4 — Fixing a bug in XML parsing
 
-1. Creare o aggiornare la fixture XML in `tests/fixtures/` per riprodurre il bug
-2. Scrivere un test che fallisce con la fixture (red)
-3. Correggere la funzione `parse_*()` in `_xml.py`
-4. Verificare che il test passi (green)
-5. Se la correzione rivela un'assunzione sbagliata documentata in un ADR → aggiornare l'ADR
+1. Create or update the XML fixture in `tests/fixtures/` to reproduce the bug
+2. Write a failing test with the fixture (red)
+3. Fix the `parse_*()` function in `_xml.py`
+4. Verify the test passes (green)
+5. If the fix reveals a wrong assumption documented in an ADR → update the ADR
 
-## Workflow 5 — Aggiornare le istruzioni Claude
+## Workflow 5 — Updating Claude instructions
 
-1. Modificare i file in `.claude/agents/` o `.claude/commands/` direttamente
-2. Se la modifica riflette un cambiamento architetturale → aggiornare l'ADR corrispondente (ADR-010 o ADR-011)
-3. Se la modifica riflette un cambiamento ai comandi di sviluppo → aggiornare anche `CLAUDE.md`
+1. Edit files in `.claude/agents/` or `.claude/commands/` directly
+2. If the change reflects an architectural modification → update the corresponding ADR (ADR-010 or ADR-011)
+3. If the change reflects a change to development commands → also update `CLAUDE.md`
 
-## Regole trasversali
+## Cross-cutting rules
 
-- **Nessuna dipendenza esterna senza ADR.** Dipendenze di produzione (`requests` è l'unica consentita).
-- **Nessuna modifica a `__init__.py` exports senza revisione.** L'interfaccia pubblica è contrattuale.
-- **I test non usano `requests` reali.** Ogni chiamata HTTP nei test è intercettata da `responses`.
-- **Gli ADR non si cancellano.** Se una decisione è superata, lo status diventa `Superseded` con riferimento al nuovo ADR.
+- **No external dependencies without an ADR.** Production dependencies (`requests` is the only one allowed).
+- **No changes to `__init__.py` exports without review.** The public interface is contractual.
+- **Tests do not use real `requests`.** Every HTTP call in tests is intercepted by `responses`.
+- **ADRs are never deleted.** If a decision is superseded, its status becomes `Superseded` with a reference to the new ADR.
 
-## Conseguenze
+## Consequences
 
-- Ogni tipo di modifica ha un percorso chiaro da seguire
-- Gli agenti Claude che usano `/check-adr` possono rilevare deviazioni da questi workflow
-- I workflow sono documenti vivi: aggiornare questo ADR se il processo cambia
+- Every type of change has a clear path to follow
+- Claude agents using `/check-adr` can detect deviations from these workflows
+- Workflows are living documents: update this ADR if the process changes

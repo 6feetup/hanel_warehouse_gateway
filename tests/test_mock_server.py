@@ -1,9 +1,9 @@
 """
-Test del mock server SOAP Hanel.
-Richiede il server in esecuzione su http://localhost:8080.
+Tests for the Hanel SOAP mock server.
+Requires the server running at http://localhost:8080.
 
-Avvio: docker compose up --build
-Esecuzione: pytest tests/test_mock_server.py -v
+Start: docker compose up --build
+Run: pytest tests/test_mock_server.py -v
 """
 import xml.etree.ElementTree as ET
 
@@ -107,21 +107,21 @@ def reset_state():
 # ---------------------------------------------------------------------------
 
 class TestSendAPD:
-    def test_registra_articolo_nuovo(self):
-        resp = send_apd("ART-NEW", "Nuovo Articolo")
+    def test_registers_new_article(self):
+        resp = send_apd("ART-NEW", "New Article")
         assert resp.status_code == 200
         assert get_return_value(resp.text) == 0
 
-    def test_articolo_compare_nello_stato(self):
-        send_apd("ART-NEW", "Nuovo Articolo")
+    def test_article_appears_in_state(self):
+        send_apd("ART-NEW", "New Article")
         state = requests.get(f"{BASE_URL}/admin/state").json()
         assert "ART-NEW" in state["articles"]
-        assert state["articles"]["ART-NEW"]["article_name"] == "Nuovo Articolo"
+        assert state["articles"]["ART-NEW"]["article_name"] == "New Article"
 
-    def test_aggiorna_articolo_esistente(self):
-        send_apd("ART-001", "Nome Aggiornato")
+    def test_updates_existing_article(self):
+        send_apd("ART-001", "Updated Name")
         state = requests.get(f"{BASE_URL}/admin/state").json()
-        assert state["articles"]["ART-001"]["article_name"] == "Nome Aggiornato"
+        assert state["articles"]["ART-001"]["article_name"] == "Updated Name"
 
 
 # ---------------------------------------------------------------------------
@@ -129,17 +129,17 @@ class TestSendAPD:
 # ---------------------------------------------------------------------------
 
 class TestSendJobs:
-    def test_invia_ordine_ritorna_0(self):
+    def test_send_job_returns_0(self):
         resp = send_jobs("JOB-TEST", [{"article_number": "ART-001", "operation": "+", "nominal_quantity": 5.0}])
         assert resp.status_code == 200
         assert get_return_value(resp.text) == 0
 
-    def test_nuovo_ordine_ha_status_0(self):
+    def test_new_job_has_status_0(self):
         send_jobs("JOB-TEST", [{"article_number": "ART-001", "operation": "+", "nominal_quantity": 5.0}])
         state = requests.get(f"{BASE_URL}/admin/state").json()
         assert state["jobs"]["JOB-TEST"]["job_status"] == 0
 
-    def test_ordine_con_piu_posizioni(self):
+    def test_job_with_multiple_positions(self):
         positions = [
             {"article_number": "ART-001", "operation": "+", "nominal_quantity": 10.0},
             {"article_number": "ART-002", "operation": "-", "nominal_quantity": 3.0},
@@ -155,33 +155,33 @@ class TestSendJobs:
 # ---------------------------------------------------------------------------
 
 class TestReadAllJobs:
-    def test_mode_0_ritorna_tutti_gli_ordini(self):
+    def test_mode_0_returns_all_jobs(self):
         resp = read_jobs(0)
         assert resp.status_code == 200
         root = ET.fromstring(resp.text)
         jobs = root.findall(f".//{{{NS_XSD}}}job")
         assert len(jobs) == 4
 
-    def test_mode_1_ritorna_solo_completati(self):
+    def test_mode_1_returns_only_completed(self):
         resp = read_jobs(1)
         assert resp.status_code == 200
         root = ET.fromstring(resp.text)
         jobs = root.findall(f".//{{{NS_XSD}}}job")
         assert len(jobs) == 2
 
-    def test_nuovo_ordine_compare_in_mode_0(self):
+    def test_new_job_appears_in_mode_0(self):
         send_jobs("JOB-NEW", [{"article_number": "ART-001", "operation": "+", "nominal_quantity": 1.0}])
         root = ET.fromstring(read_jobs(0).text)
         job_numbers = [j.findtext(f"{{{NS_XSD}}}jobNumber") for j in root.findall(f".//{{{NS_XSD}}}job")]
         assert "JOB-NEW" in job_numbers
 
-    def test_nuovo_ordine_non_compare_in_mode_1(self):
+    def test_new_job_not_in_mode_1(self):
         send_jobs("JOB-NEW", [{"article_number": "ART-001", "operation": "+", "nominal_quantity": 1.0}])
         root = ET.fromstring(read_jobs(1).text)
         job_numbers = [j.findtext(f"{{{NS_XSD}}}jobNumber") for j in root.findall(f".//{{{NS_XSD}}}job")]
         assert "JOB-NEW" not in job_numbers
 
-    def test_dopo_complete_all_compare_in_mode_1(self):
+    def test_after_complete_all_appears_in_mode_1(self):
         send_jobs("JOB-NEW", [{"article_number": "ART-001", "operation": "+", "nominal_quantity": 1.0}])
         requests.post(f"{BASE_URL}/admin/complete-all")
         root = ET.fromstring(read_jobs(1).text)
@@ -194,14 +194,14 @@ class TestReadAllJobs:
 # ---------------------------------------------------------------------------
 
 class TestReadAllAMD:
-    def test_ritorna_record_inventario(self):
+    def test_returns_inventory_records(self):
         resp = read_amd()
         assert resp.status_code == 200
         root = ET.fromstring(resp.text)
         records = root.findall(f".//{{{NS_XSD}}}articleMasterData")
         assert len(records) == 6
 
-    def test_record_con_lift_zero_presente(self):
+    def test_record_with_lift_zero_present(self):
         root = ET.fromstring(read_amd().text)
         lift_zeros = [
             r for r in root.findall(f".//{{{NS_XSD}}}articleMasterData")
@@ -215,26 +215,26 @@ class TestReadAllAMD:
 # ---------------------------------------------------------------------------
 
 class TestDeleteJob:
-    def test_cancella_ordine_in_coda_ritorna_0(self):
+    def test_delete_queued_job_returns_0(self):
         resp = delete_job("ORD-001")
         assert resp.status_code == 200
         assert get_return_value(resp.text) == 0
 
-    def test_ordine_cancellato_non_compare_piu(self):
+    def test_deleted_job_no_longer_appears(self):
         delete_job("ORD-001")
         root = ET.fromstring(read_jobs(0).text)
         job_numbers = [j.findtext(f"{{{NS_XSD}}}jobNumber") for j in root.findall(f".//{{{NS_XSD}}}job")]
         assert "ORD-001" not in job_numbers
 
-    def test_cancella_ordine_completato_ritorna_1(self):
+    def test_delete_completed_job_returns_1(self):
         resp = delete_job("ORD-003")
         assert get_return_value(resp.text) == 1
 
-    def test_cancella_ordine_inesistente_ritorna_1(self):
-        resp = delete_job("NON-ESISTE")
+    def test_delete_nonexistent_job_returns_1(self):
+        resp = delete_job("NON-EXISTENT")
         assert get_return_value(resp.text) == 1
 
-    def test_cancella_ordine_in_progress_ritorna_1(self):
+    def test_delete_in_progress_job_returns_1(self):
         resp = delete_job("ORD-002")
         assert get_return_value(resp.text) == 1
 
@@ -244,7 +244,7 @@ class TestDeleteJob:
 # ---------------------------------------------------------------------------
 
 class TestAdmin:
-    def test_state_ritorna_json(self):
+    def test_state_returns_json(self):
         resp = requests.get(f"{BASE_URL}/admin/state")
         assert resp.status_code == 200
         data = resp.json()
@@ -252,14 +252,14 @@ class TestAdmin:
         assert "jobs" in data
         assert "inventory" in data
 
-    def test_reset_ripristina_dati_iniziali(self):
+    def test_reset_restores_initial_data(self):
         send_apd("ART-EXTRA", "Extra")
         requests.post(f"{BASE_URL}/admin/reset")
         state = requests.get(f"{BASE_URL}/admin/state").json()
         assert "ART-EXTRA" not in state["articles"]
         assert len(state["articles"]) == 3
 
-    def test_complete_all_completa_ordini_pendenti(self):
+    def test_complete_all_completes_pending_jobs(self):
         send_jobs("JOB-PEND", [{"article_number": "ART-001", "operation": "+", "nominal_quantity": 2.0}])
         resp = requests.post(f"{BASE_URL}/admin/complete-all")
         assert resp.status_code == 200
@@ -267,7 +267,7 @@ class TestAdmin:
         state = requests.get(f"{BASE_URL}/admin/state").json()
         assert state["jobs"]["JOB-PEND"]["job_status"] == 3
 
-    def test_operazione_sconosciuta_ritorna_soap_fault(self):
-        resp = post_soap(envelope("<main:operazioneInesistente/>"))
+    def test_unknown_operation_returns_soap_fault(self):
+        resp = post_soap(envelope("<main:unknownOperation/>"))
         assert resp.status_code == 500
         assert "Fault" in resp.text

@@ -1,21 +1,21 @@
 # CLAUDE.md — hanel_warehouse_gateway
 
-Modulo Python per la comunicazione con il magazzino automatico Hanel via SOAP. Espone un'interfaccia Python tipizzata e nasconde completamente i dettagli SOAP al chiamante.
+Python module for communicating with the Hanel automatic warehouse via SOAP. Exposes a typed Python interface and completely hides SOAP details from the caller.
 
-## Struttura directory
+## Directory structure
 
 ```
 src/hanel_warehouse_gateway/
-├── __init__.py      ← espone: HanelWarehouseGateway, dataclass pubblici, eccezioni
-├── gateway.py       ← Layer 3: interfaccia pubblica, unico punto di contatto
-├── operations.py    ← Layer 2: mapping operazioni SOAP, serializzazione/deserializzazione
-├── transport.py     ← Layer 1: HTTP POST, retry, timeout, logging payload
-├── models.py        ← dataclass: MovementLine, MovementLineResult, MovementResult, StockRecord
-├── exceptions.py    ← gerarchia HanelGatewayError
-├── config.py        ← GatewayConfig dataclass + validazione __post_init__
-└── _xml.py          ← PRIVATO: template envelope f-string, parsing ElementTree
+├── __init__.py      ← exposes: HanelWarehouseGateway, public dataclasses, exceptions
+├── gateway.py       ← Layer 3: public interface, single point of contact
+├── operations.py    ← Layer 2: SOAP operation mapping, serialization/deserialization
+├── transport.py     ← Layer 1: HTTP POST, retry, timeout, payload logging
+├── models.py        ← dataclasses: MovementLine, MovementLineResult, MovementResult, StockRecord
+├── exceptions.py    ← HanelGatewayError hierarchy
+├── config.py        ← GatewayConfig dataclass + __post_init__ validation
+└── _xml.py          ← PRIVATE: f-string envelope templates, ElementTree parsing
 tests/
-├── fixtures/        ← file XML di risposta del t-Server (fonte di verità per i parser)
+├── fixtures/        ← XML response files from t-Server (source of truth for parsers)
 ├── test_config.py
 ├── test_exceptions.py
 ├── test_models.py
@@ -23,20 +23,20 @@ tests/
 ├── test_transport.py
 └── test_operations.py
 docs/
-├── requirements.md  ← specifica tecnica completa (leggere prima di implementare)
+├── requirements.md  ← full technical specification (read before implementing)
 └── adr/             ← Architecture Decision Records (001–012)
 ```
 
-## Comandi di sviluppo
+## Development commands
 
 ```bash
-# Installazione in editable mode con dipendenze dev
+# Install in editable mode with dev dependencies
 pip install -e ".[dev]"
 
-# Esecuzione test
+# Run tests
 pytest tests/ --tb=short -q
 
-# Test con coverage
+# Run tests with coverage
 pytest tests/ --cov=src/hanel_warehouse_gateway --cov-report=term-missing
 
 # Type checking
@@ -46,22 +46,22 @@ mypy src/hanel_warehouse_gateway/
 ruff check src/ tests/
 ```
 
-## Configurazione (parametri principali)
+## Configuration (main parameters)
 
-I parametri **volatili e i secret** (`endpoint_url`, `test_mode`, `test_prefix`) vivono nel file `.env` (non committato). Usare `GatewayConfig.from_env()` per caricarli:
+**Volatile parameters and secrets** (`endpoint_url`, `test_mode`, `test_prefix`) live in the `.env` file (not committed). Use `GatewayConfig.from_env()` to load them:
 
 ```python
-# Uso standard — legge da .env o variabili d'ambiente
+# Standard usage — reads from .env or environment variables
 client = HanelWarehouseGateway(GatewayConfig.from_env())
 
-# Con override espliciti (es. nei test)
+# With explicit overrides (e.g. in tests)
 client = HanelWarehouseGateway(GatewayConfig.from_env({
     "endpoint_url": "http://mock/",
     "test_mode": True,
 }))
 ```
 
-File `.env` (non committare — vedi `.env.example` per il template):
+`.env` file (do not commit — see `.env.example` for the template):
 
 ```dotenv
 HANEL_ENDPOINT_URL=http://192.168.1.100:8080/HanelService
@@ -69,55 +69,56 @@ HANEL_TEST_MODE=false
 HANEL_TEST_PREFIX=TEST_
 ```
 
-Parametri statici con default (passabili come override):
+Static parameters with defaults (can be passed as overrides):
 
-| Parametro | Default | Note |
+| Parameter | Default | Notes |
 |---|---|---|
 | `timeout_seconds` | 30 | |
 | `retry_attempts` | 3 | |
 | `retry_delay_seconds` | 2.0 | |
 | `log_level` | `INFO` | |
 | `log_soap_payloads` | `False` | |
-| `validation_truncate` | `False` | `True` → tronca a 40 chars invece di raise |
+| `validation_truncate` | `False` | `True` → truncates to 40 chars instead of raise |
 
-## Vincoli critici
+## Critical constraints
 
-- **NO dipendenze esterne di produzione** oltre a `requests` e `python-dotenv`. zeep, lxml, pydantic, structlog sono esplicitamente escluse. Aggiungere una dipendenza richiede un ADR.
-- **NO modifica all'interfaccia pubblica** (`HanelWarehouseGateway`, dataclass in `models.py`) senza un ADR e bump di versione.
-- **NO `endpoint_url`, `test_mode`, credenziali nel codice sorgente o in file committati**. Sempre da variabili d'ambiente / `.env`.
-- **NO handler al logger**: il modulo è una libreria e usa solo `NullHandler`. Il chiamante configura i propri handler.
-- **I template XML vivono in `_xml.py`**: nessun envelope XML altrove.
-- **`__init__.py` espone solo**: `HanelWarehouseGateway`, `MovementLine`, `MovementLineResult`, `MovementResult`, `StockRecord`, e le eccezioni `HanelGateway*`.
-- **I test non fanno HTTP reale**: ogni chiamata `requests` nei test è intercettata da `responses`.
-- **Gli ADR non si cancellano**: se una decisione cambia, aggiornare lo status a `Superseded` con riferimento al nuovo ADR.
+- **NO production external dependencies** beyond `requests` and `python-dotenv`. zeep, lxml, pydantic, structlog are explicitly excluded. Adding a dependency requires an ADR.
+- **NO changes to the public interface** (`HanelWarehouseGateway`, dataclasses in `models.py`) without an ADR and version bump.
+- **NO `endpoint_url`, `test_mode`, credentials in source code or committed files**. Always from environment variables / `.env`.
+- **NO logger handlers**: the module is a library and uses only `NullHandler`. The caller configures their own handlers.
+- **XML templates live in `_xml.py`**: no XML envelopes elsewhere.
+- **`__init__.py` exposes only**: `HanelWarehouseGateway`, `MovementLine`, `MovementLineResult`, `MovementResult`, `StockRecord`, and the `HanelGateway*` exceptions.
+- **Tests do not make real HTTP calls**: every `requests` call in tests is intercepted by `responses`.
+- **ADRs are never deleted**: if a decision changes, update the status to `Superseded` with a reference to the new ADR.
+- **Documentation language**: all code comments, docstrings, ADRs, fixture descriptions, and technical notes must be written in **English**. Italian is reserved for user-facing communications only.
 
-## ADR principali
+## Key ADRs
 
-| ADR | Decisione |
-|-----|-----------|
-| [001](docs/adr/001-packaging-structure.md) | `pyproject.toml` + layout `src/` |
-| [002](docs/adr/002-soap-transport.md) | `requests` + XML manuale (no zeep) |
-| [003](docs/adr/003-configuration.md) | `GatewayConfig` dataclass da dict |
-| [004](docs/adr/004-xml-construction-parsing.md) | f-string template + ElementTree |
-| [005](docs/adr/005-error-handling-retry.md) | Gerarchia eccezioni + retry solo su errori di rete |
-| [006](docs/adr/006-logging.md) | `logging` stdlib, NullHandler, no handler di default |
+| ADR | Decision |
+|-----|----------|
+| [001](docs/adr/001-packaging-structure.md) | `pyproject.toml` + `src/` layout |
+| [002](docs/adr/002-soap-transport.md) | `requests` + manual XML (no zeep) |
+| [003](docs/adr/003-configuration.md) | `GatewayConfig` dataclass from dict |
+| [004](docs/adr/004-xml-construction-parsing.md) | f-string templates + ElementTree |
+| [005](docs/adr/005-error-handling-retry.md) | Exception hierarchy + retry on network errors only |
+| [006](docs/adr/006-logging.md) | `logging` stdlib, NullHandler, no default handlers |
 | [007](docs/adr/007-testing-strategy.md) | `pytest` + `unittest.mock` + `responses` |
-| [008](docs/adr/008-input-validation.md) | Default raise su campi > 40 chars; truncate opt-in |
-| [009](docs/adr/009-claude-instructions.md) | Questo file |
-| [010](docs/adr/010-claude-agents.md) | Agenti specializzati in `.claude/agents/` |
-| [011](docs/adr/011-claude-commands.md) | Comandi slash in `.claude/commands/` |
-| [012](docs/adr/012-development-workflow.md) | Workflow per modifiche comuni |
+| [008](docs/adr/008-input-validation.md) | Default raise on fields > 40 chars; truncate opt-in |
+| [009](docs/adr/009-claude-instructions.md) | This file |
+| [010](docs/adr/010-claude-agents.md) | Specialized agents in `.claude/agents/` |
+| [011](docs/adr/011-claude-commands.md) | Slash commands in `.claude/commands/` |
+| [012](docs/adr/012-development-workflow.md) | Workflow for common changes |
 
-## Comandi slash disponibili
+## Available slash commands
 
-- `/new-operation` — scaffold completo per una nuova operazione SOAP
-- `/check-adr` — verifica coerenza ADR vs codice attuale
-- `/soap-fixture` — genera fixture XML per un'operazione
-- `/run-tests` — esegue pytest con coverage e mostra summary
+- `/new-operation` — full scaffold for a new SOAP operation
+- `/check-adr` — verify ADR consistency vs current code
+- `/soap-fixture` — generate XML fixture for an operation
+- `/run-tests` — run pytest with coverage and show summary
 
-## Note operative
+## Operational notes
 
-- Il t-Server non ha ambiente di test separato. Usare `test_mode=True` per ordini identificabili dagli operatori.
-- Il modulo **non è thread-safe**. Istanziare un client per thread se necessario il parallelismo.
-- `get_inventory()` è l'unico modo per rilevare movimenti manuali eseguiti direttamente alla console del magazzino.
-- `actual_quantity < nominal_quantity` in `MovementLineResult` indica stock insufficiente: la gestione è responsabilità del chiamante.
+- The t-Server has no separate test environment. Use `test_mode=True` for orders identifiable by warehouse operators.
+- The module is **not thread-safe**. Instantiate one client per thread if parallelism is needed.
+- `get_inventory()` is the only way to detect manual movements performed directly at the warehouse console.
+- `actual_quantity < nominal_quantity` in `MovementLineResult` indicates insufficient stock: handling is the caller's responsibility.

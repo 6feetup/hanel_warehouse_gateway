@@ -1,49 +1,49 @@
-# ADR-007 — Strategia di testing
+# ADR-007 — Testing strategy
 
-**Status:** Accettato
+**Status:** Accepted
 
-## Contesto
+## Context
 
-Il modulo comunica con un sistema esterno (t-Server Hanel) che non è disponibile in ambiente di sviluppo e non ha un ambiente di test separato. I test devono essere eseguibili senza connettività al magazzino.
+The module communicates with an external system (Hanel t-Server) that is not available in the development environment and has no separate test environment. Tests must be runnable without connectivity to the warehouse.
 
-## Opzioni valutate
+## Options evaluated
 
-| Framework | Pro | Contro |
+| Framework | Pros | Cons |
 |---|---|---|
-| `unittest` puro | Stdlib, zero dipendenze | Verboso, fixture più complesse |
-| `pytest` | Fixture potenti, plugin ecosystem, output leggibile | Dipendenza dev |
-| `pytest` + `pytest-mock` | Mock API più pulita | Dipendenza extra, `unittest.mock` è sufficiente |
-| `responses` (mock HTTP) | Intercetta `requests` senza patch manuale | Dipendenza dev extra ma necessaria |
+| Pure `unittest` | Stdlib, zero dependencies | Verbose, more complex fixtures |
+| `pytest` | Powerful fixtures, plugin ecosystem, readable output | Dev dependency |
+| `pytest` + `pytest-mock` | Cleaner mock API | Extra dependency, `unittest.mock` is sufficient |
+| `responses` (HTTP mock) | Intercepts `requests` without manual patching | Extra dev dependency but necessary |
 
-## Decisione
+## Decision
 
-Adottiamo **`pytest`** + **`unittest.mock`** + **`responses`**.
+We adopt **`pytest`** + **`unittest.mock`** + **`responses`**.
 
-`responses` è la scelta corretta per testare `transport.py`: intercetta le chiamate HTTP a livello di `requests` senza richiedere patch manuali di `requests.post`.
+`responses` is the correct choice for testing `transport.py`: it intercepts HTTP calls at the `requests` level without requiring manual patching of `requests.post`.
 
-## Livelli di test
+## Test levels
 
-### 1. Unit test (no HTTP)
+### 1. Unit tests (no HTTP)
 
-Testano componenti isolati:
-- `test_config.py` — validazione `GatewayConfig`, chiavi mancanti, tipi errati
-- `test_exceptions.py` — costruzione eccezioni, attributi obbligatori
-- `test_models.py` — costruzione dataclass, valori di default
-- `test_xml.py` — `build_*()` produce XML atteso; `parse_*()` estrae i campi corretti da fixture XML
+Test isolated components:
+- `test_config.py` — `GatewayConfig` validation, missing keys, wrong types
+- `test_exceptions.py` — exception construction, required attributes
+- `test_models.py` — dataclass construction, default values
+- `test_xml.py` — `build_*()` produces expected XML; `parse_*()` extracts correct fields from XML fixtures
 
-### 2. Integration test (HTTP mockato)
+### 2. Integration tests (mocked HTTP)
 
-Testano il flusso completo dalla chiamata pubblica alla deserializzazione, con HTTP intercettato da `responses`:
-- `test_transport.py` — retry su errori di rete, classificazione errori HTTP
-- `test_operations.py` — ogni operazione SOAP: input → envelope corretto → parsing risposta → output atteso
+Test the full flow from public call to deserialization, with HTTP intercepted by `responses`:
+- `test_transport.py` — retry on network errors, HTTP error classification
+- `test_operations.py` — each SOAP operation: input → correct envelope → response parsing → expected output
 
 ### 3. End-to-end
 
-Non incluso. Il `test_mode=True` con prefisso `TEST_` è il meccanismo per testare contro il sistema reale senza impattare lo stock.
+Not included. `test_mode=True` with the `TEST_` prefix is the mechanism for testing against the real system without affecting stock.
 
-## Fixture XML
+## XML fixtures
 
-Le fixture risiedono in `tests/fixtures/` come file `.xml`:
+Fixtures reside in `tests/fixtures/` as `.xml` files:
 
 ```
 tests/fixtures/
@@ -57,9 +57,9 @@ tests/fixtures/
 └── response_soap_fault.xml
 ```
 
-Le fixture rappresentano risposte reali o plausibili del t-Server e sono la fonte di verità per i parser.
+Fixtures represent real or plausible t-Server responses and are the source of truth for the parsers.
 
-## Configurazione pytest
+## pytest configuration
 
 ```toml
 [tool.pytest.ini_options]
@@ -67,7 +67,7 @@ testpaths = ["tests"]
 addopts = "--tb=short -q"
 ```
 
-Coverage configurata tramite `pytest-cov`:
+Coverage configured via `pytest-cov`:
 
 ```toml
 [tool.coverage.run]
@@ -78,8 +78,8 @@ branch = true
 fail_under = 80
 ```
 
-## Conseguenze
+## Consequences
 
-- I test sono eseguibili offline senza accesso al t-Server
-- Le fixture XML documentano implicitamente la struttura delle risposte attese
-- Aggiungere una nuova operazione SOAP richiede: fixture XML + test in `test_xml.py` + test in `test_operations.py`
+- Tests are runnable offline without access to the t-Server
+- XML fixtures implicitly document the structure of expected responses
+- Adding a new SOAP operation requires: XML fixture + tests in `test_xml.py` + tests in `test_operations.py`

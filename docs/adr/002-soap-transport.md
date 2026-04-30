@@ -1,31 +1,31 @@
-# ADR-002 — Trasporto HTTP/SOAP: requests + XML manuale
+# ADR-002 — HTTP/SOAP transport: requests + manual XML
 
-**Status:** Accettato
+**Status:** Accepted
 
-## Contesto
+## Context
 
-Il modulo deve comunicare con il t-Server Hanel tramite SOAP su HTTP. È necessario scegliere come costruire gli envelope XML e come eseguire le chiamate HTTP.
+The module must communicate with the Hanel t-Server via SOAP over HTTP. A choice must be made on how to build XML envelopes and how to execute HTTP calls.
 
-## Opzioni valutate
+## Options evaluated
 
-| Opzione | Pro | Contro |
+| Option | Pros | Cons |
 |---|---|---|
-| `zeep` | Auto-generazione da WSDL, parsing automatico | Richiede WSDL accessibile, dipendenza pesante, oscura il payload |
-| `suds-jurko` | Storico per SOAP Python | Abbandonato, incompatibile con Python 3.10+ |
-| `requests` + XML manuale | Controllo totale, zero dipendenze aggiuntive, payload deterministico | Parsing manuale della risposta |
-| `httpx` | Async nativo, moderno | Async non richiesto dalla specifica; dipendenza extra |
+| `zeep` | Auto-generation from WSDL, automatic parsing | Requires accessible WSDL, heavy dependency, obscures the payload |
+| `suds-jurko` | Historical Python SOAP library | Abandoned, incompatible with Python 3.10+ |
+| `requests` + manual XML | Full control, no additional dependencies, deterministic payload | Manual response parsing |
+| `httpx` | Native async, modern | Async not required by the specification; extra dependency |
 
-## Decisione
+## Decision
 
-Adottiamo **`requests`** per il trasporto HTTP e **f-string template** per la costruzione degli envelope SOAP, con **`xml.etree.ElementTree`** (stdlib) per il parsing delle risposte.
+We adopt **`requests`** for HTTP transport and **f-string templates** for building SOAP envelopes, with **`xml.etree.ElementTree`** (stdlib) for response parsing.
 
-Motivazione principale: i requisiti §9 indicano esplicitamente questo approccio. Il t-Server Hanel espone operazioni SOAP stabili e documentate; non è necessario né desiderabile derivare il contratto da un WSDL runtime.
+Main motivation: requirements §9 explicitly indicate this approach. The Hanel t-Server exposes stable, documented SOAP operations; deriving the contract from a runtime WSDL is neither necessary nor desirable.
 
-## Implementazione
+## Implementation
 
-### Costruzione envelope
+### Envelope construction
 
-Gli envelope sono f-string centralizzati in `_xml.py`:
+Envelopes are f-strings centralised in `_xml.py`:
 
 ```python
 ENVELOPE_SEND_APD = """\
@@ -46,9 +46,9 @@ ENVELOPE_SEND_APD = """\
 </soapenv:Envelope>"""
 ```
 
-### Esecuzione chiamata
+### Executing the call
 
-`transport.py` esegue:
+`transport.py` executes:
 
 ```python
 response = requests.post(
@@ -59,9 +59,9 @@ response = requests.post(
 )
 ```
 
-### Parsing risposta
+### Response parsing
 
-`_xml.py` usa `ElementTree` con namespace espliciti:
+`_xml.py` uses `ElementTree` with explicit namespaces:
 
 ```python
 ns = {
@@ -72,10 +72,10 @@ root = ET.fromstring(response.text)
 return_value = root.find(".//xsd:returnValue", ns).text
 ```
 
-## Conseguenze
+## Consequences
 
-- Payload XML predicibile e leggibile nei log
-- Nessuna dipendenza aggiuntiva oltre `requests`
-- Ogni modifica agli envelope è visibile direttamente nel sorgente
-- Il parsing deve essere testato con fixture XML reali (vedere ADR-007)
-- In caso di cambiamenti al protocollo t-Server, le modifiche sono localizzate in `_xml.py`
+- XML payload is predictable and readable in logs
+- No additional dependencies beyond `requests`
+- Every envelope change is directly visible in the source
+- Parsing must be tested with real XML fixtures (see ADR-007)
+- If the t-Server protocol changes, modifications are localised in `_xml.py`

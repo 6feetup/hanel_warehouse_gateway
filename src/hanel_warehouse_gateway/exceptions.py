@@ -1,10 +1,10 @@
-"""Gerarchia di eccezioni per hanel_warehouse_gateway."""
+"""Exception hierarchy for hanel_warehouse_gateway."""
 
 from __future__ import annotations
 
 
 class HanelGatewayError(Exception):
-    """Eccezione base per tutti gli errori del modulo."""
+    """Base exception for all module errors."""
 
     def __init__(
         self,
@@ -29,11 +29,11 @@ class HanelGatewayError(Exception):
 
 
 class HanelGatewayNetworkError(HanelGatewayError):
-    """Errore di rete dopo esaurimento di tutti i tentativi di retry."""
+    """Network error after all retry attempts are exhausted."""
 
 
 class HanelGatewayHttpError(HanelGatewayError):
-    """Risposta HTTP con status code non 2xx."""
+    """HTTP response with a non-2xx status code."""
 
     def __init__(
         self,
@@ -48,7 +48,7 @@ class HanelGatewayHttpError(HanelGatewayError):
 
 
 class HanelGatewaySoapFaultError(HanelGatewayError):
-    """Fault SOAP presente nell'envelope di risposta."""
+    """SOAP fault present in the response envelope."""
 
     def __init__(
         self,
@@ -65,7 +65,7 @@ class HanelGatewaySoapFaultError(HanelGatewayError):
 
 
 class HanelGatewayApplicationError(HanelGatewayError):
-    """returnValue != 0 nella risposta applicativa."""
+    """returnValue != 0 in the application response."""
 
     def __init__(
         self,
@@ -80,7 +80,7 @@ class HanelGatewayApplicationError(HanelGatewayError):
 
 
 class HanelGatewayValidationError(HanelGatewayError):
-    """Input non valido rilevato prima dell'invio. Nessuna chiamata HTTP."""
+    """Invalid input detected before sending. No HTTP call is made."""
 
     def __init__(
         self,
