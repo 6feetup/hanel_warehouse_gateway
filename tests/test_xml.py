@@ -8,7 +8,9 @@ import pytest
 
 from hanel_warehouse_gateway._xml import (
     build_cancel_order_envelope,
+    build_read_jobs_envelope,
     build_register_article_envelope,
+    parse_movement_results,
     parse_return_value,
 )
 from hanel_warehouse_gateway.exceptions import (
@@ -148,3 +150,87 @@ class TestParseReturnValue:
             "</xsd:return></soapenv:Body></soapenv:Envelope>"
         )
         assert parse_return_value(xml, "op", "http://example.com/custom") == 0
+
+
+class TestBuildReadJobsEnvelope:
+    def test_mode_1_in_envelope(self) -> None:
+        xml = build_read_jobs_envelope(1, _NS_MAIN, _NS_XSD)
+        assert "<xsd:mode>1</xsd:mode>" in xml
+
+    def test_mode_0_in_envelope(self) -> None:
+        xml = build_read_jobs_envelope(0, _NS_MAIN, _NS_XSD)
+        assert "<xsd:mode>0</xsd:mode>" in xml
+
+    def test_contains_operation_name(self) -> None:
+        xml = build_read_jobs_envelope(1, _NS_MAIN, _NS_XSD)
+        assert "readAllJobsReqV01" in xml
+
+    def test_uses_namespaces(self) -> None:
+        xml = build_read_jobs_envelope(1, _NS_MAIN, _NS_XSD)
+        assert _NS_MAIN in xml
+        assert _NS_XSD in xml
+
+    def test_is_valid_xml(self) -> None:
+        import xml.etree.ElementTree as ET
+
+        xml = build_read_jobs_envelope(1, _NS_MAIN, _NS_XSD)
+        ET.fromstring(xml)  # must not raise
+
+
+_EMPTY_JOBS_RESPONSE = (
+    '<?xml version="1.0" encoding="UTF-8"?>'
+    '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"'
+    ' xmlns:main="http://main.jws.com.hanel.de"'
+    ' xmlns:xsd="http://main.jws.com.hanel.de/xsd">'
+    "<soapenv:Header/><soapenv:Body>"
+    "<main:readAllJobsReqV01Response><main:return/></main:readAllJobsReqV01Response>"
+    "</soapenv:Body></soapenv:Envelope>"
+)
+
+_OPERATION = "readAllJobsReqV01"
+
+
+class TestParseMovementResults:
+    def test_two_completed_jobs(self) -> None:
+        xml = _fixture("read_jobs_response_mode1.xml")
+        results = parse_movement_results(xml, _OPERATION, _NS_XSD)
+        assert len(results) == 2
+
+    def test_job_fields(self) -> None:
+        xml = _fixture("read_jobs_response_mode1.xml")
+        results = parse_movement_results(xml, _OPERATION, _NS_XSD)
+        job = results[0]
+        assert job["job_number"] == "ORD-003"
+        assert job["job_status"] == 3
+        assert job["job_date"] == "280426"
+        assert job["job_time"] == "1430"
+        assert job["job_priority"] == 1
+
+    def test_position_fields(self) -> None:
+        xml = _fixture("read_jobs_response_mode1.xml")
+        results = parse_movement_results(xml, _OPERATION, _NS_XSD)
+        pos = results[0]["positions"][0]  # type: ignore[index]
+        assert pos["article_number"] == "ART-001"
+        assert pos["actual_quantity"] == 50.0
+        assert pos["container_size"] == 1
+        assert pos["position_status"] == 1
+
+    def test_partial_quantity_job(self) -> None:
+        xml = _fixture("read_jobs_response_mode1.xml")
+        results = parse_movement_results(xml, _OPERATION, _NS_XSD)
+        pos = results[1]["positions"][0]  # type: ignore[index]
+        assert pos["nominal_quantity"] == 40.0
+        assert pos["actual_quantity"] == 15.0
+
+    def test_empty_response_returns_empty_list(self) -> None:
+        results = parse_movement_results(_EMPTY_JOBS_RESPONSE, _OPERATION, _NS_XSD)
+        assert results == []
+
+    def test_soap_fault_raises(self) -> None:
+        xml = _fixture("response_soap_fault.xml")
+        with pytest.raises(HanelGatewaySoapFaultError):
+            parse_movement_results(xml, _OPERATION, _NS_XSD)
+
+    def test_malformed_xml_raises_parse_error(self) -> None:
+        with pytest.raises(HanelGatewayParseError):
+            parse_movement_results("<not-xml", _OPERATION, _NS_XSD)
