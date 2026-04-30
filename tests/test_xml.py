@@ -46,6 +46,21 @@ class TestBuildRegisterArticleEnvelope:
         xml = build_register_article_envelope("ART001", "Bolt M6", NS_MAIN, NS_XSD)
         ET.fromstring(xml)  # must not raise
 
+    def test_escapes_special_characters(self) -> None:
+        import xml.etree.ElementTree as ET
+
+        xml = build_register_article_envelope(
+            "A&B<1>", 'Bolt "M6" & <Nut>', NS_MAIN, NS_XSD
+        )
+        assert "<xsd:articleNumber>A&B<1></xsd:articleNumber>" not in xml
+        assert 'Bolt "M6" & <Nut>' not in xml
+        root = ET.fromstring(xml)
+        ns = {"xsd": NS_XSD}
+        number_el = root.find(".//xsd:articleNumber", ns)
+        name_el = root.find(".//xsd:articleName", ns)
+        assert number_el is not None and number_el.text == "A&B<1>"
+        assert name_el is not None and name_el.text == 'Bolt "M6" & <Nut>'
+
 
 class TestParseReturnValue:
     def test_success_fixture(self) -> None:

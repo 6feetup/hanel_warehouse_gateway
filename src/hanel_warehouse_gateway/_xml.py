@@ -12,6 +12,17 @@ _NS_SOAP = "http://schemas.xmlsoap.org/soap/envelope/"
 _NS_XSD = "http://main.jws.com.hanel.de/xsd"
 
 
+def _xml_escape(value: str) -> str:
+    """Escape characters that are reserved in XML text content and attributes."""
+    return (
+        value.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+        .replace("'", "&apos;")
+    )
+
+
 def build_register_article_envelope(
     article_number: str,
     article_name: str,
@@ -19,6 +30,8 @@ def build_register_article_envelope(
     namespace_xsd: str,
 ) -> str:
     """Build the SOAP envelope for sendAPDReqV01."""
+    article_number_escaped = _xml_escape(article_number)
+    article_name_escaped = _xml_escape(article_name)
     return (
         f'<soapenv:Envelope xmlns:soapenv="{_NS_SOAP}"'
         f' xmlns:main="{namespace_main}"'
@@ -28,8 +41,8 @@ def build_register_article_envelope(
         f"<main:sendAPDReqV01>"
         f"<main:param>"
         f"<xsd:articlePoolDataRecord>"
-        f"<xsd:articleNumber>{article_number}</xsd:articleNumber>"
-        f"<xsd:articleName>{article_name}</xsd:articleName>"
+        f"<xsd:articleNumber>{article_number_escaped}</xsd:articleNumber>"
+        f"<xsd:articleName>{article_name_escaped}</xsd:articleName>"
         f"</xsd:articlePoolDataRecord>"
         f"</main:param>"
         f"</main:sendAPDReqV01>"
