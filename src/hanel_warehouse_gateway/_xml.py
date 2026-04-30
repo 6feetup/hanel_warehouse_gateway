@@ -60,7 +60,32 @@ def build_send_movement_order_envelope(
     namespace_xsd: str,
 ) -> str:
     """Build the SOAP envelope for sendJobsReqV01."""
-    raise NotImplementedError
+    job_number_escaped = _xml_escape(job_number)
+    positions_xml = "".join(
+        f"<xsd:JobPosition>"
+        f"<xsd:articleNumber>{_xml_escape(str(p['article_number']))}</xsd:articleNumber>"
+        f"<xsd:operation>{_xml_escape(str(p['operation']))}</xsd:operation>"
+        f"<xsd:nominalQuantity>{p['nominal_quantity']}</xsd:nominalQuantity>"
+        f"</xsd:JobPosition>"
+        for p in positions
+    )
+    return (
+        f'<soapenv:Envelope xmlns:soapenv="{_NS_SOAP}"'
+        f' xmlns:main="{namespace_main}"'
+        f' xmlns:xsd="{namespace_xsd}">'
+        f"<soapenv:Header/>"
+        f"<soapenv:Body>"
+        f"<main:sendJobsReqV01>"
+        f"<main:param>"
+        f"<xsd:job>"
+        f"<xsd:jobNumber>{job_number_escaped}</xsd:jobNumber>"
+        f"{positions_xml}"
+        f"</xsd:job>"
+        f"</main:param>"
+        f"</main:sendJobsReqV01>"
+        f"</soapenv:Body>"
+        f"</soapenv:Envelope>"
+    )
 
 
 def build_read_jobs_envelope(

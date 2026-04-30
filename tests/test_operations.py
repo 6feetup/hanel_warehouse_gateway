@@ -213,3 +213,148 @@ class TestCancelOrder:
         payload = responses_lib.calls[0].request.body.decode("utf-8")
         assert "X" * 40 in payload
         assert "X" * 41 not in payload
+
+
+from hanel_warehouse_gateway.models import MovementLine  # noqa: E402
+
+_SUCCESS_XML = _fixture("send_movement_order_success.xml")
+
+_ONE_LINE = [
+    MovementLine(article_number="ART-001", operation="+", nominal_quantity=5.0)
+]
+
+
+class TestSendMovementOrder:
+    def test_success_returns_true(self) -> None:
+        ops, transport = _make_operations(_SUCCESS_XML)
+        assert ops.send_movement_order("JOB-1", _ONE_LINE) is True
+        transport.post.assert_called_once()
+
+    def test_calls_correct_soap_operation(self) -> None:
+        ops, transport = _make_operations(_SUCCESS_XML)
+        ops.send_movement_order("JOB-1", _ONE_LINE)
+        _, call_operation = transport.post.call_args[0]
+        assert call_operation == "sendJobsReqV01"
+
+    def test_envelope_contains_job_number(self) -> None:
+        ops, transport = _make_operations(_SUCCESS_XML)
+        ops.send_movement_order("JOB-42", _ONE_LINE)
+        envelope, _ = transport.post.call_args[0]
+        assert "JOB-42" in envelope
+
+    def test_envelope_contains_article_number(self) -> None:
+        ops, transport = _make_operations(_SUCCESS_XML)
+        ops.send_movement_order("JOB-1", _ONE_LINE)
+        envelope, _ = transport.post.call_args[0]
+        assert "ART-001" in envelope
+
+    def test_envelope_contains_operation_and_quantity(self) -> None:
+        ops, transport = _make_operations(_SUCCESS_XML)
+        ops.send_movement_order("JOB-1", _ONE_LINE)
+        envelope, _ = transport.post.call_args[0]
+        assert "<xsd:operation>+</xsd:operation>" in envelope
+        assert "5.0" in envelope
+
+    def test_multiple_positions_all_in_envelope(self) -> None:
+        positions = [
+            MovementLine("ART-001", "+", 10.0),
+            MovementLine("ART-002", "-", 3.5),
+        ]
+        ops, transport = _make_operations(_SUCCESS_XML)
+        ops.send_movement_order("JOB-MULTI", positions)
+        envelope, _ = transport.post.call_args[0]
+        assert "ART-001" in envelope
+        assert "ART-002" in envelope
+
+    def test_test_mode_prepends_prefix(self) -> None:
+        ops, transport = _make_operations(
+            _SUCCESS_XML, test_mode=True, test_prefix="TEST_"
+        )
+        ops.send_movement_order("JOB-1", _ONE_LINE)
+        envelope, _ = transport.post.call_args[0]
+        assert "TEST_JOB-1" in envelope
+        assert "<xsd:jobNumber>TEST_JOB-1</xsd:jobNumber>" in envelope
+
+    def test_test_mode_false_no_prefix(self) -> None:
+        ops, transport = _make_operations(_SUCCESS_XML, test_mode=False)
+        ops.send_movement_order("JOB-1", _ONE_LINE)
+        envelope, _ = transport.post.call_args[0]
+        assert "<xsd:jobNumber>JOB-1</xsd:jobNumber>" in envelope
+
+    def test_empty_positions_raises_validation_error(self) -> None:
+        ops, transport = _make_operations()
+        with pytest.raises(HanelGatewayValidationError) as exc_info:
+            ops.send_movement_order("JOB-1", [])
+        assert exc_info.value.field == "positions"
+        transport.post.assert_not_called()
+
+    def test_invalid_operation_raises_validation_error(self) -> None:
+        ops, transport = _make_operations()
+        bad = [MovementLine("ART-001", "X", 1.0)]
+        with pytest.raises(HanelGatewayValidationError) as exc_info:
+            ops.send_movement_order("JOB-1", bad)
+        assert "operation" in exc_info.value.field
+        transport.post.assert_not_called()
+
+    def test_zero_quantity_raises_validation_error(self) -> None:
+        ops, transport = _make_operations()
+        bad = [
+            MovementLine(article_number="ART-001", operation="+", nominal_quantity=0.0)
+        ]
+        with pytest.raises(HanelGatewayValidationError) as exc_info:
+            ops.send_movement_order("JOB-1", bad)
+        assert "nominal_quantity" in exc_info.value.field
+        transport.post.assert_not_called()
+
+    def test_negative_quantity_raises_validation_error(self) -> None:
+        ops, transport = _make_operations()
+        bad = [
+            MovementLine(article_number="ART-001", operation="+", nominal_quantity=-1.0)
+        ]
+        with pytest.raises(HanelGatewayValidationError) as exc_info:
+            ops.send_movement_order("JOB-1", bad)
+        assert "nominal_quantity" in exc_info.value.field
+        transport.post.assert_not_called()
+
+    def test_order_number_too_long_raises_validation_error(self) -> None:
+        ops, transport = _make_operations()
+        with pytest.raises(HanelGatewayValidationError) as exc_info:
+            ops.send_movement_order("J" * 41, _ONE_LINE)
+        assert exc_info.value.field == "job_number"
+        transport.post.assert_not_called()
+
+    def test_article_number_too_long_raises_validation_error(self) -> None:
+        ops, transport = _make_operations()
+        bad = [
+            MovementLine(article_number="A" * 41, operation="+", nominal_quantity=1.0)
+        ]
+        with pytest.raises(HanelGatewayValidationError) as exc_info:
+            ops.send_movement_order("JOB-1", bad)
+        assert "article_number" in exc_info.value.field
+        transport.post.assert_not_called()
+
+    def test_order_number_exactly_40_chars_is_valid(self) -> None:
+        ops, transport = _make_operations(_SUCCESS_XML)
+        ops.send_movement_order("J" * 40, _ONE_LINE)
+        transport.post.assert_called_once()
+
+    def test_validation_truncate_order_number(self) -> None:
+        ops, transport = _make_operations(_SUCCESS_XML, validation_truncate=True)
+        ops.send_movement_order("J" * 41, _ONE_LINE)
+        envelope, _ = transport.post.call_args[0]
+        assert "J" * 40 in envelope
+        assert "J" * 41 not in envelope
+
+    def test_test_mode_prefix_counts_toward_length_limit(self) -> None:
+        ops, transport = _make_operations(test_mode=True, test_prefix="TEST_")
+        with pytest.raises(HanelGatewayValidationError):
+            ops.send_movement_order("J" * 36, _ONE_LINE)
+        transport.post.assert_not_called()
+
+    def test_nonzero_return_value_raises_application_error(self) -> None:
+        error_xml = _fixture("sendAPDReqV01_error.xml")
+        ops, _ = _make_operations(error_xml)
+        with pytest.raises(HanelGatewayApplicationError) as exc_info:
+            ops.send_movement_order("JOB-1", _ONE_LINE)
+        assert exc_info.value.return_value == 1
+        assert exc_info.value.operation == "sendJobsReqV01"

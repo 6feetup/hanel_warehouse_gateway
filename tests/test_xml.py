@@ -9,6 +9,7 @@ import pytest
 from hanel_warehouse_gateway._xml import (
     build_cancel_order_envelope,
     build_register_article_envelope,
+    build_send_movement_order_envelope,
     parse_return_value,
 )
 from hanel_warehouse_gateway.exceptions import (
@@ -139,6 +140,10 @@ class TestParseReturnValue:
         with pytest.raises(HanelGatewayParseError):
             parse_return_value(xml, "deleteJobReqV01", _NS_XSD)
 
+    def test_send_movement_order_success_fixture(self) -> None:
+        xml = _fixture("send_movement_order_success.xml")
+        assert parse_return_value(xml, "sendJobsReqV01", _NS_XSD) == 0
+
     def test_custom_namespace_xsd_is_honored(self) -> None:
         xml = (
             '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"'
@@ -148,3 +153,70 @@ class TestParseReturnValue:
             "</xsd:return></soapenv:Body></soapenv:Envelope>"
         )
         assert parse_return_value(xml, "op", "http://example.com/custom") == 0
+
+
+_ONE_POSITION = [
+    {"article_number": "ART-001", "operation": "+", "nominal_quantity": 5.0}
+]
+
+
+def _build_smo(job_number: str, positions: list[dict[str, object]]) -> str:
+    return build_send_movement_order_envelope(job_number, positions, _NS_MAIN, _NS_XSD)
+
+
+class TestBuildSendMovementOrderEnvelope:
+    def test_contains_job_number(self) -> None:
+        xml = _build_smo("JOB-123", _ONE_POSITION)
+        assert "<xsd:jobNumber>JOB-123</xsd:jobNumber>" in xml
+
+    def test_contains_operation_name(self) -> None:
+        xml = _build_smo("JOB-1", _ONE_POSITION)
+        assert "sendJobsReqV01" in xml
+
+    def test_single_position_fields(self) -> None:
+        xml = _build_smo("JOB-1", _ONE_POSITION)
+        assert "<xsd:articleNumber>ART-001</xsd:articleNumber>" in xml
+        assert "<xsd:operation>+</xsd:operation>" in xml
+        assert "<xsd:nominalQuantity>5.0</xsd:nominalQuantity>" in xml
+
+    def test_multiple_positions_all_present(self) -> None:
+        positions = [
+            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 10.0},
+            {"article_number": "ART-002", "operation": "-", "nominal_quantity": 3.5},
+        ]
+        xml = _build_smo("JOB-MULTI", positions)
+        assert "ART-001" in xml
+        assert "ART-002" in xml
+        assert xml.count("<xsd:JobPosition>") == 2
+
+    def test_namespaces_declared(self) -> None:
+        xml = _build_smo("JOB-1", _ONE_POSITION)
+        assert _NS_MAIN in xml
+        assert _NS_XSD in xml
+        assert "http://schemas.xmlsoap.org/soap/envelope/" in xml
+
+    def test_is_valid_xml(self) -> None:
+        import xml.etree.ElementTree as ET
+
+        xml = _build_smo("JOB-1", _ONE_POSITION)
+        ET.fromstring(xml)  # must not raise
+
+    def test_escapes_special_chars_in_job_number(self) -> None:
+        import xml.etree.ElementTree as ET
+
+        xml = _build_smo("JOB&<>", _ONE_POSITION)
+        assert "JOB&<>" not in xml
+        root = ET.fromstring(xml)
+        el = root.find(f".//{{{_NS_XSD}}}jobNumber")
+        assert el is not None and el.text == "JOB&<>"
+
+    def test_escapes_special_chars_in_article_number(self) -> None:
+        import xml.etree.ElementTree as ET
+
+        positions = [
+            {"article_number": "ART&01", "operation": "+", "nominal_quantity": 1.0}
+        ]
+        xml = _build_smo("JOB-1", positions)
+        root = ET.fromstring(xml)
+        el = root.find(f".//{{{_NS_XSD}}}articleNumber")
+        assert el is not None and el.text == "ART&01"
