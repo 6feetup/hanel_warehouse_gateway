@@ -50,6 +50,8 @@ class SoapOperations:
     def register_article(self, article_number: str, article_name: str) -> bool:
         """Register or update an article in the warehouse (sendAPDReqV01)."""
         operation = "sendAPDReqV01"
+        if self._config.test_mode:
+            article_number = f"{self._config.test_prefix}{article_number}"
 
         article_number = _validate_field_length(
             article_number, "article_number", operation, self._config
