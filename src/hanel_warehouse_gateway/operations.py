@@ -8,12 +8,38 @@ Does not make HTTP calls directly: delegates to SoapTransport.
 from __future__ import annotations
 
 import logging
+from datetime import datetime, timezone
 
+from . import _xml
 from .config import GatewayConfig
+from .exceptions import (
+    HanelGatewayApplicationError,
+    HanelGatewaySoapFaultError,
+    HanelGatewayValidationError,
+)
 from .models import MovementLine, MovementResult, StockRecord
 from .transport import SoapTransport
 
 logger = logging.getLogger(__name__)
+
+
+def _validate_field_length(
+    value: str, field: str, operation: str, config: GatewayConfig
+) -> str:
+    """Validate that a string field does not exceed 40 chars (ADR-008)."""
+    if len(value) <= 40:
+        return value
+    if config.validation_truncate:
+        logger.warning("Field '%s' truncated to 40 chars in '%s'", field, operation)
+        return value[:40]
+    raise HanelGatewayValidationError(
+        message=f"Field '{field}' exceeds the 40-character limit",
+        operation=operation,
+        detail=f"Length: {len(value)}, value: {value!r}",
+        timestamp=datetime.now(timezone.utc).isoformat(),
+        field=field,
+        value=value,
+    )
 
 
 class SoapOperations:
@@ -25,7 +51,58 @@ class SoapOperations:
 
     def register_article(self, article_number: str, article_name: str) -> bool:
         """Register or update an article in the warehouse (sendAPDReqV01)."""
-        raise NotImplementedError
+        operation = "sendAPDReqV01"
+
+        article_number = _validate_field_length(
+            article_number, "article_number", operation, self._config
+        )
+        article_name = _validate_field_length(
+            article_name, "article_name", operation, self._config
+        )
+
+        logger.info(
+            "register_article: initiating %s for article_number=%r",
+            operation,
+            article_number,
+        )
+
+        envelope = _xml.build_register_article_envelope(
+            article_number,
+            article_name,
+            self._config.namespace_main,
+            self._config.namespace_xsd,
+        )
+
+        raw = self._transport.post(envelope, operation)
+
+        fault = _xml.extract_soap_fault(raw)
+        if fault is not None:
+            fault_code, fault_string = fault
+            raise HanelGatewaySoapFaultError(
+                message=f"SOAP fault in {operation}: {fault_string}",
+                operation=operation,
+                detail=f"fault_code={fault_code!r}",
+                timestamp=datetime.now(timezone.utc).isoformat(),
+                fault_string=fault_string,
+                fault_code=fault_code,
+            )
+
+        return_value = _xml.parse_return_value(raw)
+        if return_value != 0:
+            raise HanelGatewayApplicationError(
+                message=f"{operation} returned error code {return_value}",
+                operation=operation,
+                detail=f"returnValue={return_value}",
+                timestamp=datetime.now(timezone.utc).isoformat(),
+                return_value=return_value,
+            )
+
+        logger.info(
+            "register_article: %s succeeded for article_number=%r",
+            operation,
+            article_number,
+        )
+        return True
 
     def send_movement_order(
         self, order_number: str, positions: list[MovementLine]
