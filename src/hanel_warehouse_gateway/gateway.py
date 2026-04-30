@@ -43,7 +43,7 @@ class HanelWarehouseGateway:
         Returns:
             True if the operation succeeded (returnValue == 0).
         """
-        raise NotImplementedError
+        return self._operations.register_article(article_number, article_name)
 
     def send_movement_order(
         self, order_number: str, positions: list[MovementLine]

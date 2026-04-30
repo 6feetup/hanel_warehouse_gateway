@@ -8,6 +8,7 @@ import pytest
 
 from hanel_warehouse_gateway._xml import (
     build_cancel_order_envelope,
+    build_register_article_envelope,
     parse_return_value,
 )
 from hanel_warehouse_gateway.exceptions import (
@@ -23,6 +24,50 @@ _NS_XSD = "http://main.jws.com.hanel.de/xsd"
 
 def _fixture(name: str) -> str:
     return (_FIXTURES / name).read_text(encoding="utf-8")
+
+
+class TestBuildRegisterArticleEnvelope:
+    def test_contains_article_number(self) -> None:
+        xml = build_register_article_envelope("ART001", "Bolt M6", _NS_MAIN, _NS_XSD)
+        assert "ART001" in xml
+
+    def test_contains_article_name(self) -> None:
+        xml = build_register_article_envelope("ART001", "Bolt M6", _NS_MAIN, _NS_XSD)
+        assert "Bolt M6" in xml
+
+    def test_contains_operation_tag(self) -> None:
+        xml = build_register_article_envelope("ART001", "Bolt M6", _NS_MAIN, _NS_XSD)
+        assert "sendAPDReqV01" in xml
+
+    def test_contains_article_pool_data_record(self) -> None:
+        xml = build_register_article_envelope("ART001", "Bolt M6", _NS_MAIN, _NS_XSD)
+        assert "articlePoolDataRecord" in xml
+
+    def test_uses_provided_namespaces(self) -> None:
+        xml = build_register_article_envelope("X", "Y", _NS_MAIN, _NS_XSD)
+        assert _NS_MAIN in xml
+        assert _NS_XSD in xml
+
+    def test_is_valid_xml(self) -> None:
+        import xml.etree.ElementTree as ET
+
+        xml = build_register_article_envelope("ART001", "Bolt M6", _NS_MAIN, _NS_XSD)
+        ET.fromstring(xml)  # must not raise
+
+    def test_escapes_special_characters(self) -> None:
+        import xml.etree.ElementTree as ET
+
+        xml = build_register_article_envelope(
+            "A&B<1>", 'Bolt "M6" & <Nut>', _NS_MAIN, _NS_XSD
+        )
+        assert "<xsd:articleNumber>A&B<1></xsd:articleNumber>" not in xml
+        assert 'Bolt "M6" & <Nut>' not in xml
+        root = ET.fromstring(xml)
+        ns = {"xsd": _NS_XSD}
+        number_el = root.find(".//xsd:articleNumber", ns)
+        name_el = root.find(".//xsd:articleName", ns)
+        assert number_el is not None and number_el.text == "A&B<1>"
+        assert name_el is not None and name_el.text == 'Bolt "M6" & <Nut>'
 
 
 class TestBuildCancelOrderEnvelope:
@@ -60,6 +105,14 @@ class TestParseReturnValue:
     def test_error_fixture_returns_one(self) -> None:
         xml = _fixture("response_delete_job_error.xml")
         assert parse_return_value(xml, "deleteJobReqV01", _NS_XSD) == 1
+
+    def test_register_article_success_fixture(self) -> None:
+        xml = _fixture("sendAPDReqV01_success.xml")
+        assert parse_return_value(xml, "sendAPDReqV01", _NS_XSD) == 0
+
+    def test_register_article_error_fixture(self) -> None:
+        xml = _fixture("sendAPDReqV01_error.xml")
+        assert parse_return_value(xml, "sendAPDReqV01", _NS_XSD) == 1
 
     def test_soap_fault_raises_soap_fault_error(self) -> None:
         xml = _fixture("response_soap_fault.xml")

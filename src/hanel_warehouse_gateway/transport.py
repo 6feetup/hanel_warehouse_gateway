@@ -41,9 +41,15 @@ class SoapTransport:
             HanelGatewayNetworkError: If all retry attempts are exhausted.
             HanelGatewayHttpError: If the response has a non-2xx status code.
         """
-        headers = {"Content-Type": "text/xml; charset=utf-8"}
-        response: requests.Response | None = None
+        headers = {
+            "Content-Type": "text/xml; charset=utf-8",
+            "SOAPAction": '""',
+        }
 
+        if self._config.log_soap_payloads:
+            logger.debug("Request [%s]: %s", operation, envelope)
+
+        response: requests.Response | None = None
         for attempt in range(1, self._config.retry_attempts + 1):
             try:
                 response = requests.post(
@@ -76,7 +82,6 @@ class SoapTransport:
         assert response is not None
 
         if self._config.log_soap_payloads:
-            logger.debug("Request [%s]: %s", operation, envelope)
             logger.debug("Response [%s]: %s", operation, response.text)
 
         if not response.ok:

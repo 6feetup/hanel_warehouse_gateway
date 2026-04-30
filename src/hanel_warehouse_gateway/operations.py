@@ -12,7 +12,7 @@ import logging
 
 from . import _xml
 from .config import GatewayConfig
-from .exceptions import HanelGatewayValidationError
+from .exceptions import HanelGatewayApplicationError, HanelGatewayValidationError
 from .models import MovementLine, MovementResult, StockRecord
 from .transport import SoapTransport
 
@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 def _validate_field_length(
     value: str, field: str, operation: str, config: GatewayConfig
 ) -> str:
+    """Validate that a string field does not exceed 40 chars (ADR-008)."""
     if len(value) <= 40:
         return value
     if config.validation_truncate:
@@ -48,7 +49,48 @@ class SoapOperations:
 
     def register_article(self, article_number: str, article_name: str) -> bool:
         """Register or update an article in the warehouse (sendAPDReqV01)."""
-        raise NotImplementedError
+        operation = "sendAPDReqV01"
+
+        article_number = _validate_field_length(
+            article_number, "article_number", operation, self._config
+        )
+        article_name = _validate_field_length(
+            article_name, "article_name", operation, self._config
+        )
+
+        logger.info(
+            "register_article: initiating %s for article_number=%r",
+            operation,
+            article_number,
+        )
+
+        envelope = _xml.build_register_article_envelope(
+            article_number,
+            article_name,
+            self._config.namespace_main,
+            self._config.namespace_xsd,
+        )
+
+        raw = self._transport.post(envelope, operation)
+
+        return_value = _xml.parse_return_value(
+            raw, operation, self._config.namespace_xsd
+        )
+        if return_value != 0:
+            raise HanelGatewayApplicationError(
+                message=f"{operation} returned error code {return_value}",
+                operation=operation,
+                detail=f"returnValue={return_value}",
+                timestamp=datetime.datetime.utcnow().isoformat(),
+                return_value=return_value,
+            )
+
+        logger.info(
+            "register_article: %s succeeded for article_number=%r",
+            operation,
+            article_number,
+        )
+        return True
 
     def send_movement_order(
         self, order_number: str, positions: list[MovementLine]

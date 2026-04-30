@@ -14,6 +14,17 @@ from .exceptions import HanelGatewayParseError, HanelGatewaySoapFaultError
 _NS_SOAP = "http://schemas.xmlsoap.org/soap/envelope/"
 
 
+def _xml_escape(value: str) -> str:
+    """Escape characters that are reserved in XML text content and attributes."""
+    return (
+        value.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+        .replace("'", "&apos;")
+    )
+
+
 def build_register_article_envelope(
     article_number: str,
     article_name: str,
@@ -21,7 +32,25 @@ def build_register_article_envelope(
     namespace_xsd: str,
 ) -> str:
     """Build the SOAP envelope for sendAPDReqV01."""
-    raise NotImplementedError
+    article_number_escaped = _xml_escape(article_number)
+    article_name_escaped = _xml_escape(article_name)
+    return (
+        f'<soapenv:Envelope xmlns:soapenv="{_NS_SOAP}"'
+        f' xmlns:main="{namespace_main}"'
+        f' xmlns:xsd="{namespace_xsd}">'
+        f"<soapenv:Header/>"
+        f"<soapenv:Body>"
+        f"<main:sendAPDReqV01>"
+        f"<main:param>"
+        f"<xsd:articlePoolDataRecord>"
+        f"<xsd:articleNumber>{article_number_escaped}</xsd:articleNumber>"
+        f"<xsd:articleName>{article_name_escaped}</xsd:articleName>"
+        f"</xsd:articlePoolDataRecord>"
+        f"</main:param>"
+        f"</main:sendAPDReqV01>"
+        f"</soapenv:Body>"
+        f"</soapenv:Envelope>"
+    )
 
 
 def build_send_movement_order_envelope(
@@ -57,6 +86,7 @@ def build_cancel_order_envelope(
     namespace_xsd: str,
 ) -> str:
     """Build the SOAP envelope for deleteJobReqV01."""
+    job_number_escaped = _xml_escape(job_number)
     return (
         f'<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"'
         f' xmlns:main="{namespace_main}" xmlns:xsd="{namespace_xsd}">'
@@ -64,7 +94,7 @@ def build_cancel_order_envelope(
         "<soapenv:Body>"
         "<main:deleteJobReqV01>"
         "<main:param>"
-        f"<xsd:jobNumber>{job_number}</xsd:jobNumber>"
+        f"<xsd:jobNumber>{job_number_escaped}</xsd:jobNumber>"
         "</main:param>"
         "</main:deleteJobReqV01>"
         "</soapenv:Body>"
