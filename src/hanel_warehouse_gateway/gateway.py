@@ -69,7 +69,7 @@ class HanelWarehouseGateway:
 
     def get_all_orders(self) -> list[MovementResult]:
         """Retrieve all orders currently in the warehouse queue."""
-        raise NotImplementedError
+        return self._operations.get_all_orders()
 
     def get_inventory(self) -> list[StockRecord]:
         """Retrieve stock levels for all articles in the warehouse.

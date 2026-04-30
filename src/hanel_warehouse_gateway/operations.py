@@ -216,7 +216,35 @@ class SoapOperations:
 
     def get_all_orders(self) -> list[MovementResult]:
         """Retrieve all queued orders (readAllJobsReqV01, mode=0)."""
-        raise NotImplementedError
+        operation = "readAllJobsReqV01"
+        logger.info("get_all_orders: initiating %s (mode=0)", operation)
+        envelope = _xml.build_read_jobs_envelope(
+            mode=0,
+            namespace_main=self._config.namespace_main,
+            namespace_xsd=self._config.namespace_xsd,
+        )
+        raw = self._transport.post(envelope, operation)
+        raw_jobs = _xml.parse_movement_results(
+            raw, operation, self._config.namespace_xsd
+        )
+        results = [
+            MovementResult(
+                job_number=str(job["job_number"]),
+                job_priority=int(job["job_priority"]),  # type: ignore[call-overload]
+                job_status=int(job["job_status"]),  # type: ignore[call-overload]
+                job_date=str(job["job_date"]),
+                job_time=str(job["job_time"]),
+                positions=[
+                    MovementLineResult(**pos)
+                    for pos in job["positions"]  # type: ignore[attr-defined]
+                ],
+            )
+            for job in raw_jobs
+        ]
+        logger.info(
+            "get_all_orders: %s returned %d results", operation, len(results)
+        )
+        return results
 
     def get_inventory(self) -> list[StockRecord]:
         """Retrieve stock levels for all articles (readAllAMDReqV01)."""
