@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.3](https://github.com/6feetup/hanel_warehouse_gateway/compare/v0.1.2...v0.1.3) (2026-06-04)
+
+
+### Documentation
+
+* add missing ADRs 009-013, 015-016 to MkDocs navigation ([1eabcef](https://github.com/6feetup/hanel_warehouse_gateway/commit/1eabcef22ce8cc129e17c41343439af54dadc2e5))
+* add missing ADRs 009-013, 015-016 to MkDocs navigation ([4db0315](https://github.com/6feetup/hanel_warehouse_gateway/commit/4db0315287d66215a7242840d42f51c3acbd2d83))
+
 ## [0.1.2](https://github.com/6feetup/hanel_warehouse_gateway/compare/v0.1.1...v0.1.2) (2026-06-04)
 
 
