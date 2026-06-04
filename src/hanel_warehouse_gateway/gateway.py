@@ -33,17 +33,26 @@ class HanelWarehouseGateway:
         self._transport = SoapTransport(config)
         self._operations = SoapOperations(config, self._transport)
 
-    def register_article(self, article_number: str, article_name: str) -> bool:
+    def register_article(
+        self,
+        article_number: str,
+        article_name: str,
+        batch_number: str | None = None,
+    ) -> bool:
         """Register or update an article in the warehouse catalogue.
 
         Args:
             article_number: Unique article code (max 40 alphanumeric chars).
             article_name: Article description (max 40 chars).
+            batch_number: Lot/batch number (max 40 chars). Only used when
+                lot_management_enabled=True in GatewayConfig.
 
         Returns:
             True if the operation succeeded (returnValue == 0).
         """
-        return self._operations.register_article(article_number, article_name)
+        return self._operations.register_article(
+            article_number, article_name, batch_number
+        )
 
     def send_movement_order(
         self, order_number: str, positions: list[MovementLine]

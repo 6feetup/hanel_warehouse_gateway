@@ -66,6 +66,41 @@ def build_register_article_envelope(
     )
 
 
+def build_register_article_envelope_v03(
+    article_number: str,
+    article_name: str,
+    batch_number: str | None,
+    namespace_main: str,
+    namespace_xsd: str,
+) -> str:
+    """Build the SOAP envelope for sendAPDV03."""
+    article_number_escaped = _xml_escape(article_number)
+    article_name_escaped = _xml_escape(article_name)
+    batch_xml = (
+        f"<xsd:batchNumber>{_xml_escape(batch_number)}</xsd:batchNumber>"
+        if batch_number is not None
+        else ""
+    )
+    return (
+        f'<soapenv:Envelope xmlns:soapenv="{_NS_SOAP}"'
+        f' xmlns:main="{namespace_main}"'
+        f' xmlns:xsd="{namespace_xsd}">'
+        f"<soapenv:Header/>"
+        f"<soapenv:Body>"
+        f"<main:sendAPDV03>"
+        f"<main:param>"
+        f"<xsd:articlePoolDataRecord>"
+        f"<xsd:articleNumber>{article_number_escaped}</xsd:articleNumber>"
+        f"<xsd:articleName>{article_name_escaped}</xsd:articleName>"
+        f"{batch_xml}"
+        f"</xsd:articlePoolDataRecord>"
+        f"</main:param>"
+        f"</main:sendAPDV03>"
+        f"</soapenv:Body>"
+        f"</soapenv:Envelope>"
+    )
+
+
 def build_send_movement_order_envelope(
     job_number: str,
     positions: list[dict[str, object]],
@@ -101,6 +136,50 @@ def build_send_movement_order_envelope(
     )
 
 
+def build_send_movement_order_envelope_v02(
+    job_number: str,
+    positions: list[dict[str, object]],
+    namespace_main: str,
+    namespace_xsd: str,
+) -> str:
+    """Build the SOAP envelope for sendJobsV02."""
+    job_number_escaped = _xml_escape(job_number)
+    parts = []
+    for p in positions:
+        batch_xml = ""
+        batch_number = p.get("batch_number")
+        if batch_number is not None:
+            batch_xml = (
+                f"<xsd:batchNumber>{_xml_escape(str(batch_number))}</xsd:batchNumber>"
+            )
+        parts.append(
+            f"<xsd:JobPosition>"
+            f"<xsd:articleNumber>{_xml_escape(str(p['article_number']))}</xsd:articleNumber>"
+            f"<xsd:operation>{_xml_escape(str(p['operation']))}</xsd:operation>"
+            f"<xsd:nominalQuantity>{p['nominal_quantity']}</xsd:nominalQuantity>"
+            f"{batch_xml}"
+            f"</xsd:JobPosition>"
+        )
+    positions_xml = "".join(parts)
+    return (
+        f'<soapenv:Envelope xmlns:soapenv="{_NS_SOAP}"'
+        f' xmlns:main="{namespace_main}"'
+        f' xmlns:xsd="{namespace_xsd}">'
+        f"<soapenv:Header/>"
+        f"<soapenv:Body>"
+        f"<main:sendJobsV02>"
+        f"<main:param>"
+        f"<xsd:job>"
+        f"<xsd:jobNumber>{job_number_escaped}</xsd:jobNumber>"
+        f"{positions_xml}"
+        f"</xsd:job>"
+        f"</main:param>"
+        f"</main:sendJobsV02>"
+        f"</soapenv:Body>"
+        f"</soapenv:Envelope>"
+    )
+
+
 def build_read_jobs_envelope(
     mode: int,
     namespace_main: str,
@@ -126,6 +205,31 @@ def build_read_jobs_envelope(
     )
 
 
+def build_read_jobs_envelope_v02(
+    mode: int,
+    namespace_main: str,
+    namespace_xsd: str,
+) -> str:
+    """Build the SOAP envelope for readAllJobsV02.
+
+    mode=0: all orders, mode=1: completed only.
+    """
+    return (
+        f'<soapenv:Envelope xmlns:soapenv="{_NS_SOAP}"'
+        f' xmlns:main="{namespace_main}"'
+        f' xmlns:xsd="{namespace_xsd}">'
+        f"<soapenv:Header/>"
+        f"<soapenv:Body>"
+        f"<main:readAllJobsV02>"
+        f"<main:param>"
+        f"<xsd:mode>{mode}</xsd:mode>"
+        f"</main:param>"
+        f"</main:readAllJobsV02>"
+        f"</soapenv:Body>"
+        f"</soapenv:Envelope>"
+    )
+
+
 def build_get_inventory_envelope(namespace_main: str) -> str:
     """Build the SOAP envelope for readAllAMDReqV01."""
     return (
@@ -134,6 +238,19 @@ def build_get_inventory_envelope(namespace_main: str) -> str:
         f"<soapenv:Header/>"
         f"<soapenv:Body>"
         f"<main:readAllAMDReqV01/>"
+        f"</soapenv:Body>"
+        f"</soapenv:Envelope>"
+    )
+
+
+def build_get_inventory_envelope_v04(namespace_main: str) -> str:
+    """Build the SOAP envelope for readAllAMDV04."""
+    return (
+        f'<soapenv:Envelope xmlns:soapenv="{_NS_SOAP}"'
+        f' xmlns:main="{namespace_main}">'
+        f"<soapenv:Header/>"
+        f"<soapenv:Body>"
+        f"<main:readAllAMDV04/>"
         f"</soapenv:Body>"
         f"</soapenv:Envelope>"
     )
@@ -206,7 +323,7 @@ def parse_return_value(xml_text: str, operation: str, namespace_xsd: str) -> int
 def parse_movement_results(
     xml_text: str, operation: str, namespace_xsd: str
 ) -> list[dict[str, object]]:
-    """Extract the list of movement orders from a readAllJobsReqV01 response."""
+    """Extract the list of movement orders from a readAllJobs response (V01 or V02)."""
     try:
         root = ET.fromstring(xml_text)
     except ET.ParseError as exc:
@@ -251,6 +368,7 @@ def parse_movement_results(
                 "position_status": int(
                     pos_el.findtext("xsd:positionStatus", "0", ns)
                 ),
+                "batch_number": pos_el.findtext("xsd:batchNumber", None, ns),
             })
         results.append({
             "job_number": job_el.findtext("xsd:jobNumber", "", ns),
@@ -266,7 +384,7 @@ def parse_movement_results(
 def parse_stock_records(
     xml_text: str, operation: str, namespace_xsd: str
 ) -> list[dict[str, object]]:
-    """Extract the list of stock records from a readAllAMDReqV01 response."""
+    """Extract the list of stock records from a readAllAMD response (V01 or V04)."""
     try:
         root = ET.fromstring(xml_text)
     except ET.ParseError as exc:
@@ -313,5 +431,6 @@ def parse_stock_records(
             "minimum_inventory": float(
                 rec_el.findtext("xsd:minimumInventory", "0", ns)
             ),
+            "batch_number": rec_el.findtext("xsd:batchNumber", None, ns),
         })
     return results

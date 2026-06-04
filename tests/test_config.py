@@ -105,3 +105,37 @@ class TestGatewayConfigFromEnv:
         monkeypatch.setenv("HANEL_TEST_MODE", "false")
         config = GatewayConfig.from_env()
         assert config.test_mode is False
+
+    def test_lot_management_default_false(self) -> None:
+        config = GatewayConfig(endpoint_url="http://x.com/")
+        assert config.lot_management_enabled is False
+
+    def test_lot_management_from_env_true(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setenv("HANEL_ENDPOINT_URL", "http://x.com/")
+        monkeypatch.setenv("HANEL_LOT_MANAGEMENT_ENABLED", "true")
+        config = GatewayConfig.from_env()
+        assert config.lot_management_enabled is True
+
+    def test_lot_management_from_env_false(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setenv("HANEL_ENDPOINT_URL", "http://x.com/")
+        monkeypatch.setenv("HANEL_LOT_MANAGEMENT_ENABLED", "false")
+        config = GatewayConfig.from_env()
+        assert config.lot_management_enabled is False
+
+    def test_lot_management_from_env_case_insensitive(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setenv("HANEL_ENDPOINT_URL", "http://x.com/")
+        monkeypatch.setenv("HANEL_LOT_MANAGEMENT_ENABLED", "TRUE")
+        config = GatewayConfig.from_env()
+        assert config.lot_management_enabled is True
+
+    def test_lot_management_override(self) -> None:
+        config = GatewayConfig.from_env(
+            overrides={"endpoint_url": "http://x.com/", "lot_management_enabled": True}
+        )
+        assert config.lot_management_enabled is True

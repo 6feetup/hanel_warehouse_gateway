@@ -34,7 +34,11 @@ def build_config(args: argparse.Namespace) -> GatewayConfig:
 
 def run(operation: str, data: dict, gw: HanelWarehouseGateway) -> object:
     if operation == "register_article":
-        return gw.register_article(data["article_number"], data["article_name"])
+        return gw.register_article(
+            data["article_number"],
+            data["article_name"],
+            data.get("batch_number"),
+        )
     if operation == "send_movement_order":
         positions = [MovementLine(**p) for p in data["positions"]]
         return gw.send_movement_order(data["order_number"], positions)

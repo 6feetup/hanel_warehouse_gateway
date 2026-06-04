@@ -40,6 +40,19 @@ def _validate_field_length(
     )
 
 
+def _raise_application_error(operation: str, return_value: int, lot_hint: bool) -> None:
+    msg = f"{operation} returned error code {return_value}"
+    if lot_hint:
+        msg += " (hint: verify lot_management_enabled configuration)"
+    raise HanelGatewayApplicationError(
+        message=msg,
+        operation=operation,
+        detail=f"returnValue={return_value}",
+        timestamp=datetime.datetime.utcnow().isoformat(),
+        return_value=return_value,
+    )
+
+
 class SoapOperations:
     """Implements SOAP operations for the Hanel t-Server."""
 
@@ -47,9 +60,19 @@ class SoapOperations:
         self._config = config
         self._transport = transport
 
-    def register_article(self, article_number: str, article_name: str) -> bool:
-        """Register or update an article in the warehouse (sendAPDReqV01)."""
-        operation = "sendAPDReqV01"
+    def register_article(
+        self,
+        article_number: str,
+        article_name: str,
+        batch_number: str | None = None,
+    ) -> bool:
+        """Register or update an article in the warehouse.
+
+        Uses sendAPDV03 when lot_management_enabled=True, sendAPDReqV01 otherwise.
+        """
+        lot = self._config.lot_management_enabled
+        operation = "sendAPDV03" if lot else "sendAPDReqV01"
+
         if self._config.test_mode:
             article_number = f"{self._config.test_prefix}{article_number}"
 
@@ -59,19 +82,40 @@ class SoapOperations:
         article_name = _validate_field_length(
             article_name, "article_name", operation, self._config
         )
+        if lot and batch_number is not None:
+            batch_number = _validate_field_length(
+                batch_number, "batch_number", operation, self._config
+            )
 
-        logger.info(
-            "register_article: initiating %s for article_number=%r",
-            operation,
-            article_number,
-        )
+        if batch_number is not None:
+            logger.info(
+                "register_article: initiating %s for article_number=%r batch_number=%r",
+                operation,
+                article_number,
+                batch_number,
+            )
+        else:
+            logger.info(
+                "register_article: initiating %s for article_number=%r",
+                operation,
+                article_number,
+            )
 
-        envelope = _xml.build_register_article_envelope(
-            article_number,
-            article_name,
-            self._config.namespace_main,
-            self._config.namespace_xsd,
-        )
+        if lot:
+            envelope = _xml.build_register_article_envelope_v03(
+                article_number,
+                article_name,
+                batch_number,
+                self._config.namespace_main,
+                self._config.namespace_xsd,
+            )
+        else:
+            envelope = _xml.build_register_article_envelope(
+                article_number,
+                article_name,
+                self._config.namespace_main,
+                self._config.namespace_xsd,
+            )
 
         raw = self._transport.post(envelope, operation)
 
@@ -79,13 +123,7 @@ class SoapOperations:
             raw, operation, self._config.namespace_xsd
         )
         if return_value != 0:
-            raise HanelGatewayApplicationError(
-                message=f"{operation} returned error code {return_value}",
-                operation=operation,
-                detail=f"returnValue={return_value}",
-                timestamp=datetime.datetime.utcnow().isoformat(),
-                return_value=return_value,
-            )
+            _raise_application_error(operation, return_value, lot)
 
         logger.info(
             "register_article: %s succeeded for article_number=%r",
@@ -97,8 +135,12 @@ class SoapOperations:
     def send_movement_order(
         self, order_number: str, positions: list[MovementLine]
     ) -> bool:
-        """Send a movement order to the warehouse (sendJobsReqV01)."""
-        operation = "sendJobsReqV01"
+        """Send a movement order to the warehouse.
+
+        Uses sendJobsV02 when lot_management_enabled=True, sendJobsReqV01 otherwise.
+        """
+        lot = self._config.lot_management_enabled
+        operation = "sendJobsV02" if lot else "sendJobsReqV01"
 
         if not positions:
             raise HanelGatewayValidationError(
@@ -143,11 +185,14 @@ class SoapOperations:
             article_number = _validate_field_length(
                 pos.article_number, field_name, operation, self._config
             )
-            positions_dicts.append({
+            pos_dict: dict[str, object] = {
                 "article_number": article_number,
                 "operation": pos.operation,
                 "nominal_quantity": pos.nominal_quantity,
-            })
+            }
+            if lot:
+                pos_dict["batch_number"] = pos.batch_number
+            positions_dicts.append(pos_dict)
 
         logger.info(
             "send_movement_order: initiating %s for job_number=%r with %d position(s)",
@@ -156,12 +201,20 @@ class SoapOperations:
             len(positions),
         )
 
-        envelope = _xml.build_send_movement_order_envelope(
-            job_number,
-            positions_dicts,
-            self._config.namespace_main,
-            self._config.namespace_xsd,
-        )
+        if lot:
+            envelope = _xml.build_send_movement_order_envelope_v02(
+                job_number,
+                positions_dicts,
+                self._config.namespace_main,
+                self._config.namespace_xsd,
+            )
+        else:
+            envelope = _xml.build_send_movement_order_envelope(
+                job_number,
+                positions_dicts,
+                self._config.namespace_main,
+                self._config.namespace_xsd,
+            )
 
         raw = self._transport.post(envelope, operation)
 
@@ -169,13 +222,7 @@ class SoapOperations:
             raw, operation, self._config.namespace_xsd
         )
         if return_value != 0:
-            raise HanelGatewayApplicationError(
-                message=f"{operation} returned error code {return_value}",
-                operation=operation,
-                detail=f"returnValue={return_value}",
-                timestamp=datetime.datetime.utcnow().isoformat(),
-                return_value=return_value,
-            )
+            _raise_application_error(operation, return_value, lot)
 
         logger.info(
             "send_movement_order: %s succeeded for job_number=%r",
@@ -185,14 +232,26 @@ class SoapOperations:
         return True
 
     def get_completed_movements(self) -> list[MovementResult]:
-        """Retrieve completed orders (readAllJobsReqV01, mode=1)."""
-        operation = "readAllJobsReqV01"
+        """Retrieve completed orders.
+
+        Uses readAllJobsV02 when lot_management_enabled=True,
+        readAllJobsReqV01 otherwise.
+        """
+        lot = self._config.lot_management_enabled
+        operation = "readAllJobsV02" if lot else "readAllJobsReqV01"
         logger.info("get_completed_movements: initiating %s (mode=1)", operation)
-        envelope = _xml.build_read_jobs_envelope(
-            mode=1,
-            namespace_main=self._config.namespace_main,
-            namespace_xsd=self._config.namespace_xsd,
-        )
+        if lot:
+            envelope = _xml.build_read_jobs_envelope_v02(
+                mode=1,
+                namespace_main=self._config.namespace_main,
+                namespace_xsd=self._config.namespace_xsd,
+            )
+        else:
+            envelope = _xml.build_read_jobs_envelope(
+                mode=1,
+                namespace_main=self._config.namespace_main,
+                namespace_xsd=self._config.namespace_xsd,
+            )
         raw = self._transport.post(envelope, operation)
         raw_jobs = _xml.parse_movement_results(
             raw, operation, self._config.namespace_xsd
@@ -217,14 +276,26 @@ class SoapOperations:
         return results
 
     def get_all_orders(self) -> list[MovementResult]:
-        """Retrieve all queued orders (readAllJobsReqV01, mode=0)."""
-        operation = "readAllJobsReqV01"
+        """Retrieve all queued orders.
+
+        Uses readAllJobsV02 when lot_management_enabled=True,
+        readAllJobsReqV01 otherwise.
+        """
+        lot = self._config.lot_management_enabled
+        operation = "readAllJobsV02" if lot else "readAllJobsReqV01"
         logger.info("get_all_orders: initiating %s (mode=0)", operation)
-        envelope = _xml.build_read_jobs_envelope(
-            mode=0,
-            namespace_main=self._config.namespace_main,
-            namespace_xsd=self._config.namespace_xsd,
-        )
+        if lot:
+            envelope = _xml.build_read_jobs_envelope_v02(
+                mode=0,
+                namespace_main=self._config.namespace_main,
+                namespace_xsd=self._config.namespace_xsd,
+            )
+        else:
+            envelope = _xml.build_read_jobs_envelope(
+                mode=0,
+                namespace_main=self._config.namespace_main,
+                namespace_xsd=self._config.namespace_xsd,
+            )
         raw = self._transport.post(envelope, operation)
         raw_jobs = _xml.parse_movement_results(
             raw, operation, self._config.namespace_xsd
@@ -249,10 +320,19 @@ class SoapOperations:
         return results
 
     def get_inventory(self) -> list[StockRecord]:
-        """Retrieve stock levels for all articles (readAllAMDReqV01)."""
-        operation = "readAllAMDReqV01"
+        """Retrieve stock levels for all articles.
+
+        Uses readAllAMDV04 when lot_management_enabled=True, readAllAMDReqV01 otherwise.
+        """
+        lot = self._config.lot_management_enabled
+        operation = "readAllAMDV04" if lot else "readAllAMDReqV01"
         logger.info("get_inventory: initiating %s", operation)
-        envelope = _xml.build_get_inventory_envelope(self._config.namespace_main)
+        if lot:
+            envelope = _xml.build_get_inventory_envelope_v04(
+                self._config.namespace_main
+            )
+        else:
+            envelope = _xml.build_get_inventory_envelope(self._config.namespace_main)
         raw = self._transport.post(envelope, operation)
         raw_records = _xml.parse_stock_records(
             raw, operation, self._config.namespace_xsd
@@ -269,6 +349,7 @@ class SoapOperations:
                 fifo=int(r["fifo"]),  # type: ignore[call-overload]
                 inventory_at_storage_location=float(r["inventory_at_storage_location"]),  # type: ignore[arg-type]
                 minimum_inventory=float(r["minimum_inventory"]),  # type: ignore[arg-type]
+                batch_number=r["batch_number"],  # type: ignore[arg-type]
             )
             for r in raw_records
         ]

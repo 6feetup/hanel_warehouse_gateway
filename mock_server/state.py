@@ -15,6 +15,7 @@ class JobPosition:
     actual_quantity: float
     container_size: int
     position_status: int
+    batch_number: str = None  # type: ignore[assignment]
 
 
 @dataclass
@@ -40,6 +41,7 @@ class ArticleMasterData:
     fifo: int
     inventory_at_storage_location: float
     minimum_inventory: float
+    batch_number: str = None  # type: ignore[assignment]
 
 
 def _data_dir() -> str:
@@ -130,6 +132,7 @@ def _job_to_dict(job: Job) -> dict:
                 "actual_quantity": p.actual_quantity,
                 "container_size": p.container_size,
                 "position_status": p.position_status,
+                "batch_number": p.batch_number,
             }
             for p in job.positions
         ],
@@ -148,6 +151,7 @@ def _amd_to_dict(r: ArticleMasterData) -> dict:
         "fifo": r.fifo,
         "inventory_at_storage_location": r.inventory_at_storage_location,
         "minimum_inventory": r.minimum_inventory,
+        "batch_number": r.batch_number,
     }
 
 

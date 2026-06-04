@@ -8,9 +8,13 @@ from flask import Flask, Response, jsonify, request
 from handlers import (
     handle_delete_job,
     handle_read_amd,
+    handle_read_amd_v04,
     handle_read_jobs,
+    handle_read_jobs_v02,
     handle_send_apd,
+    handle_send_apd_v03,
     handle_send_jobs,
+    handle_send_jobs_v02,
 )
 from responses import soap_fault_response
 from state import complete_job, state
@@ -21,9 +25,13 @@ _SOAP_BODY = "{http://schemas.xmlsoap.org/soap/envelope/}Body"
 
 _DISPATCH = {
     "sendAPDReqV01": handle_send_apd,
+    "sendAPDV03": handle_send_apd_v03,
     "sendJobsReqV01": handle_send_jobs,
+    "sendJobsV02": handle_send_jobs_v02,
     "readAllJobsReqV01": handle_read_jobs,
+    "readAllJobsV02": handle_read_jobs_v02,
     "readAllAMDReqV01": handle_read_amd,
+    "readAllAMDV04": handle_read_amd_v04,
     "deleteJobReqV01": handle_delete_job,
 }
 

@@ -34,6 +34,7 @@ class GatewayConfig:
     log_level: str = "INFO"
     log_soap_payloads: bool = False
     validation_truncate: bool = False
+    lot_management_enabled: bool = False
 
     def __post_init__(self) -> None:
         if not self.endpoint_url or not self.endpoint_url.strip():
@@ -91,6 +92,10 @@ class GatewayConfig:
         raw_test_prefix = os.getenv("HANEL_TEST_PREFIX")
         if raw_test_prefix is not None:
             env_values["test_prefix"] = raw_test_prefix
+
+        raw_lot = os.getenv("HANEL_LOT_MANAGEMENT_ENABLED")
+        if raw_lot is not None:
+            env_values["lot_management_enabled"] = raw_lot.strip().lower() == "true"
 
         if overrides:
             env_values.update(overrides)

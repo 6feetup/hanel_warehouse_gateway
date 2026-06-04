@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:main="http://main.jws.com.hanel.de"
+                  xmlns:xsd="http://main.jws.com.hanel.de/xsd">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <main:readAllAMDV04Response>
+      <main:return>
+        <xsd:articleMasterDataRecord>
+          <xsd:articleNumber>ART-001</xsd:articleNumber>
+          <xsd:articleName>Bolt M6</xsd:articleName>
+          <xsd:liftNumber>1</xsd:liftNumber>
+          <xsd:shelfNumber>5</xsd:shelfNumber>
+          <xsd:compartmentNumber>12</xsd:compartmentNumber>
+          <xsd:compartmentDepthNumber>3</xsd:compartmentDepthNumber>
+          <xsd:containerSize>1</xsd:containerSize>
+          <xsd:fifo>0</xsd:fifo>
+          <xsd:inventoryAtStorageLocation>250.0</xsd:inventoryAtStorageLocation>
+          <xsd:minimumInventory>50.0</xsd:minimumInventory>
+          <xsd:batchNumber>LOT-2024</xsd:batchNumber>
+        </xsd:articleMasterDataRecord>
+        <xsd:articleMasterDataRecord>
+          <xsd:articleNumber>ART-002</xsd:articleNumber>
+          <xsd:articleName>Washer 10mm</xsd:articleName>
+          <xsd:liftNumber>0</xsd:liftNumber>
+          <xsd:shelfNumber>0</xsd:shelfNumber>
+          <xsd:compartmentNumber>0</xsd:compartmentNumber>
+          <xsd:compartmentDepthNumber>0</xsd:compartmentDepthNumber>
+          <xsd:containerSize>2</xsd:containerSize>
+          <xsd:fifo>1</xsd:fifo>
+          <xsd:inventoryAtStorageLocation>0.0</xsd:inventoryAtStorageLocation>
+          <xsd:minimumInventory>10.0</xsd:minimumInventory>
+        </xsd:articleMasterDataRecord>
+      </main:return>
+    </main:readAllAMDV04Response>
+  </soapenv:Body>
+</soapenv:Envelope>

@@ -63,7 +63,8 @@ I file possono essere modificati liberamente. Per applicare le modifiche senza r
         "nominal_quantity": 10.0,
         "actual_quantity": 0.0,
         "container_size": 1,
-        "position_status": 0
+        "position_status": 0,
+        "batch_number": "LOTTO-2026-A"
       }
     ]
   }
@@ -72,7 +73,8 @@ I file possono essere modificati liberamente. Per applicare le modifiche senza r
 
 `job_status`: `0`=in coda, `1`=in lavorazione, `2`=parziale, `3`=completato  
 `operation`: `+`=prelievo, `-`=carico  
-`position_status`: `0`=pending, `1`=completato
+`position_status`: `0`=pending, `1`=completato  
+`batch_number`: opzionale — numero lotto/batch (solo per operazioni V02/V03/V04).
 
 ### Formato `inventory.json`
 
@@ -88,12 +90,13 @@ I file possono essere modificati liberamente. Per applicare le modifiche senza r
     "container_size": 1,
     "fifo": 1,
     "inventory_at_storage_location": 150.0,
-    "minimum_inventory": 20.0
+    "minimum_inventory": 20.0,
+    "batch_number": "LOTTO-2026-A"
   }
 ]
 ```
 
-Un articolo può avere più record (più locazioni fisiche). Record con `lift_number=0` e `shelf_number=0` indicano articoli presenti nel master ma senza stock fisico.
+Un articolo può avere più record (più locazioni fisiche). Record con `lift_number=0` e `shelf_number=0` indicano articoli presenti nel master ma senza stock fisico. `batch_number` è opzionale; viene incluso nella risposta solo dalle operazioni V04.
 
 ---
 
@@ -215,6 +218,97 @@ curl -s -X POST http://localhost:8080/HanelService \
 
 ---
 
+## Operazioni con lotti (V02/V03/V04)
+
+Le seguenti operazioni estendono le rispettive V01 aggiungendo il supporto al campo `batchNumber`. Vengono usate automaticamente dal gateway quando `lot_management_enabled=True` (env var `HANEL_LOT_MANAGEMENT_ENABLED`).
+
+### Registrazione articolo con lotto — `sendAPDV03`
+
+```bash
+curl -s -X POST http://localhost:8080/HanelService \
+  -H "Content-Type: text/xml" \
+  -d '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+        xmlns:main="http://main.jws.com.hanel.de"
+        xmlns:xsd="http://main.jws.com.hanel.de/xsd">
+    <soapenv:Header/>
+    <soapenv:Body>
+      <main:sendAPDV03>
+        <main:param>
+          <xsd:articlePoolDataRecord>
+            <xsd:articleNumber>ART-NEW</xsd:articleNumber>
+            <xsd:articleName>Nuovo Articolo</xsd:articleName>
+            <xsd:batchNumber>LOTTO-2026-A</xsd:batchNumber>
+          </xsd:articlePoolDataRecord>
+        </main:param>
+      </main:sendAPDV03>
+    </soapenv:Body>
+  </soapenv:Envelope>'
+```
+
+### Invio ordine con lotto — `sendJobsV02`
+
+```bash
+curl -s -X POST http://localhost:8080/HanelService \
+  -H "Content-Type: text/xml" \
+  -d '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+        xmlns:main="http://main.jws.com.hanel.de"
+        xmlns:xsd="http://main.jws.com.hanel.de/xsd">
+    <soapenv:Header/>
+    <soapenv:Body>
+      <main:sendJobsV02>
+        <main:param>
+          <xsd:job>
+            <xsd:jobNumber>ORD-LOT-001</xsd:jobNumber>
+            <xsd:JobPosition>
+              <xsd:articleNumber>ART-001</xsd:articleNumber>
+              <xsd:operation>+</xsd:operation>
+              <xsd:nominalQuantity>5.0</xsd:nominalQuantity>
+              <xsd:batchNumber>LOTTO-2026-A</xsd:batchNumber>
+            </xsd:JobPosition>
+          </xsd:job>
+        </main:param>
+      </main:sendJobsV02>
+    </soapenv:Body>
+  </soapenv:Envelope>'
+```
+
+### Lettura ordini con lotto — `readAllJobsV02`
+
+Identica a `readAllJobsReqV01` come input; la risposta include `<xsd:batchNumber>` nelle posizioni che lo hanno valorizzato.
+
+```bash
+curl -s -X POST http://localhost:8080/HanelService \
+  -H "Content-Type: text/xml" \
+  -d '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+        xmlns:main="http://main.jws.com.hanel.de"
+        xmlns:xsd="http://main.jws.com.hanel.de/xsd">
+    <soapenv:Header/>
+    <soapenv:Body>
+      <main:readAllJobsV02>
+        <main:param><xsd:mode>0</xsd:mode></main:param>
+      </main:readAllJobsV02>
+    </soapenv:Body>
+  </soapenv:Envelope>'
+```
+
+### Inventario con lotto — `readAllAMDV04`
+
+Identica a `readAllAMDReqV01` come input; la risposta include `<xsd:batchNumber>` nei record che lo hanno valorizzato.
+
+```bash
+curl -s -X POST http://localhost:8080/HanelService \
+  -H "Content-Type: text/xml" \
+  -d '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+        xmlns:main="http://main.jws.com.hanel.de">
+    <soapenv:Header/>
+    <soapenv:Body>
+      <main:readAllAMDV04/>
+    </soapenv:Body>
+  </soapenv:Envelope>'
+```
+
+---
+
 ## Endpoint admin
 
 Endpoint HTTP di supporto per il testing.
@@ -243,8 +337,7 @@ curl -X POST http://localhost:8080/admin/reset
 Il progetto include una suite di test in `tests/test_mock_server.py` che richiede il server in esecuzione.
 
 ```bash
-pip install pytest requests
-pytest tests/test_mock_server.py -v
+uv run pytest tests/test_mock_server.py -v
 ```
 
 ---

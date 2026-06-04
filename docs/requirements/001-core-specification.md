@@ -56,6 +56,8 @@ The module must be configurable without code changes. All parameters are loaded 
 | `log_level` | `str` | Logging level: `DEBUG`, `INFO`, `WARNING`, `ERROR` |
 | `log_soap_payloads` | `bool` | If `True`, logs full XML envelopes (only at `DEBUG` level) |
 
+> *Extended by REQ-LOT-001: adds `lot_management_enabled` (`bool`, default `False`) to enable lot-management operations V02/V03/V04. See §6 of that document.*
+
 ### Configuration Example
 
 ```python
@@ -90,6 +92,8 @@ client = HanelWarehouseGateway(config)
 | `article_number` | `str` | max 40 chars, alphanumeric | Unique article code |
 | `article_name` | `str` | max 40 chars | Article description |
 
+> *Extended by REQ-LOT-001: adds optional `batch_number: str | None = None` input parameter. See §4.1 of that document.*
+
 **Behaviour:** the article master is always owned by the calling system. The warehouse only receives and stores; it does not create articles autonomously.
 
 **Output:** `bool` — `True` if `returnValue == 0`, `False` otherwise.
@@ -112,6 +116,8 @@ client = HanelWarehouseGateway(config)
   </soapenv:Body>
 </soapenv:Envelope>
 ```
+
+> *This envelope applies only when `lot_management_enabled=False`. When `True`, the operation becomes `sendAPDV03` with `APDTypeV03`. See §7.4 of REQ-LOT-001.*
 
 ---
 
@@ -136,6 +142,8 @@ client = HanelWarehouseGateway(config)
 | `article_number` | `str` | max 40 chars | Must match a previously registered article |
 | `operation` | `str` | `+` = pick, `-` = load | Movement direction |
 | `nominal_quantity` | `float` | > 0 | Requested quantity |
+
+> *Extended by REQ-LOT-001: adds optional `batch_number: str | None = None` to `MovementLine`. See §4.2 and §5 of that document.*
 
 **Test mode behaviour:** if `test_mode=True`, the module automatically prepends the configured prefix to the `job_number` (e.g. `ORDER1` → `TEST_ORDER1`). This allows warehouse operators to identify and ignore test orders without affecting real stock levels.
 
@@ -164,6 +172,8 @@ client = HanelWarehouseGateway(config)
   </soapenv:Body>
 </soapenv:Envelope>
 ```
+
+> *This envelope applies only when `lot_management_enabled=False`. When `True`, the operation becomes `sendJobsV02` with `JobPositionTypeV02`. See §7.1 of REQ-LOT-001.*
 
 ---
 
@@ -198,6 +208,8 @@ client = HanelWarehouseGateway(config)
 | `container_size` | `int` | Container size code |
 | `position_status` | `int` | `0` = pending, `1` = completed |
 
+> *Extended by REQ-LOT-001: adds `batch_number: str | None` to `MovementLineResult` (the lot actually moved by the warehouse). See §4.3 and §5 of that document.*
+
 **`job_status` values:**
 
 | Value | Meaning |
@@ -224,6 +236,8 @@ client = HanelWarehouseGateway(config)
   </soapenv:Body>
 </soapenv:Envelope>
 ```
+
+> *This envelope applies only when `lot_management_enabled=False`. When `True`, the operation becomes `readAllJobsV02` with `JobTypeV02`. See §7.2 of REQ-LOT-001.*
 
 ---
 
@@ -254,6 +268,8 @@ client = HanelWarehouseGateway(config)
 </soapenv:Envelope>
 ```
 
+> *This envelope applies only when `lot_management_enabled=False`. When `True`, the operation becomes `readAllJobsV02` with `JobTypeV02`. See §7.2 of REQ-LOT-001.*
+
 ---
 
 ### 3.5 Fetch Stock Levels — `get_inventory`
@@ -280,6 +296,8 @@ client = HanelWarehouseGateway(config)
 | `inventory_at_storage_location` | `float` | Quantity at this location |
 | `minimum_inventory` | `float` | Configured minimum threshold |
 
+> *Extended by REQ-LOT-001: adds `batch_number: str | None` to `StockRecord`. When lot management is active, an article appears in multiple records (one per lot × location). See §4.4 and §5 of that document.*
+
 **Operational notes:**
 - An article may appear in multiple `StockRecord` entries if distributed across multiple physical locations. The total stock for an article is the sum of all records sharing the same `article_number`.
 - Records with `lift_number=0` and `shelf_number=0` indicate articles present in the master registry but with no physical stock.
@@ -295,6 +313,8 @@ client = HanelWarehouseGateway(config)
   </soapenv:Body>
 </soapenv:Envelope>
 ```
+
+> *This envelope applies only when `lot_management_enabled=False`. When `True`, the operation becomes `readAllAMDV04` with `AMDTypeV02`. See §7.3 of REQ-LOT-001.*
 
 ---
 
@@ -348,6 +368,8 @@ The table below relates business flows, public interface methods, and the corres
 | *(queue monitoring)* | `get_all_orders` | `readAllJobsReqV01` (mode=0) | Diagnostics; all orders regardless of status |
 | *(order cancellation)* | `cancel_order` | `deleteJobReqV01` | Only orders in status 0 (not yet processed) |
 
+> *This table reflects `lot_management_enabled=False` (V01 operations). When `True`, operations V02/V03/V04 are used for all rows except `cancel_order`. See §8 of REQ-LOT-001.*
+
 ### 4.2 Method → SOAP Operation Reference
 
 | Python Method | SOAP Operation | Key Parameters |
@@ -371,6 +393,8 @@ get_all_orders()              → readAllJobsReqV01 (mode=0)
 get_inventory()               → readAllAMDReqV01
 cancel_order(...)             → deleteJobReqV01
 ```
+
+> *This dispatcher reflects `lot_management_enabled=False`. When `True`, the routing changes for all operations except `cancel_order`. See §8 of REQ-LOT-001.*
 
 ---
 
@@ -542,6 +566,8 @@ class StockRecord:
     inventory_at_storage_location: float
     minimum_inventory: float
 ```
+
+> *Extended by REQ-LOT-001: `MovementLine`, `MovementLineResult`, and `StockRecord` each gain an optional `batch_number: str | None = None` field. `register_article` gains an optional `batch_number` parameter. See §5 of that document.*
 
 ---
 

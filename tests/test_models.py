@@ -19,6 +19,21 @@ class TestMovementLine:
         assert line.operation == "+"
         assert line.nominal_quantity == 10.0
 
+    def test_batch_number_default_none(self) -> None:
+        line = MovementLine(
+            article_number="ART001", operation="+", nominal_quantity=1.0
+        )
+        assert line.batch_number is None
+
+    def test_batch_number_explicit(self) -> None:
+        line = MovementLine(
+            article_number="ART001",
+            operation="+",
+            nominal_quantity=1.0,
+            batch_number="LOT-A",
+        )
+        assert line.batch_number == "LOT-A"
+
 
 class TestMovementLineResult:
     def test_instantiation(self) -> None:
@@ -32,6 +47,29 @@ class TestMovementLineResult:
         )
         assert result.actual_quantity == 8.0
         assert result.position_status == 1
+
+    def test_batch_number_default_none(self) -> None:
+        result = MovementLineResult(
+            article_number="ART001",
+            operation="+",
+            nominal_quantity=10.0,
+            actual_quantity=8.0,
+            container_size=1,
+            position_status=1,
+        )
+        assert result.batch_number is None
+
+    def test_batch_number_explicit(self) -> None:
+        result = MovementLineResult(
+            article_number="ART001",
+            operation="+",
+            nominal_quantity=10.0,
+            actual_quantity=8.0,
+            container_size=1,
+            position_status=1,
+            batch_number="LOT-B",
+        )
+        assert result.batch_number == "LOT-B"
 
 
 class TestMovementResult:
@@ -81,3 +119,34 @@ class TestStockRecord:
         )
         assert record.article_number == "ART001"
         assert record.inventory_at_storage_location == 50.0
+
+    def test_batch_number_default_none(self) -> None:
+        record = StockRecord(
+            article_number="ART001",
+            article_name="M6 Screw",
+            lift_number=1,
+            shelf_number=3,
+            compartment_number=2,
+            compartment_depth_number=1,
+            container_size=1,
+            fifo=0,
+            inventory_at_storage_location=50.0,
+            minimum_inventory=10.0,
+        )
+        assert record.batch_number is None
+
+    def test_batch_number_explicit(self) -> None:
+        record = StockRecord(
+            article_number="ART001",
+            article_name="M6 Screw",
+            lift_number=1,
+            shelf_number=3,
+            compartment_number=2,
+            compartment_depth_number=1,
+            container_size=1,
+            fifo=0,
+            inventory_at_storage_location=50.0,
+            minimum_inventory=10.0,
+            batch_number="LOT-C",
+        )
+        assert record.batch_number == "LOT-C"

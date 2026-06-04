@@ -12,6 +12,7 @@ class MovementLine:
     article_number: str
     operation: str  # '+' = pick, '-' = load
     nominal_quantity: float
+    batch_number: str | None = None
 
 
 @dataclass
@@ -27,6 +28,7 @@ class MovementLineResult:
     actual_quantity: float
     container_size: int
     position_status: int  # 0=pending, 1=completed
+    batch_number: str | None = None
 
 
 @dataclass
@@ -58,3 +60,4 @@ class StockRecord:
     fifo: int
     inventory_at_storage_location: float
     minimum_inventory: float
+    batch_number: str | None = None
