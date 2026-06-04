@@ -569,3 +569,165 @@ class TestGetInventory:
         ops, _ = _make_operations("NOT VALID XML<<<")
         with pytest.raises(HanelGatewayParseError):
             ops.get_inventory()
+
+
+class TestRegisterArticleV03:
+    def test_lot_mode_calls_sendAPDV03(self) -> None:
+        xml = _fixture("sendAPDV03_success.xml")
+        ops, transport = _make_operations(xml, lot_management_enabled=True)
+        ops.register_article("ART001", "Bolt M6")
+        _, operation = transport.post.call_args[0]
+        assert operation == "sendAPDV03"
+
+    def test_lot_mode_false_calls_sendAPDReqV01(self) -> None:
+        xml = _fixture("sendAPDReqV01_success.xml")
+        ops, transport = _make_operations(xml, lot_management_enabled=False)
+        ops.register_article("ART001", "Bolt M6")
+        _, operation = transport.post.call_args[0]
+        assert operation == "sendAPDReqV01"
+
+    def test_batch_number_in_envelope(self) -> None:
+        xml = _fixture("sendAPDV03_success.xml")
+        ops, transport = _make_operations(xml, lot_management_enabled=True)
+        ops.register_article("ART001", "Bolt M6", batch_number="LOT-X")
+        envelope, _ = transport.post.call_args[0]
+        assert "LOT-X" in envelope
+
+    def test_batch_number_absent_when_none(self) -> None:
+        xml = _fixture("sendAPDV03_success.xml")
+        ops, transport = _make_operations(xml, lot_management_enabled=True)
+        ops.register_article("ART001", "Bolt M6", batch_number=None)
+        envelope, _ = transport.post.call_args[0]
+        assert "batchNumber" not in envelope
+
+    def test_batch_number_too_long_raises_validation(self) -> None:
+        ops, transport = _make_operations(lot_management_enabled=True)
+        with pytest.raises(HanelGatewayValidationError) as exc_info:
+            ops.register_article("ART001", "Bolt M6", batch_number="L" * 41)
+        assert exc_info.value.field == "batch_number"
+        transport.post.assert_not_called()
+
+    def test_application_error_hint_in_lot_mode(self) -> None:
+        xml = _fixture("sendAPDV03_error.xml")
+        ops, _ = _make_operations(xml, lot_management_enabled=True)
+        with pytest.raises(HanelGatewayApplicationError) as exc_info:
+            ops.register_article("ART001", "Bolt M6")
+        assert "hint" in exc_info.value.message
+
+
+class TestSendMovementOrderV02:
+    def test_lot_mode_calls_sendJobsV02(self) -> None:
+        xml = _fixture("send_movement_order_v02_success.xml")
+        ops, transport = _make_operations(xml, lot_management_enabled=True)
+        ops.send_movement_order("JOB-1", [MovementLine("ART-001", "+", 5.0)])
+        _, operation = transport.post.call_args[0]
+        assert operation == "sendJobsV02"
+
+    def test_lot_mode_false_calls_sendJobsReqV01(self) -> None:
+        xml = _fixture("send_movement_order_success.xml")
+        ops, transport = _make_operations(xml, lot_management_enabled=False)
+        ops.send_movement_order("JOB-1", [MovementLine("ART-001", "+", 5.0)])
+        _, operation = transport.post.call_args[0]
+        assert operation == "sendJobsReqV01"
+
+    def test_batch_number_in_envelope(self) -> None:
+        xml = _fixture("send_movement_order_v02_success.xml")
+        ops, transport = _make_operations(xml, lot_management_enabled=True)
+        line = MovementLine("ART-001", "+", 5.0, batch_number="LOT-B")
+        ops.send_movement_order("JOB-1", [line])
+        envelope, _ = transport.post.call_args[0]
+        assert "LOT-B" in envelope
+
+    def test_batch_number_absent_when_none(self) -> None:
+        xml = _fixture("send_movement_order_v02_success.xml")
+        ops, transport = _make_operations(xml, lot_management_enabled=True)
+        line = MovementLine("ART-001", "+", 5.0)
+        ops.send_movement_order("JOB-1", [line])
+        envelope, _ = transport.post.call_args[0]
+        assert "batchNumber" not in envelope
+
+    def test_application_error_hint_in_lot_mode(self) -> None:
+        xml = _fixture("sendAPDReqV01_error.xml")
+        ops, _ = _make_operations(xml, lot_management_enabled=True)
+        with pytest.raises(HanelGatewayApplicationError) as exc_info:
+            ops.send_movement_order("JOB-1", [MovementLine("ART-001", "+", 5.0)])
+        assert "hint" in exc_info.value.message
+
+
+class TestGetCompletedMovementsV02:
+    def test_lot_mode_calls_readAllJobsV02(self) -> None:
+        xml = _fixture("read_jobs_v02_response_mode1.xml")
+        ops, transport = _make_operations(xml, lot_management_enabled=True)
+        ops.get_completed_movements()
+        _, operation = transport.post.call_args[0]
+        assert operation == "readAllJobsV02"
+
+    def test_lot_mode_envelope_contains_mode_1(self) -> None:
+        xml = _fixture("read_jobs_v02_response_mode1.xml")
+        ops, transport = _make_operations(xml, lot_management_enabled=True)
+        ops.get_completed_movements()
+        envelope, _ = transport.post.call_args[0]
+        assert "<xsd:mode>1</xsd:mode>" in envelope
+
+    def test_batch_number_mapped_in_positions(self) -> None:
+        xml = _fixture("read_jobs_v02_response_mode1.xml")
+        ops, _ = _make_operations(xml, lot_management_enabled=True)
+        results = ops.get_completed_movements()
+        assert results[0].positions[0].batch_number == "LOT-A"
+
+    def test_lot_mode_false_calls_readAllJobsReqV01(self) -> None:
+        xml = _fixture("read_jobs_response_mode1.xml")
+        ops, transport = _make_operations(xml, lot_management_enabled=False)
+        ops.get_completed_movements()
+        _, operation = transport.post.call_args[0]
+        assert operation == "readAllJobsReqV01"
+
+
+class TestGetAllOrdersV02:
+    def test_lot_mode_calls_readAllJobsV02(self) -> None:
+        xml = _fixture("read_jobs_v02_response_mode0.xml")
+        ops, transport = _make_operations(xml, lot_management_enabled=True)
+        ops.get_all_orders()
+        _, operation = transport.post.call_args[0]
+        assert operation == "readAllJobsV02"
+
+    def test_lot_mode_envelope_contains_mode_0(self) -> None:
+        xml = _fixture("read_jobs_v02_response_mode0.xml")
+        ops, transport = _make_operations(xml, lot_management_enabled=True)
+        ops.get_all_orders()
+        envelope, _ = transport.post.call_args[0]
+        assert "<xsd:mode>0</xsd:mode>" in envelope
+
+    def test_batch_number_none_when_absent(self) -> None:
+        xml = _fixture("read_jobs_v02_response_mode0.xml")
+        ops, _ = _make_operations(xml, lot_management_enabled=True)
+        results = ops.get_all_orders()
+        assert results[1].positions[0].batch_number is None
+
+
+class TestGetInventoryV04:
+    def test_lot_mode_calls_readAllAMDV04(self) -> None:
+        xml = _fixture("read_inventory_v04_response.xml")
+        ops, transport = _make_operations(xml, lot_management_enabled=True)
+        ops.get_inventory()
+        _, operation = transport.post.call_args[0]
+        assert operation == "readAllAMDV04"
+
+    def test_lot_mode_false_calls_readAllAMDReqV01(self) -> None:
+        xml = _fixture("read_inventory_response.xml")
+        ops, transport = _make_operations(xml, lot_management_enabled=False)
+        ops.get_inventory()
+        _, operation = transport.post.call_args[0]
+        assert operation == "readAllAMDReqV01"
+
+    def test_batch_number_mapped_in_stock_records(self) -> None:
+        xml = _fixture("read_inventory_v04_response.xml")
+        ops, _ = _make_operations(xml, lot_management_enabled=True)
+        results = ops.get_inventory()
+        assert results[0].batch_number == "LOT-2024"
+
+    def test_batch_number_none_when_absent(self) -> None:
+        xml = _fixture("read_inventory_v04_response.xml")
+        ops, _ = _make_operations(xml, lot_management_enabled=True)
+        results = ops.get_inventory()
+        assert results[1].batch_number is None

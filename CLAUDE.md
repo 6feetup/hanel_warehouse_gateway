@@ -91,6 +91,7 @@ Static parameters with defaults (can be passed as overrides):
 | `log_level` | `INFO` | |
 | `log_soap_payloads` | `False` | |
 | `validation_truncate` | `False` | `True` → truncates to 40 chars instead of raise |
+| `lot_management_enabled` | `False` | `True` → uses V02/V03/V04 SOAP ops with batch_number support |
 
 ## Critical constraints
 

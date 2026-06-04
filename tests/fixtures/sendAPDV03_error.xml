@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:main="http://main.jws.com.hanel.de" xmlns:xsd="http://main.jws.com.hanel.de/xsd"><soapenv:Header/><soapenv:Body><main:sendAPDV03Response><main:return><xsd:returnValue>1</xsd:returnValue></main:return></main:sendAPDV03Response></soapenv:Body></soapenv:Envelope>

@@ -222,13 +222,13 @@ class TestReadAllAMD:
         resp = read_amd()
         assert resp.status_code == 200
         root = ET.fromstring(resp.text)
-        records = root.findall(f".//{{{NS_XSD}}}articleMasterData")
+        records = root.findall(f".//{{{NS_XSD}}}articleMasterDataRecord")
         assert len(records) == 6
 
     def test_record_with_lift_zero_present(self):
         root = ET.fromstring(read_amd().text)
         lift_zeros = [
-            r for r in root.findall(f".//{{{NS_XSD}}}articleMasterData")
+            r for r in root.findall(f".//{{{NS_XSD}}}articleMasterDataRecord")
             if r.findtext(f"{{{NS_XSD}}}liftNumber") == "0"
         ]
         assert len(lift_zeros) >= 1
@@ -301,3 +301,234 @@ class TestAdmin:
         resp = post_soap(envelope("<main:unknownOperation/>"))
         assert resp.status_code == 500
         assert "Fault" in resp.text
+
+
+# ---------------------------------------------------------------------------
+# V02/V03/V04 helpers
+# ---------------------------------------------------------------------------
+
+def send_apd_v03(
+    article_number: str, article_name: str, batch_number: str = None
+) -> requests.Response:
+    batch_xml = (
+        f"<xsd:batchNumber>{batch_number}</xsd:batchNumber>" if batch_number else ""
+    )
+    return post_soap(envelope(
+        f"<main:sendAPDV03><main:param>"
+        f"<xsd:articlePoolDataRecord>"
+        f"<xsd:articleNumber>{article_number}</xsd:articleNumber>"
+        f"<xsd:articleName>{article_name}</xsd:articleName>"
+        f"{batch_xml}"
+        f"</xsd:articlePoolDataRecord>"
+        f"</main:param></main:sendAPDV03>"
+    ))
+
+
+def send_jobs_v02(job_number: str, positions: list) -> requests.Response:
+    pos_xml = ""
+    for p in positions:
+        batch_xml = (
+            f"<xsd:batchNumber>{p['batch_number']}</xsd:batchNumber>"
+            if p.get("batch_number")
+            else ""
+        )
+        pos_xml += (
+            f"<xsd:JobPosition>"
+            f"<xsd:articleNumber>{p['article_number']}</xsd:articleNumber>"
+            f"<xsd:operation>{p['operation']}</xsd:operation>"
+            f"<xsd:nominalQuantity>{p['nominal_quantity']}</xsd:nominalQuantity>"
+            f"{batch_xml}"
+            f"</xsd:JobPosition>"
+        )
+    return post_soap(envelope(
+        f"<main:sendJobsV02><main:param>"
+        f"<xsd:job>"
+        f"<xsd:jobNumber>{job_number}</xsd:jobNumber>"
+        f"{pos_xml}"
+        f"</xsd:job>"
+        f"</main:param></main:sendJobsV02>"
+    ))
+
+
+def read_jobs_v02(mode: int) -> requests.Response:
+    return post_soap(envelope(
+        f"<main:readAllJobsV02><main:param>"
+        f"<xsd:mode>{mode}</xsd:mode>"
+        f"</main:param></main:readAllJobsV02>"
+    ))
+
+
+def read_amd_v04() -> requests.Response:
+    return post_soap(envelope("<main:readAllAMDV04/>"))
+
+
+# ---------------------------------------------------------------------------
+# sendAPDV03
+# ---------------------------------------------------------------------------
+
+class TestSendAPDV03:
+    def test_registers_article_without_batch(self):
+        resp = send_apd_v03("ART-V03", "V03 Article")
+        assert resp.status_code == 200
+        assert get_return_value(resp.text) == 0
+
+    def test_registers_article_with_batch(self):
+        resp = send_apd_v03("ART-V03", "V03 Article", batch_number="LOT-001")
+        assert resp.status_code == 200
+        assert get_return_value(resp.text) == 0
+
+    def test_response_tag_is_sendAPDV03Response(self):
+        resp = send_apd_v03("ART-V03", "V03 Article", batch_number="LOT-X")
+        assert "sendAPDV03Response" in resp.text
+
+    def test_article_appears_in_state(self):
+        send_apd_v03("ART-V03-NEW", "New V03 Article", batch_number="LOT-A")
+        state = requests.get(f"{BASE_URL}/admin/state").json()
+        assert "ART-V03-NEW" in state["articles"]
+
+
+# ---------------------------------------------------------------------------
+# sendJobsV02
+# ---------------------------------------------------------------------------
+
+class TestSendJobsV02:
+    def test_send_job_returns_0(self):
+        positions = [
+            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 5.0, "batch_number": "LOT-B"}  # noqa: E501
+        ]
+        resp = send_jobs_v02("JOB-V02-1", positions)
+        assert resp.status_code == 200
+        assert get_return_value(resp.text) == 0
+
+    def test_response_tag_is_sendJobsV02Response(self):
+        positions = [
+            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 5.0}
+        ]
+        resp = send_jobs_v02("JOB-V02-2", positions)
+        assert "sendJobsV02Response" in resp.text
+
+    def test_job_with_batch_stored(self):
+        positions = [
+            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 3.0, "batch_number": "LOT-C"}  # noqa: E501
+        ]
+        send_jobs_v02("JOB-V02-3", positions)
+        state = requests.get(f"{BASE_URL}/admin/state").json()
+        pos = state["jobs"]["JOB-V02-3"]["positions"][0]
+        assert pos["batch_number"] == "LOT-C"
+
+    def test_job_without_batch_stored_as_none(self):
+        positions = [
+            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 3.0}
+        ]
+        send_jobs_v02("JOB-V02-4", positions)
+        state = requests.get(f"{BASE_URL}/admin/state").json()
+        pos = state["jobs"]["JOB-V02-4"]["positions"][0]
+        assert pos["batch_number"] is None
+
+
+# ---------------------------------------------------------------------------
+# readAllJobsV02
+# ---------------------------------------------------------------------------
+
+class TestReadAllJobsV02:
+    def test_mode_0_returns_all_jobs(self):
+        resp = read_jobs_v02(0)
+        assert resp.status_code == 200
+        root = ET.fromstring(resp.text)
+        jobs = root.findall(f".//{{{NS_XSD}}}job")
+        assert len(jobs) >= 1
+
+    def test_response_tag_is_readAllJobsV02Response(self):
+        resp = read_jobs_v02(0)
+        assert "readAllJobsV02Response" in resp.text
+
+    def test_batch_number_present_in_response(self):
+        positions = [
+            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 2.0, "batch_number": "LOT-D"}  # noqa: E501
+        ]
+        send_jobs_v02("JOB-V02-LOT", positions)
+        requests.post(f"{BASE_URL}/admin/complete-all")
+        root = ET.fromstring(read_jobs_v02(1).text)
+        jobs = root.findall(f".//{{{NS_XSD}}}job")
+        v02_job = next(
+            (j for j in jobs if j.findtext(f"{{{NS_XSD}}}jobNumber") == "JOB-V02-LOT"),
+            None,
+        )
+        assert v02_job is not None
+        pos = v02_job.find(f".//{{{NS_XSD}}}JobPosition")
+        batch = pos.findtext(f"{{{NS_XSD}}}batchNumber")
+        assert batch == "LOT-D"
+
+    def test_mode_1_returns_completed_only(self):
+        positions = [
+            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 1.0}
+        ]
+        send_jobs_v02("JOB-V02-PEND", positions)
+        root_before = ET.fromstring(read_jobs_v02(1).text)
+        job_numbers_before = [
+            j.findtext(f"{{{NS_XSD}}}jobNumber")
+            for j in root_before.findall(f".//{{{NS_XSD}}}job")
+        ]
+        assert "JOB-V02-PEND" not in job_numbers_before
+        requests.post(f"{BASE_URL}/admin/complete-all")
+        root_after = ET.fromstring(read_jobs_v02(1).text)
+        job_numbers_after = [
+            j.findtext(f"{{{NS_XSD}}}jobNumber")
+            for j in root_after.findall(f".//{{{NS_XSD}}}job")
+        ]
+        assert "JOB-V02-PEND" in job_numbers_after
+
+
+# ---------------------------------------------------------------------------
+# readAllAMDV04
+# ---------------------------------------------------------------------------
+
+class TestReadAllAMDV04:
+    def test_returns_inventory_records(self):
+        resp = read_amd_v04()
+        assert resp.status_code == 200
+        root = ET.fromstring(resp.text)
+        records = root.findall(f".//{{{NS_XSD}}}articleMasterDataRecord")
+        assert len(records) >= 1
+
+    def test_response_tag_is_readAllAMDV04Response(self):
+        resp = read_amd_v04()
+        assert "readAllAMDV04Response" in resp.text
+
+
+# ---------------------------------------------------------------------------
+# Backward compatibility: V01 and V02 on the same mock state
+# ---------------------------------------------------------------------------
+
+class TestBackwardCompatibility:
+    def test_v01_send_apd_still_works(self):
+        resp = send_apd("ART-COMPAT", "Compat Article")
+        assert resp.status_code == 200
+        assert get_return_value(resp.text) == 0
+
+    def test_v01_send_jobs_still_works(self):
+        positions = [
+            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 1.0}
+        ]
+        resp = send_jobs("JOB-COMPAT-V01", positions)
+        assert resp.status_code == 200
+        assert get_return_value(resp.text) == 0
+
+    def test_v01_and_v02_jobs_coexist_in_state(self):
+        positions = [
+            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 1.0}
+        ]
+        send_jobs("JOB-V01-COEX", positions)
+        send_jobs_v02("JOB-V02-COEX", positions)
+        state = requests.get(f"{BASE_URL}/admin/state").json()
+        assert "JOB-V01-COEX" in state["jobs"]
+        assert "JOB-V02-COEX" in state["jobs"]
+
+    def test_v01_read_jobs_does_not_include_batch_tag(self):
+        positions = [
+            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 1.0, "batch_number": "LOT-X"}  # noqa: E501
+        ]
+        send_jobs_v02("JOB-MIXED", positions)
+        requests.post(f"{BASE_URL}/admin/complete-all")
+        resp = read_jobs(1)
+        assert "batchNumber" not in resp.text

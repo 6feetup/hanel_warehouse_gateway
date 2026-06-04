@@ -8,11 +8,16 @@ import pytest
 
 from hanel_warehouse_gateway._xml import (
     build_cancel_order_envelope,
+    build_get_inventory_envelope_v04,
     build_read_jobs_envelope,
+    build_read_jobs_envelope_v02,
     build_register_article_envelope,
+    build_register_article_envelope_v03,
     build_send_movement_order_envelope,
+    build_send_movement_order_envelope_v02,
     parse_movement_results,
     parse_return_value,
+    parse_stock_records,
 )
 from hanel_warehouse_gateway.exceptions import (
     HanelGatewayParseError,
@@ -306,3 +311,156 @@ class TestParseMovementResults:
     def test_malformed_xml_raises_parse_error(self) -> None:
         with pytest.raises(HanelGatewayParseError):
             parse_movement_results("<not-xml", _OPERATION, _NS_XSD)
+
+    def test_batch_number_present_in_v02_fixture(self) -> None:
+        xml = _fixture("read_jobs_v02_response_mode1.xml")
+        results = parse_movement_results(xml, "readAllJobsV02", _NS_XSD)
+        assert results[0]["positions"][0]["batch_number"] == "LOT-A"  # type: ignore[index]
+
+    def test_batch_number_absent_returns_none(self) -> None:
+        xml = _fixture("read_jobs_v02_response_mode0.xml")
+        results = parse_movement_results(xml, "readAllJobsV02", _NS_XSD)
+        assert results[1]["positions"][0]["batch_number"] is None  # type: ignore[index]
+
+    def test_v01_fixture_batch_number_is_none(self) -> None:
+        xml = _fixture("read_jobs_response_mode1.xml")
+        results = parse_movement_results(xml, "readAllJobsReqV01", _NS_XSD)
+        assert results[0]["positions"][0]["batch_number"] is None  # type: ignore[index]
+
+
+class TestParseStockRecords:
+    def test_batch_number_present_in_v04_fixture(self) -> None:
+        xml = _fixture("read_inventory_v04_response.xml")
+        results = parse_stock_records(xml, "readAllAMDV04", _NS_XSD)
+        assert results[0]["batch_number"] == "LOT-2024"
+
+    def test_batch_number_absent_returns_none(self) -> None:
+        xml = _fixture("read_inventory_v04_response.xml")
+        results = parse_stock_records(xml, "readAllAMDV04", _NS_XSD)
+        assert results[1]["batch_number"] is None
+
+    def test_v01_fixture_batch_number_is_none(self) -> None:
+        xml = _fixture("read_inventory_response.xml")
+        results = parse_stock_records(xml, "readAllAMDReqV01", _NS_XSD)
+        assert results[0]["batch_number"] is None
+
+
+def _build_apd_v03(
+    article_number: str,
+    article_name: str,
+    batch_number: str | None,
+) -> str:
+    return build_register_article_envelope_v03(
+        article_number, article_name, batch_number, _NS_MAIN, _NS_XSD
+    )
+
+
+def _build_smo_v02(job_number: str, positions: list[dict[str, object]]) -> str:
+    return build_send_movement_order_envelope_v02(
+        job_number, positions, _NS_MAIN, _NS_XSD
+    )
+
+
+class TestBuildRegisterArticleEnvelopeV03:
+    def test_contains_operation_tag(self) -> None:
+        xml = _build_apd_v03("ART001", "Bolt M6", None)
+        assert "sendAPDV03" in xml
+
+    def test_contains_article_number(self) -> None:
+        xml = _build_apd_v03("ART001", "Bolt M6", None)
+        assert "ART001" in xml
+
+    def test_batch_number_emitted_when_set(self) -> None:
+        xml = _build_apd_v03("ART001", "Bolt M6", "LOT-X")
+        assert "<xsd:batchNumber>LOT-X</xsd:batchNumber>" in xml
+
+    def test_batch_number_absent_when_none(self) -> None:
+        xml = _build_apd_v03("ART001", "Bolt M6", None)
+        assert "batchNumber" not in xml
+
+    def test_is_valid_xml(self) -> None:
+        import xml.etree.ElementTree as ET
+        xml = _build_apd_v03("ART001", "Bolt M6", "LOT-1")
+        ET.fromstring(xml)
+
+
+_ONE_POSITION_V02 = [
+    {"article_number": "ART-001", "operation": "+", "nominal_quantity": 5.0}
+]
+
+
+class TestBuildSendMovementOrderEnvelopeV02:
+    def test_contains_operation_tag(self) -> None:
+        xml = _build_smo_v02("JOB-1", _ONE_POSITION_V02)
+        assert "sendJobsV02" in xml
+
+    def test_batch_number_emitted_when_set(self) -> None:
+        positions = [
+            {
+                "article_number": "ART-001",
+                "operation": "+",
+                "nominal_quantity": 5.0,
+                "batch_number": "LOT-A",
+            }
+        ]
+        xml = _build_smo_v02("JOB-1", positions)
+        assert "<xsd:batchNumber>LOT-A</xsd:batchNumber>" in xml
+
+    def test_batch_number_absent_when_none(self) -> None:
+        positions = [
+            {
+                "article_number": "ART-001",
+                "operation": "+",
+                "nominal_quantity": 5.0,
+                "batch_number": None,
+            }
+        ]
+        xml = _build_smo_v02("JOB-1", positions)
+        assert "batchNumber" not in xml
+
+    def test_batch_number_absent_when_key_missing(self) -> None:
+        xml = _build_smo_v02("JOB-1", _ONE_POSITION_V02)
+        assert "batchNumber" not in xml
+
+    def test_is_valid_xml(self) -> None:
+        import xml.etree.ElementTree as ET
+        positions = [
+            {
+                "article_number": "ART-001",
+                "operation": "+",
+                "nominal_quantity": 5.0,
+                "batch_number": "L1",
+            }
+        ]
+        xml = _build_smo_v02("JOB-1", positions)
+        ET.fromstring(xml)
+
+
+class TestBuildReadJobsEnvelopeV02:
+    def test_contains_operation_tag(self) -> None:
+        xml = build_read_jobs_envelope_v02(1, _NS_MAIN, _NS_XSD)
+        assert "readAllJobsV02" in xml
+
+    def test_mode_1_in_envelope(self) -> None:
+        xml = build_read_jobs_envelope_v02(1, _NS_MAIN, _NS_XSD)
+        assert "<xsd:mode>1</xsd:mode>" in xml
+
+    def test_mode_0_in_envelope(self) -> None:
+        xml = build_read_jobs_envelope_v02(0, _NS_MAIN, _NS_XSD)
+        assert "<xsd:mode>0</xsd:mode>" in xml
+
+    def test_is_valid_xml(self) -> None:
+        import xml.etree.ElementTree as ET
+        xml = build_read_jobs_envelope_v02(1, _NS_MAIN, _NS_XSD)
+        ET.fromstring(xml)
+
+
+class TestBuildGetInventoryEnvelopeV04:
+    def test_contains_operation_tag(self) -> None:
+        xml = build_get_inventory_envelope_v04(_NS_MAIN)
+        assert "readAllAMDV04" in xml
+
+    def test_is_valid_xml(self) -> None:
+        import xml.etree.ElementTree as ET
+        xml = build_get_inventory_envelope_v04(_NS_MAIN)
+        ET.fromstring(xml)

@@ -13,7 +13,9 @@
    ```dotenv
    HANEL_ENDPOINT_URL=http://localhost:8080/HanelService
    HANEL_TEST_MODE=false
+   HANEL_LOT_MANAGEMENT_ENABLED=false
    ```
+   Set `HANEL_LOT_MANAGEMENT_ENABLED=true` to use V02/V03/V04 SOAP operations with `batch_number` support.
 
 3. **Dependencies installed:**
    ```bash
@@ -54,9 +56,12 @@ Registers or updates an article in the warehouse catalogue.
 ```json
 {
   "article_number": "ART-CLI-001",
-  "article_name": "M6 stainless bolt"
+  "article_name": "M6 stainless bolt",
+  "batch_number": "LOTTO-2026-A"
 }
 ```
+
+`batch_number` is optional. It is only sent to the warehouse when `HANEL_LOT_MANAGEMENT_ENABLED=true`.
 
 **Command:**
 ```bash
@@ -101,6 +106,18 @@ Sends a movement order to the warehouse.
   ]
 }
 ```
+
+**JSON input — with lot/batch numbers** (requires `HANEL_LOT_MANAGEMENT_ENABLED=true`):
+```json
+{
+  "order_number": "ORD-LOT-001",
+  "positions": [
+    {"article_number": "ART-001", "operation": "+", "nominal_quantity": 5.0, "batch_number": "LOTTO-2026-A"}
+  ]
+}
+```
+
+`batch_number` per position is optional. It is included in the SOAP request only when `HANEL_LOT_MANAGEMENT_ENABLED=true`.
 
 **Command:**
 ```bash
@@ -210,6 +227,37 @@ uv run python scripts/hanel_cli.py get_completed_movements --endpoint $ENDPOINT
 # 6. Try to cancel the (now completed) order — expect HanelGatewayApplicationError
 echo '{"order_number": "ORD-CLI-001"}' | \
   uv run python scripts/hanel_cli.py cancel_order --endpoint $ENDPOINT
+```
+
+---
+
+---
+
+## End-to-end test sequence — lot management
+
+Run these commands to test the lot management workflow (requires `HANEL_LOT_MANAGEMENT_ENABLED=true` in `.env`):
+
+```bash
+ENDPOINT=http://localhost:8080/HanelService
+
+# 1. Reset mock server state
+curl -s -X POST http://localhost:8080/admin/reset
+
+# 2. Register an article with a batch number (uses sendAPDV03)
+echo '{"article_number": "ART-CLI-001", "article_name": "M6 stainless bolt", "batch_number": "LOTTO-2026-A"}' | \
+  uv run python scripts/hanel_cli.py register_article --endpoint $ENDPOINT
+
+# 3. Send a movement order with batch number on each position (uses sendJobsV02)
+echo '{
+  "order_number": "ORD-LOT-001",
+  "positions": [{"article_number": "ART-001", "operation": "+", "nominal_quantity": 3.0, "batch_number": "LOTTO-2026-A"}]
+}' | uv run python scripts/hanel_cli.py send_movement_order --endpoint $ENDPOINT
+
+# 4. Complete all pending orders
+curl -s -X POST http://localhost:8080/admin/complete-all
+
+# 5. Verify completed movements — response includes batch_number per position (uses readAllJobsV02)
+uv run python scripts/hanel_cli.py get_completed_movements --endpoint $ENDPOINT
 ```
 
 ---
