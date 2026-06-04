@@ -45,7 +45,7 @@ Define four slash commands in `.claude/commands/`:
 
 **Automated workflow:**
 1. Asks for the SOAP operation name
-2. Generates a plausible XML fixture based on the response structure documented in `requirements.md`
+2. Generates a plausible XML fixture based on the response structure documented in `docs/requirements/`
 3. Saves the file to `tests/fixtures/response_<operation>_ok.xml`
 4. Also generates a version with `returnValue != 0` and one with a SOAP fault
 

@@ -27,7 +27,7 @@ Or without arguments to choose interactively.
 
 ### Step 1 — Read requirements
 
-Read the corresponding section in `docs/requirements.md` for the expected response structure.
+Read the corresponding section in `docs/requirements/` for the expected response structure.
 
 ### Step 2 — Generate fixtures
 

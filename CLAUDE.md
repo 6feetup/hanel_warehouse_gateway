@@ -24,7 +24,7 @@ tests/
 └── test_operations.py
 docs/
 ├── index.md         ← quick start for integrators (MkDocs home)
-├── requirements.md  ← full technical specification (read before implementing)
+├── requirements/    ← technical specifications (read before implementing)
 ├── scripts.md       ← CLI tool and e2e testing guide
 ├── api/             ← API reference pages (rendered via mkdocstrings)
 └── adr/             ← Architecture Decision Records (001–014)

@@ -8,7 +8,7 @@ This module is developed with a mix of human contributions and Claude agents. Wi
 
 ## Workflow 1 — Adding a new SOAP operation
 
-1. Verify the operation does not already exist (consult `docs/requirements.md` §3 and `operations.py`)
+1. Verify the operation does not already exist (consult `docs/requirements/` §3 and `operations.py`)
 2. If the operation introduces a new pattern not covered by existing ADRs → create a new ADR
 3. Add the required dataclasses in `models.py`
 4. Add the envelope template and parsing function in `_xml.py`

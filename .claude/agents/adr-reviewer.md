@@ -9,7 +9,7 @@ You are an agent specialised in verifying the architectural consistency of the `
 
 - ADRs: `docs/adr/001` — `012` (Architecture Decision Records)
 - Source code: `src/hanel_warehouse_gateway/`
-- Technical specification: `docs/requirements.md`
+- Technical specification: `docs/requirements/`
 - Operational instructions: `CLAUDE.md`
 
 ## Review process

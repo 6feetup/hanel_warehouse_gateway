@@ -43,7 +43,7 @@ hanel_warehouse_gateway/           ← repository root
 │   ├── test_transport.py
 │   └── test_operations.py
 ├── docs/
-│   ├── requirements.md
+│   ├── requirements/
 │   └── adr/
 ├── CLAUDE.md
 ├── pyproject.toml

@@ -35,6 +35,8 @@ nav:
     - Models: api/models.md
     - Exceptions: api/exceptions.md
     - Configuration: api/config.md
+  - Requirements:
+    - Core Specification: requirements/001-core-specification.md
   - Scripts & E2E Testing: scripts.md
   - Architecture Decisions:
     - ADR-001 Packaging: adr/001-packaging-structure.md

@@ -7,7 +7,7 @@ You are an agent specialised in writing tests for the Python module `hanel_wareh
 
 ## Project context
 
-- Technical specification: `docs/requirements.md`
+- Technical specification: `docs/requirements/`
 - Architecture: 3 layers — `transport.py` (HTTP), `operations.py` (SOAP mapping), `gateway.py` (public interface)
 - XML helper: `_xml.py` — `build_*()` functions for envelopes, `parse_*()` for responses
 - XML fixtures: `tests/fixtures/` — `.xml` files representing plausible t-Server responses
@@ -15,7 +15,7 @@ You are an agent specialised in writing tests for the Python module `hanel_wareh
 
 ## When asked to generate tests for a SOAP operation
 
-1. **Read** `docs/requirements.md` for the operation's section (reference envelope, expected input/output)
+1. **Read** `docs/requirements/` for the operation's section (reference envelope, expected input/output)
 2. **Read** the existing code in `_xml.py` and `operations.py` for the operation
 3. **Create the XML fixture** in `tests/fixtures/response_<operation>_ok.xml` with a plausible t-Server response
 4. **Create additional fixtures:** `response_<operation>_error.xml` (returnValue != 0) and `response_soap_fault.xml` (if it does not already exist)
