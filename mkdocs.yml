@@ -47,11 +47,11 @@ nav:
     - ADR-006 Logging: adr/006-logging.md
     - ADR-007 Testing Strategy: adr/007-testing-strategy.md
     - ADR-008 Input Validation: adr/008-input-validation.md
-    - ADR-009 Claude Instructions: adr/009-claude-instructions.md
-    - ADR-010 Claude Agents: adr/010-claude-agents.md
-    - ADR-011 Claude Commands: adr/011-claude-commands.md
-    - ADR-012 Development Workflow: adr/012-development-workflow.md
     - ADR-013 uv Package Manager: adr/013-uv-package-manager.md
     - ADR-014 Documentation: adr/014-documentation-toolchain.md
     - ADR-015 Lot Management: adr/015-lot-management.md
     - ADR-016 Lot Tag Names (Provisional): adr/016-lot-tag-names-provisional.md
+  - Contributing:
+    - Development Workflow: contributing/development-workflow.md
+    - Claude Agents: contributing/claude-agents.md
+    - Claude Commands: contributing/claude-commands.md
