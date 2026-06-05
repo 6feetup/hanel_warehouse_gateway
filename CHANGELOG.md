@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.4](https://github.com/6feetup/hanel_warehouse_gateway/compare/v0.1.3...v0.1.4) (2026-06-05)
+
+
+### Documentation
+
+* move procedural ADRs 009-012 to Contributing section ([#29](https://github.com/6feetup/hanel_warehouse_gateway/issues/29)) ([87676e5](https://github.com/6feetup/hanel_warehouse_gateway/commit/87676e5810a4292ac315af2b9e3e5afcc049a879))
+
 ## [0.1.3](https://github.com/6feetup/hanel_warehouse_gateway/compare/v0.1.2...v0.1.3) (2026-06-04)
 
 
