@@ -1,6 +1,8 @@
 # ADR-009 — CLAUDE.md: operational instructions for Claude agents
 
-**Status:** Accepted
+**Status:** Moved
+
+> The content of this document is embodied in `CLAUDE.md` at the repository root, which is the authoritative source for Claude agent instructions.
 
 ## Context
 

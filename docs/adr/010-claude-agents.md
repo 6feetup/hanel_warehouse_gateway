@@ -1,6 +1,9 @@
 # ADR-010 — Specialized Claude agents
 
-**Status:** Accepted
+**Status:** Moved
+
+> This document has been moved to the Contributing section of the project documentation.
+> See: [Claude Agents](../contributing/claude-agents.md)
 
 ## Context
 

@@ -27,7 +27,8 @@ docs/
 ├── requirements/    ← technical specifications (read before implementing)
 ├── scripts.md       ← CLI tool and e2e testing guide
 ├── api/             ← API reference pages (rendered via mkdocstrings)
-└── adr/             ← Architecture Decision Records (001–014)
+├── adr/             ← Architecture Decision Records (001–016)
+└── contributing/    ← Development workflow, Claude agents, slash commands
 ```
 
 ## Development commands
@@ -117,12 +118,11 @@ Static parameters with defaults (can be passed as overrides):
 | [006](docs/adr/006-logging.md) | `logging` stdlib, NullHandler, no default handlers |
 | [007](docs/adr/007-testing-strategy.md) | `pytest` + `unittest.mock` + `responses` |
 | [008](docs/adr/008-input-validation.md) | Default raise on fields > 40 chars; truncate opt-in |
-| [009](docs/adr/009-claude-instructions.md) | This file |
-| [010](docs/adr/010-claude-agents.md) | Specialized agents in `.claude/agents/` |
-| [011](docs/adr/011-claude-commands.md) | Slash commands in `.claude/commands/` |
-| [012](docs/adr/012-development-workflow.md) | Workflow for common changes |
 | [013](docs/adr/013-uv-package-manager.md) | `uv` as official package manager |
 | [014](docs/adr/014-documentation-toolchain.md) | MkDocs + mkdocstrings for API docs |
+| [015](docs/adr/015-lot-management.md) | Lot management via feature flag + V02/V03/V04 ops |
+| [016](docs/adr/016-lot-tag-names-provisional.md) | Provisional XML tag names for lot management |
+| [Contributing docs](docs/contributing/) | Development workflow, Claude agents, slash commands |
 
 ## Available slash commands
 
