@@ -63,28 +63,28 @@ class TestRegisterArticle:
     def test_success_returns_true(self) -> None:
         xml = _fixture("sendAPDReqV01_success.xml")
         ops, transport = _make_operations(xml)
-        result = ops.register_article("ART001", "Bolt M6")
+        result = ops.register_article("1001", "Bolt M6")
         assert result is True
         transport.post.assert_called_once()
 
     def test_calls_correct_soap_operation(self) -> None:
         xml = _fixture("sendAPDReqV01_success.xml")
         ops, transport = _make_operations(xml)
-        ops.register_article("ART001", "Bolt M6")
+        ops.register_article("1001", "Bolt M6")
         _, call_operation = transport.post.call_args[0]
         assert call_operation == "sendAPDReqV01"
 
     def test_envelope_contains_article_number(self) -> None:
         xml = _fixture("sendAPDReqV01_success.xml")
         ops, transport = _make_operations(xml)
-        ops.register_article("ART001", "Bolt M6")
+        ops.register_article("1001", "Bolt M6")
         envelope, _ = transport.post.call_args[0]
-        assert "ART001" in envelope
+        assert "1001" in envelope
 
     def test_envelope_contains_article_name(self) -> None:
         xml = _fixture("sendAPDReqV01_success.xml")
         ops, transport = _make_operations(xml)
-        ops.register_article("ART001", "Bolt M6")
+        ops.register_article("1001", "Bolt M6")
         envelope, _ = transport.post.call_args[0]
         assert "Bolt M6" in envelope
 
@@ -92,21 +92,42 @@ class TestRegisterArticle:
         xml = _fixture("sendAPDReqV01_error.xml")
         ops, _ = _make_operations(xml)
         with pytest.raises(HanelGatewayApplicationError) as exc_info:
-            ops.register_article("ART001", "Bolt M6")
+            ops.register_article("1001", "Bolt M6")
         assert exc_info.value.return_value == 1
         assert exc_info.value.operation == "sendAPDReqV01"
+
+    def test_application_error_includes_response_snippet(self) -> None:
+        xml = _fixture("sendAPDReqV01_error.xml")
+        ops, _ = _make_operations(xml)
+        with pytest.raises(HanelGatewayApplicationError) as exc_info:
+            ops.register_article("1001", "Bolt M6")
+        assert "returnValue=1" in exc_info.value.detail
+        assert "response=" in exc_info.value.detail
+
+    def test_application_error_logs_error(
+        self, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        xml = _fixture("sendAPDReqV01_error.xml")
+        ops, _ = _make_operations(xml)
+        with caplog.at_level("ERROR", logger="hanel_warehouse_gateway"):
+            with pytest.raises(HanelGatewayApplicationError):
+                ops.register_article("1001", "Bolt M6")
+        assert any(
+            "Application error" in r.message and r.levelname == "ERROR"
+            for r in caplog.records
+        )
 
     def test_soap_fault_raises(self) -> None:
         xml = _fixture("soap_fault.xml")
         ops, _ = _make_operations(xml)
         with pytest.raises(HanelGatewaySoapFaultError) as exc_info:
-            ops.register_article("ART001", "Bolt M6")
+            ops.register_article("1001", "Bolt M6")
         assert exc_info.value.fault_code == "soapenv:Server"
         assert "Internal error" in exc_info.value.fault_string
 
     def test_article_number_too_long_raises_validation_error(self) -> None:
         ops, transport = _make_operations()
-        long_number = "A" * 41
+        long_number = "1" * 41
         with pytest.raises(HanelGatewayValidationError) as exc_info:
             ops.register_article(long_number, "Valid Name")
         assert exc_info.value.field == "article_number"
@@ -116,34 +137,34 @@ class TestRegisterArticle:
         ops, transport = _make_operations()
         long_name = "N" * 41
         with pytest.raises(HanelGatewayValidationError) as exc_info:
-            ops.register_article("ART001", long_name)
+            ops.register_article("1001", long_name)
         assert exc_info.value.field == "article_name"
         transport.post.assert_not_called()
 
     def test_article_number_exactly_40_chars_is_valid(self) -> None:
         xml = _fixture("sendAPDReqV01_success.xml")
         ops, transport = _make_operations(xml)
-        ops.register_article("A" * 40, "Valid Name")
+        ops.register_article("1" * 40, "Valid Name")
         transport.post.assert_called_once()
 
     def test_article_name_exactly_40_chars_is_valid(self) -> None:
         xml = _fixture("sendAPDReqV01_success.xml")
         ops, transport = _make_operations(xml)
-        ops.register_article("ART001", "N" * 40)
+        ops.register_article("1001", "N" * 40)
         transport.post.assert_called_once()
 
     def test_validation_truncate_article_number(self) -> None:
         xml = _fixture("sendAPDReqV01_success.xml")
         ops, transport = _make_operations(xml, validation_truncate=True)
-        ops.register_article("A" * 41, "Valid Name")
+        ops.register_article("1" * 41, "Valid Name")
         envelope, _ = transport.post.call_args[0]
-        assert "A" * 40 in envelope
-        assert "A" * 41 not in envelope
+        assert "1" * 40 in envelope
+        assert "1" * 41 not in envelope
 
     def test_validation_truncate_article_name(self) -> None:
         xml = _fixture("sendAPDReqV01_success.xml")
         ops, transport = _make_operations(xml, validation_truncate=True)
-        ops.register_article("ART001", "N" * 41)
+        ops.register_article("1001", "N" * 41)
         envelope, _ = transport.post.call_args[0]
         assert "N" * 40 in envelope
         assert "N" * 41 not in envelope
@@ -151,23 +172,77 @@ class TestRegisterArticle:
     def test_test_mode_prepends_prefix(self) -> None:
         xml = _fixture("sendAPDReqV01_success.xml")
         ops, transport = _make_operations(xml, test_mode=True, test_prefix="TEST_")
-        ops.register_article("ART001", "Bolt M6")
+        ops.register_article("1001", "Bolt M6")
         envelope, _ = transport.post.call_args[0]
-        assert "TEST_ART001" in envelope
+        assert "TEST_1001" in envelope
 
     def test_test_mode_false_no_prefix(self) -> None:
         xml = _fixture("sendAPDReqV01_success.xml")
         ops, transport = _make_operations(xml, test_mode=False)
-        ops.register_article("ART001", "Bolt M6")
+        ops.register_article("1001", "Bolt M6")
         envelope, _ = transport.post.call_args[0]
-        assert "ART001" in envelope
-        assert "TEST_ART001" not in envelope
+        assert "1001" in envelope
+        assert "TEST_1001" not in envelope
 
     def test_test_mode_prefix_counts_toward_length_limit(self) -> None:
         ops, transport = _make_operations(test_mode=True, test_prefix="TEST_")
         with pytest.raises(HanelGatewayValidationError):
-            ops.register_article("A" * 36, "Valid Name")
+            ops.register_article("1" * 36, "Valid Name")
         transport.post.assert_not_called()
+
+    def test_article_number_with_hyphen_raises_validation_error(self) -> None:
+        ops, transport = _make_operations()
+        with pytest.raises(HanelGatewayValidationError) as exc_info:
+            ops.register_article("ART-001", "Valid Name")
+        assert exc_info.value.field == "article_number"
+        transport.post.assert_not_called()
+
+    def test_article_number_with_space_raises_validation_error(self) -> None:
+        ops, transport = _make_operations()
+        with pytest.raises(HanelGatewayValidationError) as exc_info:
+            ops.register_article("12 34", "Valid Name")
+        assert exc_info.value.field == "article_number"
+        transport.post.assert_not_called()
+
+    def test_article_number_with_symbol_raises_validation_error(self) -> None:
+        ops, transport = _make_operations()
+        with pytest.raises(HanelGatewayValidationError) as exc_info:
+            ops.register_article("12/34", "Valid Name")
+        assert exc_info.value.field == "article_number"
+        transport.post.assert_not_called()
+
+    def test_article_number_with_letters_raises_validation_error(self) -> None:
+        # The article number is a numeric code: letters are rejected.
+        ops, transport = _make_operations()
+        with pytest.raises(HanelGatewayValidationError) as exc_info:
+            ops.register_article("ART001", "Valid Name")
+        assert exc_info.value.field == "article_number"
+        transport.post.assert_not_called()
+
+    def test_article_name_may_contain_spaces_and_symbols(self) -> None:
+        # The charset constraint applies only to article_number, not article_name.
+        xml = _fixture("sendAPDReqV01_success.xml")
+        ops, transport = _make_operations(xml)
+        ops.register_article("1001", "M6 stainless bolt - A2/70")
+        transport.post.assert_called_once()
+
+    def test_validation_truncate_does_not_bypass_charset_check(self) -> None:
+        # Unlike the length check, the charset rule always raises even with
+        # validation_truncate=True: an article number cannot be auto-corrected.
+        ops, transport = _make_operations(validation_truncate=True)
+        with pytest.raises(HanelGatewayValidationError) as exc_info:
+            ops.register_article("ART-001", "Valid Name")
+        assert exc_info.value.field == "article_number"
+        transport.post.assert_not_called()
+
+    def test_test_mode_prefix_underscore_does_not_trigger_charset_error(self) -> None:
+        # The test_prefix ("TEST_") contains an underscore; the charset check
+        # runs on the caller value before the prefix is prepended.
+        xml = _fixture("sendAPDReqV01_success.xml")
+        ops, transport = _make_operations(xml, test_mode=True, test_prefix="TEST_")
+        ops.register_article("1001", "Valid Name")
+        envelope, _ = transport.post.call_args[0]
+        assert "TEST_1001" in envelope
 
 
 class TestCancelOrder:
@@ -249,7 +324,7 @@ class TestCancelOrder:
 _SUCCESS_XML = _fixture("send_movement_order_success.xml")
 
 _ONE_LINE = [
-    MovementLine(article_number="ART-001", operation="+", nominal_quantity=5.0)
+    MovementLine(article_number="1001", operation="+", nominal_quantity=5.0)
 ]
 
 
@@ -275,7 +350,7 @@ class TestSendMovementOrder:
         ops, transport = _make_operations(_SUCCESS_XML)
         ops.send_movement_order("JOB-1", _ONE_LINE)
         envelope, _ = transport.post.call_args[0]
-        assert "ART-001" in envelope
+        assert "1001" in envelope
 
     def test_envelope_contains_operation_and_quantity(self) -> None:
         ops, transport = _make_operations(_SUCCESS_XML)
@@ -286,14 +361,14 @@ class TestSendMovementOrder:
 
     def test_multiple_positions_all_in_envelope(self) -> None:
         positions = [
-            MovementLine("ART-001", "+", 10.0),
-            MovementLine("ART-002", "-", 3.5),
+            MovementLine("1001", "+", 10.0),
+            MovementLine("1002", "-", 3.5),
         ]
         ops, transport = _make_operations(_SUCCESS_XML)
         ops.send_movement_order("JOB-MULTI", positions)
         envelope, _ = transport.post.call_args[0]
-        assert "ART-001" in envelope
-        assert "ART-002" in envelope
+        assert "1001" in envelope
+        assert "1002" in envelope
 
     def test_test_mode_prepends_prefix(self) -> None:
         ops, transport = _make_operations(
@@ -319,7 +394,7 @@ class TestSendMovementOrder:
 
     def test_invalid_operation_raises_validation_error(self) -> None:
         ops, transport = _make_operations()
-        bad = [MovementLine("ART-001", "X", 1.0)]
+        bad = [MovementLine("1001", "X", 1.0)]
         with pytest.raises(HanelGatewayValidationError) as exc_info:
             ops.send_movement_order("JOB-1", bad)
         assert "operation" in exc_info.value.field
@@ -328,7 +403,7 @@ class TestSendMovementOrder:
     def test_zero_quantity_raises_validation_error(self) -> None:
         ops, transport = _make_operations()
         bad = [
-            MovementLine(article_number="ART-001", operation="+", nominal_quantity=0.0)
+            MovementLine(article_number="1001", operation="+", nominal_quantity=0.0)
         ]
         with pytest.raises(HanelGatewayValidationError) as exc_info:
             ops.send_movement_order("JOB-1", bad)
@@ -338,7 +413,7 @@ class TestSendMovementOrder:
     def test_negative_quantity_raises_validation_error(self) -> None:
         ops, transport = _make_operations()
         bad = [
-            MovementLine(article_number="ART-001", operation="+", nominal_quantity=-1.0)
+            MovementLine(article_number="1001", operation="+", nominal_quantity=-1.0)
         ]
         with pytest.raises(HanelGatewayValidationError) as exc_info:
             ops.send_movement_order("JOB-1", bad)
@@ -355,12 +430,28 @@ class TestSendMovementOrder:
     def test_article_number_too_long_raises_validation_error(self) -> None:
         ops, transport = _make_operations()
         bad = [
-            MovementLine(article_number="A" * 41, operation="+", nominal_quantity=1.0)
+            MovementLine(article_number="1" * 41, operation="+", nominal_quantity=1.0)
         ]
         with pytest.raises(HanelGatewayValidationError) as exc_info:
             ops.send_movement_order("JOB-1", bad)
         assert "article_number" in exc_info.value.field
         transport.post.assert_not_called()
+
+    def test_article_number_with_hyphen_raises_validation_error(self) -> None:
+        ops, transport = _make_operations()
+        bad = [
+            MovementLine(article_number="ART-001", operation="+", nominal_quantity=1.0)
+        ]
+        with pytest.raises(HanelGatewayValidationError) as exc_info:
+            ops.send_movement_order("JOB-1", bad)
+        assert exc_info.value.field == "positions[0].article_number"
+        transport.post.assert_not_called()
+
+    def test_order_number_with_hyphen_is_allowed(self) -> None:
+        # The charset constraint applies to article_number only, not job_number.
+        ops, transport = _make_operations(_SUCCESS_XML)
+        ops.send_movement_order("JOB-001", _ONE_LINE)
+        transport.post.assert_called_once()
 
     def test_order_number_exactly_40_chars_is_valid(self) -> None:
         ops, transport = _make_operations(_SUCCESS_XML)
@@ -529,8 +620,8 @@ class TestGetInventory:
     def test_maps_article_number(self) -> None:
         ops, _ = _make_operations(_fixture("read_inventory_response.xml"))
         results = ops.get_inventory()
-        assert results[0].article_number == "ART-001"
-        assert results[1].article_number == "ART-002"
+        assert results[0].article_number == "1001"
+        assert results[1].article_number == "1002"
 
     def test_maps_article_name(self) -> None:
         ops, _ = _make_operations(_fixture("read_inventory_response.xml"))
@@ -575,35 +666,35 @@ class TestRegisterArticleV03:
     def test_lot_mode_calls_sendAPDV03(self) -> None:
         xml = _fixture("sendAPDV03_success.xml")
         ops, transport = _make_operations(xml, lot_management_enabled=True)
-        ops.register_article("ART001", "Bolt M6")
+        ops.register_article("1001", "Bolt M6")
         _, operation = transport.post.call_args[0]
         assert operation == "sendAPDV03"
 
     def test_lot_mode_false_calls_sendAPDReqV01(self) -> None:
         xml = _fixture("sendAPDReqV01_success.xml")
         ops, transport = _make_operations(xml, lot_management_enabled=False)
-        ops.register_article("ART001", "Bolt M6")
+        ops.register_article("1001", "Bolt M6")
         _, operation = transport.post.call_args[0]
         assert operation == "sendAPDReqV01"
 
     def test_batch_number_in_envelope(self) -> None:
         xml = _fixture("sendAPDV03_success.xml")
         ops, transport = _make_operations(xml, lot_management_enabled=True)
-        ops.register_article("ART001", "Bolt M6", batch_number="LOT-X")
+        ops.register_article("1001", "Bolt M6", batch_number="LOT-X")
         envelope, _ = transport.post.call_args[0]
         assert "LOT-X" in envelope
 
     def test_batch_number_absent_when_none(self) -> None:
         xml = _fixture("sendAPDV03_success.xml")
         ops, transport = _make_operations(xml, lot_management_enabled=True)
-        ops.register_article("ART001", "Bolt M6", batch_number=None)
+        ops.register_article("1001", "Bolt M6", batch_number=None)
         envelope, _ = transport.post.call_args[0]
         assert "batchNumber" not in envelope
 
     def test_batch_number_too_long_raises_validation(self) -> None:
         ops, transport = _make_operations(lot_management_enabled=True)
         with pytest.raises(HanelGatewayValidationError) as exc_info:
-            ops.register_article("ART001", "Bolt M6", batch_number="L" * 41)
+            ops.register_article("1001", "Bolt M6", batch_number="L" * 41)
         assert exc_info.value.field == "batch_number"
         transport.post.assert_not_called()
 
@@ -611,7 +702,7 @@ class TestRegisterArticleV03:
         xml = _fixture("sendAPDV03_error.xml")
         ops, _ = _make_operations(xml, lot_management_enabled=True)
         with pytest.raises(HanelGatewayApplicationError) as exc_info:
-            ops.register_article("ART001", "Bolt M6")
+            ops.register_article("1001", "Bolt M6")
         assert "hint" in exc_info.value.message
 
 
@@ -619,21 +710,21 @@ class TestSendMovementOrderV02:
     def test_lot_mode_calls_sendJobsV02(self) -> None:
         xml = _fixture("send_movement_order_v02_success.xml")
         ops, transport = _make_operations(xml, lot_management_enabled=True)
-        ops.send_movement_order("JOB-1", [MovementLine("ART-001", "+", 5.0)])
+        ops.send_movement_order("JOB-1", [MovementLine("1001", "+", 5.0)])
         _, operation = transport.post.call_args[0]
         assert operation == "sendJobsV02"
 
     def test_lot_mode_false_calls_sendJobsReqV01(self) -> None:
         xml = _fixture("send_movement_order_success.xml")
         ops, transport = _make_operations(xml, lot_management_enabled=False)
-        ops.send_movement_order("JOB-1", [MovementLine("ART-001", "+", 5.0)])
+        ops.send_movement_order("JOB-1", [MovementLine("1001", "+", 5.0)])
         _, operation = transport.post.call_args[0]
         assert operation == "sendJobsReqV01"
 
     def test_batch_number_in_envelope(self) -> None:
         xml = _fixture("send_movement_order_v02_success.xml")
         ops, transport = _make_operations(xml, lot_management_enabled=True)
-        line = MovementLine("ART-001", "+", 5.0, batch_number="LOT-B")
+        line = MovementLine("1001", "+", 5.0, batch_number="LOT-B")
         ops.send_movement_order("JOB-1", [line])
         envelope, _ = transport.post.call_args[0]
         assert "LOT-B" in envelope
@@ -641,7 +732,7 @@ class TestSendMovementOrderV02:
     def test_batch_number_absent_when_none(self) -> None:
         xml = _fixture("send_movement_order_v02_success.xml")
         ops, transport = _make_operations(xml, lot_management_enabled=True)
-        line = MovementLine("ART-001", "+", 5.0)
+        line = MovementLine("1001", "+", 5.0)
         ops.send_movement_order("JOB-1", [line])
         envelope, _ = transport.post.call_args[0]
         assert "batchNumber" not in envelope
@@ -650,7 +741,7 @@ class TestSendMovementOrderV02:
         xml = _fixture("sendAPDReqV01_error.xml")
         ops, _ = _make_operations(xml, lot_management_enabled=True)
         with pytest.raises(HanelGatewayApplicationError) as exc_info:
-            ops.send_movement_order("JOB-1", [MovementLine("ART-001", "+", 5.0)])
+            ops.send_movement_order("JOB-1", [MovementLine("1001", "+", 5.0)])
         assert "hint" in exc_info.value.message
 
 

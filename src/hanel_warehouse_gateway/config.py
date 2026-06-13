@@ -97,6 +97,16 @@ class GatewayConfig:
         if raw_lot is not None:
             env_values["lot_management_enabled"] = raw_lot.strip().lower() == "true"
 
+        raw_log_level = os.getenv("HANEL_LOG_LEVEL")
+        if raw_log_level is not None:
+            env_values["log_level"] = raw_log_level.strip().upper()
+
+        raw_log_payloads = os.getenv("HANEL_LOG_SOAP_PAYLOADS")
+        if raw_log_payloads is not None:
+            env_values["log_soap_payloads"] = (
+                raw_log_payloads.strip().lower() == "true"
+            )
+
         if overrides:
             env_values.update(overrides)
 

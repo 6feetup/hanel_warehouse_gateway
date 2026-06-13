@@ -42,7 +42,7 @@ I file possono essere modificati liberamente. Per applicare le modifiche senza r
 
 ```json
 {
-  "ART-001": {"article_number": "ART-001", "article_name": "Nome articolo"}
+  "1001": {"article_number": "1001", "article_name": "Nome articolo"}
 }
 ```
 
@@ -58,7 +58,7 @@ I file possono essere modificati liberamente. Per applicare le modifiche senza r
     "job_time": "0800",
     "positions": [
       {
-        "article_number": "ART-001",
+        "article_number": "1001",
         "operation": "+",
         "nominal_quantity": 10.0,
         "actual_quantity": 0.0,
@@ -81,7 +81,7 @@ I file possono essere modificati liberamente. Per applicare le modifiche senza r
 ```json
 [
   {
-    "article_number": "ART-001",
+    "article_number": "1001",
     "article_name": "Nome articolo",
     "lift_number": 1,
     "shelf_number": 12,
@@ -117,7 +117,7 @@ curl -s -X POST http://localhost:8080/HanelService \
       <main:sendAPDReqV01>
         <main:param>
           <xsd:articlePoolDataRecord>
-            <xsd:articleNumber>ART-NEW</xsd:articleNumber>
+            <xsd:articleNumber>1999</xsd:articleNumber>
             <xsd:articleName>Nuovo Articolo</xsd:articleName>
           </xsd:articlePoolDataRecord>
         </main:param>
@@ -145,7 +145,7 @@ curl -s -X POST http://localhost:8080/HanelService \
           <xsd:job>
             <xsd:jobNumber>ORD-TEST</xsd:jobNumber>
             <xsd:JobPosition>
-              <xsd:articleNumber>ART-001</xsd:articleNumber>
+              <xsd:articleNumber>1001</xsd:articleNumber>
               <xsd:operation>+</xsd:operation>
               <xsd:nominalQuantity>5.0</xsd:nominalQuantity>
             </xsd:JobPosition>
@@ -235,7 +235,7 @@ curl -s -X POST http://localhost:8080/HanelService \
       <main:sendAPDV03>
         <main:param>
           <xsd:articlePoolDataRecord>
-            <xsd:articleNumber>ART-NEW</xsd:articleNumber>
+            <xsd:articleNumber>1999</xsd:articleNumber>
             <xsd:articleName>Nuovo Articolo</xsd:articleName>
             <xsd:batchNumber>LOTTO-2026-A</xsd:batchNumber>
           </xsd:articlePoolDataRecord>
@@ -260,7 +260,7 @@ curl -s -X POST http://localhost:8080/HanelService \
           <xsd:job>
             <xsd:jobNumber>ORD-LOT-001</xsd:jobNumber>
             <xsd:JobPosition>
-              <xsd:articleNumber>ART-001</xsd:articleNumber>
+              <xsd:articleNumber>1001</xsd:articleNumber>
               <xsd:operation>+</xsd:operation>
               <xsd:nominalQuantity>5.0</xsd:nominalQuantity>
               <xsd:batchNumber>LOTTO-2026-A</xsd:batchNumber>

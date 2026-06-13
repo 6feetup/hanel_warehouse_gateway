@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import dataclasses
 import json
+import logging
 import sys
 
 from hanel_warehouse_gateway import (
@@ -19,6 +20,8 @@ OPERATIONS = {
     "register_article",
     "send_movement_order",
     "get_completed_movements",
+    "get_all_orders",
+    "get_inventory",
     "cancel_order",
 }
 
@@ -29,6 +32,10 @@ def build_config(args: argparse.Namespace) -> GatewayConfig:
         overrides["endpoint_url"] = args.endpoint
     if args.test_mode:
         overrides["test_mode"] = True
+    if args.verbose:
+        # Surface the full request/response payloads and ERROR failure logs.
+        overrides["log_level"] = "DEBUG"
+        overrides["log_soap_payloads"] = True
     return GatewayConfig.from_env(overrides if overrides else None)
 
 
@@ -44,6 +51,10 @@ def run(operation: str, data: dict, gw: HanelWarehouseGateway) -> object:
         return gw.send_movement_order(data["order_number"], positions)
     if operation == "get_completed_movements":
         return [dataclasses.asdict(r) for r in gw.get_completed_movements()]
+    if operation == "get_all_orders":
+        return [dataclasses.asdict(r) for r in gw.get_all_orders()]
+    if operation == "get_inventory":
+        return [dataclasses.asdict(r) for r in gw.get_inventory()]
     if operation == "cancel_order":
         return gw.cancel_order(data["order_number"])
     raise ValueError(f"Unknown operation: {operation}")
@@ -69,16 +80,36 @@ def main() -> None:
     parser.add_argument("--input", metavar="FILE", help="JSON file with operation parameters (default: stdin)")
     parser.add_argument("--endpoint", metavar="URL", help="Override HANEL_ENDPOINT_URL from .env")
     parser.add_argument("--test-mode", action="store_true", help="Enable test_mode (prepends test prefix to order numbers)")
+    parser.add_argument(
+        "--verbose",
+        "-v",
+        action="store_true",
+        help="Log SOAP request/response payloads and failures to stderr (DEBUG)",
+    )
     args = parser.parse_args()
 
     data = load_input(args)
 
     try:
-        gw = HanelWarehouseGateway(build_config(args))
+        config = build_config(args)
+        # Install a stderr handler so the library logs become visible. The level
+        # honors HANEL_LOG_LEVEL from .env; --verbose forces DEBUG (and payload
+        # logging) via build_config, overriding the .env values.
+        logging.basicConfig(
+            stream=sys.stderr,
+            level=getattr(logging, config.log_level, logging.INFO),
+            format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+        )
+        gw = HanelWarehouseGateway(config)
         result = run(args.operation, data, gw)
         print(json.dumps({"ok": True, "result": result}, indent=2, default=str))
     except HanelGatewayError as exc:
-        print(json.dumps({"ok": False, "error": str(exc), "type": type(exc).__name__}, indent=2))
+        error: dict[str, object] = {"ok": False, "type": type(exc).__name__}
+        # Surface every diagnostic attribute the exception carries (operation,
+        # detail, timestamp, fault_code/fault_string/fault_detail, http_status,
+        # return_value, field/value) instead of just the summary message.
+        error.update(vars(exc))
+        print(json.dumps(error, indent=2, default=str))
         sys.exit(1)
     except KeyError as exc:
         print(json.dumps({"ok": False, "error": f"Missing required field: {exc}", "type": "KeyError"}, indent=2))

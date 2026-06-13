@@ -36,19 +36,19 @@ def _fixture(name: str) -> str:
 
 class TestBuildRegisterArticleEnvelope:
     def test_contains_article_number(self) -> None:
-        xml = build_register_article_envelope("ART001", "Bolt M6", _NS_MAIN, _NS_XSD)
-        assert "ART001" in xml
+        xml = build_register_article_envelope("1001", "Bolt M6", _NS_MAIN, _NS_XSD)
+        assert "1001" in xml
 
     def test_contains_article_name(self) -> None:
-        xml = build_register_article_envelope("ART001", "Bolt M6", _NS_MAIN, _NS_XSD)
+        xml = build_register_article_envelope("1001", "Bolt M6", _NS_MAIN, _NS_XSD)
         assert "Bolt M6" in xml
 
     def test_contains_operation_tag(self) -> None:
-        xml = build_register_article_envelope("ART001", "Bolt M6", _NS_MAIN, _NS_XSD)
+        xml = build_register_article_envelope("1001", "Bolt M6", _NS_MAIN, _NS_XSD)
         assert "sendAPDReqV01" in xml
 
     def test_contains_article_pool_data_record(self) -> None:
-        xml = build_register_article_envelope("ART001", "Bolt M6", _NS_MAIN, _NS_XSD)
+        xml = build_register_article_envelope("1001", "Bolt M6", _NS_MAIN, _NS_XSD)
         assert "articlePoolDataRecord" in xml
 
     def test_uses_provided_namespaces(self) -> None:
@@ -59,7 +59,7 @@ class TestBuildRegisterArticleEnvelope:
     def test_is_valid_xml(self) -> None:
         import xml.etree.ElementTree as ET
 
-        xml = build_register_article_envelope("ART001", "Bolt M6", _NS_MAIN, _NS_XSD)
+        xml = build_register_article_envelope("1001", "Bolt M6", _NS_MAIN, _NS_XSD)
         ET.fromstring(xml)  # must not raise
 
     def test_escapes_special_characters(self) -> None:
@@ -131,6 +131,29 @@ class TestParseReturnValue:
         assert exc.fault_string == "Unknown operation"
         assert exc.operation == "deleteJobReqV01"
 
+    def test_soap_fault_captures_actor_and_detail(self) -> None:
+        xml = _fixture("response_soap_fault_with_detail.xml")
+        with pytest.raises(HanelGatewaySoapFaultError) as exc_info:
+            parse_return_value(xml, "deleteJobReqV01", _NS_XSD)
+        exc = exc_info.value
+        assert exc.fault_code == "env:Server"
+        assert exc.fault_string == "Warehouse busy or unavailable"
+        assert exc.fault_actor == "http://192.168.1.100:8080/HanelService"
+        assert "Lift 1 is in maintenance mode" in exc.fault_detail
+        # The combined detail field surfaces actor and detail for diagnostics.
+        assert "Lift 1 is in maintenance mode" in exc.detail
+        assert "actor=" in exc.detail
+
+    def test_soap_fault_logs_error(self, caplog: pytest.LogCaptureFixture) -> None:
+        xml = _fixture("response_soap_fault_with_detail.xml")
+        with caplog.at_level("ERROR", logger="hanel_warehouse_gateway"):
+            with pytest.raises(HanelGatewaySoapFaultError):
+                parse_return_value(xml, "deleteJobReqV01", _NS_XSD)
+        assert any(
+            "SOAP fault" in r.message and r.levelname == "ERROR"
+            for r in caplog.records
+        )
+
     def test_soap_fault_error_is_gateway_error(self) -> None:
         from hanel_warehouse_gateway.exceptions import HanelGatewayError
 
@@ -163,7 +186,7 @@ class TestParseReturnValue:
 
 
 _ONE_POSITION = [
-    {"article_number": "ART-001", "operation": "+", "nominal_quantity": 5.0}
+    {"article_number": "1001", "operation": "+", "nominal_quantity": 5.0}
 ]
 
 
@@ -182,18 +205,18 @@ class TestBuildSendMovementOrderEnvelope:
 
     def test_single_position_fields(self) -> None:
         xml = _build_smo("JOB-1", _ONE_POSITION)
-        assert "<xsd:articleNumber>ART-001</xsd:articleNumber>" in xml
+        assert "<xsd:articleNumber>1001</xsd:articleNumber>" in xml
         assert "<xsd:operation>+</xsd:operation>" in xml
         assert "<xsd:nominalQuantity>5.0</xsd:nominalQuantity>" in xml
 
     def test_multiple_positions_all_present(self) -> None:
         positions = [
-            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 10.0},
-            {"article_number": "ART-002", "operation": "-", "nominal_quantity": 3.5},
+            {"article_number": "1001", "operation": "+", "nominal_quantity": 10.0},
+            {"article_number": "1002", "operation": "-", "nominal_quantity": 3.5},
         ]
         xml = _build_smo("JOB-MULTI", positions)
-        assert "ART-001" in xml
-        assert "ART-002" in xml
+        assert "1001" in xml
+        assert "1002" in xml
         assert xml.count("<xsd:JobPosition>") == 2
 
     def test_namespaces_declared(self) -> None:
@@ -287,7 +310,7 @@ class TestParseMovementResults:
         xml = _fixture("read_jobs_response_mode1.xml")
         results = parse_movement_results(xml, _OPERATION, _NS_XSD)
         pos = results[0]["positions"][0]  # type: ignore[index]
-        assert pos["article_number"] == "ART-001"
+        assert pos["article_number"] == "1001"
         assert pos["actual_quantity"] == 50.0
         assert pos["container_size"] == 1
         assert pos["position_status"] == 1
@@ -363,29 +386,29 @@ def _build_smo_v02(job_number: str, positions: list[dict[str, object]]) -> str:
 
 class TestBuildRegisterArticleEnvelopeV03:
     def test_contains_operation_tag(self) -> None:
-        xml = _build_apd_v03("ART001", "Bolt M6", None)
+        xml = _build_apd_v03("1001", "Bolt M6", None)
         assert "sendAPDV03" in xml
 
     def test_contains_article_number(self) -> None:
-        xml = _build_apd_v03("ART001", "Bolt M6", None)
-        assert "ART001" in xml
+        xml = _build_apd_v03("1001", "Bolt M6", None)
+        assert "1001" in xml
 
     def test_batch_number_emitted_when_set(self) -> None:
-        xml = _build_apd_v03("ART001", "Bolt M6", "LOT-X")
+        xml = _build_apd_v03("1001", "Bolt M6", "LOT-X")
         assert "<xsd:batchNumber>LOT-X</xsd:batchNumber>" in xml
 
     def test_batch_number_absent_when_none(self) -> None:
-        xml = _build_apd_v03("ART001", "Bolt M6", None)
+        xml = _build_apd_v03("1001", "Bolt M6", None)
         assert "batchNumber" not in xml
 
     def test_is_valid_xml(self) -> None:
         import xml.etree.ElementTree as ET
-        xml = _build_apd_v03("ART001", "Bolt M6", "LOT-1")
+        xml = _build_apd_v03("1001", "Bolt M6", "LOT-1")
         ET.fromstring(xml)
 
 
 _ONE_POSITION_V02 = [
-    {"article_number": "ART-001", "operation": "+", "nominal_quantity": 5.0}
+    {"article_number": "1001", "operation": "+", "nominal_quantity": 5.0}
 ]
 
 
@@ -397,7 +420,7 @@ class TestBuildSendMovementOrderEnvelopeV02:
     def test_batch_number_emitted_when_set(self) -> None:
         positions = [
             {
-                "article_number": "ART-001",
+                "article_number": "1001",
                 "operation": "+",
                 "nominal_quantity": 5.0,
                 "batch_number": "LOT-A",
@@ -409,7 +432,7 @@ class TestBuildSendMovementOrderEnvelopeV02:
     def test_batch_number_absent_when_none(self) -> None:
         positions = [
             {
-                "article_number": "ART-001",
+                "article_number": "1001",
                 "operation": "+",
                 "nominal_quantity": 5.0,
                 "batch_number": None,
@@ -426,7 +449,7 @@ class TestBuildSendMovementOrderEnvelopeV02:
         import xml.etree.ElementTree as ET
         positions = [
             {
-                "article_number": "ART-001",
+                "article_number": "1001",
                 "operation": "+",
                 "nominal_quantity": 5.0,
                 "batch_number": "L1",

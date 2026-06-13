@@ -13,7 +13,7 @@ from .models import MovementLine, MovementResult, StockRecord
 from .operations import SoapOperations
 from .transport import SoapTransport
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("hanel_warehouse_gateway")
 
 
 class HanelWarehouseGateway:
@@ -25,11 +25,15 @@ class HanelWarehouseGateway:
     Example:
         config = GatewayConfig.from_env()
         gateway = HanelWarehouseGateway(config)
-        gateway.register_article("ART001", "M6 stainless bolt")
+        gateway.register_article("1001", "M6 stainless bolt")
     """
 
     def __init__(self, config: GatewayConfig) -> None:
         self._config = config
+        # Apply the configured verbosity to the module logger (ADR-006). The
+        # caller still owns handlers; this only sets the effective level so that
+        # DEBUG payload logging and ERROR failure logging behave as configured.
+        logger.setLevel(getattr(logging, config.log_level, logging.INFO))
         self._transport = SoapTransport(config)
         self._operations = SoapOperations(config, self._transport)
 
@@ -42,7 +46,7 @@ class HanelWarehouseGateway:
         """Register or update an article in the warehouse catalogue.
 
         Args:
-            article_number: Unique article code (max 40 alphanumeric chars).
+            article_number: Unique article code (max 40 digits, numeric only).
             article_name: Article description (max 40 chars).
             batch_number: Lot/batch number (max 40 chars). Only used when
                 lot_management_enabled=True in GatewayConfig.

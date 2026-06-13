@@ -1,0 +1,12 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+  <soapenv:Body>
+    <soapenv:Fault>
+      <faultcode>env:Server</faultcode>
+      <faultstring>Warehouse busy or unavailable</faultstring>
+      <faultactor>http://192.168.1.100:8080/HanelService</faultactor>
+      <detail>
+        <hanelError code="42">Lift 1 is in maintenance mode</hanelError>
+      </detail>
+    </soapenv:Fault>
+  </soapenv:Body>
+</soapenv:Envelope>

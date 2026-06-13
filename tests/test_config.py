@@ -139,3 +139,25 @@ class TestGatewayConfigFromEnv:
             overrides={"endpoint_url": "http://x.com/", "lot_management_enabled": True}
         )
         assert config.lot_management_enabled is True
+
+    def test_log_level_from_env(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.setenv("HANEL_ENDPOINT_URL", "http://x.com/")
+        monkeypatch.setenv("HANEL_LOG_LEVEL", "debug")
+        config = GatewayConfig.from_env()
+        assert config.log_level == "DEBUG"
+
+    def test_log_soap_payloads_from_env_true(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setenv("HANEL_ENDPOINT_URL", "http://x.com/")
+        monkeypatch.setenv("HANEL_LOG_SOAP_PAYLOADS", "true")
+        config = GatewayConfig.from_env()
+        assert config.log_soap_payloads is True
+
+    def test_log_soap_payloads_from_env_false(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setenv("HANEL_ENDPOINT_URL", "http://x.com/")
+        monkeypatch.setenv("HANEL_LOG_SOAP_PAYLOADS", "false")
+        config = GatewayConfig.from_env()
+        assert config.log_soap_payloads is False

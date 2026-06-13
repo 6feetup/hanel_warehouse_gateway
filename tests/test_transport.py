@@ -74,6 +74,22 @@ class TestHttpError:
         assert exc_info.value.http_status == 404
 
     @responses_lib.activate
+    def test_http_error_logs_error(
+        self, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        responses_lib.add(
+            responses_lib.POST, _ENDPOINT, body="Server Error", status=500
+        )
+        transport = SoapTransport(_config())
+        with caplog.at_level("ERROR", logger="hanel_warehouse_gateway"):
+            with pytest.raises(HanelGatewayHttpError):
+                transport.post(_ENVELOPE, _OPERATION)
+        assert any(
+            "HTTP 500" in r.message and r.levelname == "ERROR"
+            for r in caplog.records
+        )
+
+    @responses_lib.activate
     def test_http_500_does_not_retry(self) -> None:
         responses_lib.add(responses_lib.POST, _ENDPOINT, body="Error", status=500)
         transport = SoapTransport(_config(retry_attempts=3))
@@ -94,6 +110,23 @@ class TestNetworkError:
             transport.post(_ENVELOPE, _OPERATION)
         assert exc_info.value.operation == _OPERATION
         assert len(responses_lib.calls) == 3
+
+    @responses_lib.activate
+    def test_network_error_logs_error(
+        self, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        for _ in range(2):
+            responses_lib.add(
+                responses_lib.POST, _ENDPOINT, body=MockConnectionError()
+            )
+        transport = SoapTransport(_config(retry_attempts=2))
+        with caplog.at_level("ERROR", logger="hanel_warehouse_gateway"):
+            with pytest.raises(HanelGatewayNetworkError):
+                transport.post(_ENVELOPE, _OPERATION)
+        assert any(
+            "Network failure" in r.message and r.levelname == "ERROR"
+            for r in caplog.records
+        )
 
     @responses_lib.activate
     def test_succeeds_after_transient_failure(self) -> None:

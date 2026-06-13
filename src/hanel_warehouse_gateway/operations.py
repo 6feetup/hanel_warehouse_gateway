@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import datetime
 import logging
+import re
 
 from . import _xml
 from .config import GatewayConfig
@@ -16,7 +17,15 @@ from .exceptions import HanelGatewayApplicationError, HanelGatewayValidationErro
 from .models import MovementLine, MovementLineResult, MovementResult, StockRecord
 from .transport import SoapTransport
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("hanel_warehouse_gateway")
+
+# Human-readable descriptions for known Hanel returnValue codes. The Hanel
+# documentation does not publish an exhaustive list of application error codes;
+# entries are added here as they get confirmed against the t-Server.
+# Open question — complete from Hanel documentation when available.
+_RETURN_CODE_DESCRIPTIONS: dict[int, str] = {
+    -1: "Generic warehouse error (unspecified)",
+}
 
 
 def _validate_field_length(
@@ -40,14 +49,57 @@ def _validate_field_length(
     )
 
 
-def _raise_application_error(operation: str, return_value: int, lot_hint: bool) -> None:
+_ARTICLE_NUMBER_RE = re.compile(r"^[0-9]+$")
+
+
+def _validate_article_number_charset(value: str, field: str, operation: str) -> None:
+    """Reject article numbers that contain non-digit characters (ADR-008).
+
+    The article number is a numeric code: the Hanel t-Server rejects article
+    codes containing letters, hyphens, spaces, or symbols. This check always
+    raises on violation, regardless of validation_truncate: an article number
+    cannot be auto-corrected by stripping characters without changing the
+    article identity. The empty string is also rejected (``+`` requires at
+    least one digit).
+    """
+    if not _ARTICLE_NUMBER_RE.match(value):
+        raise HanelGatewayValidationError(
+            message=f"Field '{field}' must contain only digits (0-9)",
+            operation=operation,
+            detail=f"value: {value!r}",
+            timestamp=datetime.datetime.utcnow().isoformat(),
+            field=field,
+            value=value,
+        )
+
+
+def _raise_application_error(
+    operation: str,
+    return_value: int,
+    lot_hint: bool = False,
+    raw: str | None = None,
+) -> None:
     msg = f"{operation} returned error code {return_value}"
+    description = _RETURN_CODE_DESCRIPTIONS.get(return_value)
+    if description:
+        msg += f": {description}"
     if lot_hint:
         msg += " (hint: verify lot_management_enabled configuration)"
+
+    detail = f"returnValue={return_value}"
+    if raw is not None:
+        detail += f" | response={raw[:500]}"
+
+    logger.error(
+        "Application error in operation %s: returnValue=%d%s",
+        operation,
+        return_value,
+        f" ({description})" if description else "",
+    )
     raise HanelGatewayApplicationError(
         message=msg,
         operation=operation,
-        detail=f"returnValue={return_value}",
+        detail=detail,
         timestamp=datetime.datetime.utcnow().isoformat(),
         return_value=return_value,
     )
@@ -72,6 +124,11 @@ class SoapOperations:
         """
         lot = self._config.lot_management_enabled
         operation = "sendAPDV03" if lot else "sendAPDReqV01"
+
+        # Charset check on the caller-supplied value, before the test_prefix is
+        # prepended: the prefix is module-controlled (e.g. "TEST_") and may
+        # legitimately contain non-digit characters.
+        _validate_article_number_charset(article_number, "article_number", operation)
 
         if self._config.test_mode:
             article_number = f"{self._config.test_prefix}{article_number}"
@@ -123,7 +180,7 @@ class SoapOperations:
             raw, operation, self._config.namespace_xsd
         )
         if return_value != 0:
-            _raise_application_error(operation, return_value, lot)
+            _raise_application_error(operation, return_value, lot, raw)
 
         logger.info(
             "register_article: %s succeeded for article_number=%r",
@@ -182,6 +239,7 @@ class SoapOperations:
         positions_dicts: list[dict[str, object]] = []
         for i, pos in enumerate(positions):
             field_name = f"positions[{i}].article_number"
+            _validate_article_number_charset(pos.article_number, field_name, operation)
             article_number = _validate_field_length(
                 pos.article_number, field_name, operation, self._config
             )
@@ -222,7 +280,7 @@ class SoapOperations:
             raw, operation, self._config.namespace_xsd
         )
         if return_value != 0:
-            _raise_application_error(operation, return_value, lot)
+            _raise_application_error(operation, return_value, lot, raw)
 
         logger.info(
             "send_movement_order: %s succeeded for job_number=%r",
@@ -381,13 +439,7 @@ class SoapOperations:
             xml_response, operation, self._config.namespace_xsd
         )
         if return_value != 0:
-            raise HanelGatewayApplicationError(
-                message=f"{operation} returned error code {return_value}",
-                operation=operation,
-                detail=f"returnValue={return_value}",
-                timestamp=datetime.datetime.utcnow().isoformat(),
-                return_value=return_value,
-            )
+            _raise_application_error(operation, return_value, raw=xml_response)
 
         logger.info(
             "cancel_order: %s succeeded for job_number=%r",

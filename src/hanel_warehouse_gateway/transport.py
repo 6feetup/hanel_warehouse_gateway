@@ -14,7 +14,7 @@ import requests
 from .config import GatewayConfig
 from .exceptions import HanelGatewayHttpError, HanelGatewayNetworkError
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("hanel_warehouse_gateway")
 
 
 class SoapTransport:
@@ -61,6 +61,12 @@ class SoapTransport:
                 break
             except (requests.ConnectionError, requests.Timeout) as exc:
                 if attempt == self._config.retry_attempts:
+                    logger.error(
+                        "Network failure for operation %s after %d attempt(s): %s",
+                        operation,
+                        self._config.retry_attempts,
+                        exc,
+                    )
                     raise HanelGatewayNetworkError(
                         message=(
                             f"Network error after {self._config.retry_attempts}"
@@ -85,6 +91,12 @@ class SoapTransport:
             logger.debug("Response [%s]: %s", operation, response.text)
 
         if not response.ok:
+            logger.error(
+                "HTTP %d for operation %s: %s",
+                response.status_code,
+                operation,
+                response.text[:500],
+            )
             raise HanelGatewayHttpError(
                 message=f"HTTP {response.status_code} for operation {operation}",
                 operation=operation,
