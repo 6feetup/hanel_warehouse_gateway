@@ -25,22 +25,44 @@
 ## Usage
 
 ```
-uv run python scripts/hanel_cli.py <operation> [--input FILE] [--endpoint URL] [--test-mode]
+uv run python scripts/hanel_cli.py <operation> [--input FILE] [--endpoint URL] [--test-mode] [--verbose]
 ```
 
 | Flag | Description |
 |------|-------------|
-| `operation` | One of: `register_article`, `send_movement_order`, `get_completed_movements`, `cancel_order` |
+| `operation` | One of: `register_article`, `send_movement_order`, `get_completed_movements`, `get_all_orders`, `get_inventory`, `cancel_order` |
 | `--input FILE` | JSON file with operation parameters. If omitted, reads from stdin. |
 | `--endpoint URL` | Overrides `HANEL_ENDPOINT_URL` from `.env`. |
 | `--test-mode` | Enables `test_mode=True` (prepends `TEST_` to order numbers). |
+| `--verbose`, `-v` | Logs the full SOAP request/response payloads and any failure to stderr at DEBUG level (sets `log_soap_payloads=True`). Use this to debug calls and warehouse errors. |
 
-Output is always JSON on stdout:
+Output is always JSON on stdout. On success:
 
 ```json
 {"ok": true, "result": ...}
-{"ok": false, "error": "...", "type": "HanelGatewayApplicationError"}
 ```
+
+On error, every diagnostic attribute of the exception is included (the exact
+keys depend on the error type), for example:
+
+```json
+{
+  "ok": false,
+  "type": "HanelGatewaySoapFaultError",
+  "message": "SOAP fault in deleteJobReqV01: Warehouse busy or unavailable",
+  "operation": "deleteJobReqV01",
+  "detail": "Warehouse busy or unavailable | actor=... | detail=<detail>...</detail>",
+  "timestamp": "2026-06-13T10:00:00",
+  "fault_code": "env:Server",
+  "fault_string": "Warehouse busy or unavailable",
+  "fault_actor": "...",
+  "fault_detail": "<detail>...</detail>"
+}
+```
+
+Other error types expose their own fields: `http_status` (HTTP errors),
+`return_value` (application errors), `field`/`value` (validation errors).
+Combine `--verbose` with these fields to pinpoint warehouse-side failures.
 
 Exit code is `0` on success, `1` on error.
 
@@ -55,7 +77,7 @@ Registers or updates an article in the warehouse catalogue.
 **JSON input:**
 ```json
 {
-  "article_number": "ART-CLI-001",
+  "article_number": "2001",
   "article_name": "M6 stainless bolt",
   "batch_number": "LOTTO-2026-A"
 }
@@ -91,7 +113,7 @@ Sends a movement order to the warehouse.
 {
   "order_number": "ORD-CLI-001",
   "positions": [
-    {"article_number": "ART-001", "operation": "+", "nominal_quantity": 5.0}
+    {"article_number": "1001", "operation": "+", "nominal_quantity": 5.0}
   ]
 }
 ```
@@ -101,8 +123,8 @@ Sends a movement order to the warehouse.
 {
   "order_number": "ORD-CLI-002",
   "positions": [
-    {"article_number": "ART-001", "operation": "+", "nominal_quantity": 5.0},
-    {"article_number": "ART-002", "operation": "-", "nominal_quantity": 2.0}
+    {"article_number": "1001", "operation": "+", "nominal_quantity": 5.0},
+    {"article_number": "1002", "operation": "-", "nominal_quantity": 2.0}
   ]
 }
 ```
@@ -112,7 +134,7 @@ Sends a movement order to the warehouse.
 {
   "order_number": "ORD-LOT-001",
   "positions": [
-    {"article_number": "ART-001", "operation": "+", "nominal_quantity": 5.0, "batch_number": "LOTTO-2026-A"}
+    {"article_number": "1001", "operation": "+", "nominal_quantity": 5.0, "batch_number": "LOTTO-2026-A"}
   ]
 }
 ```
@@ -151,7 +173,7 @@ uv run python scripts/hanel_cli.py get_completed_movements \
       "job_time": "1430",
       "positions": [
         {
-          "article_number": "ART-001",
+          "article_number": "1001",
           "operation": "+",
           "nominal_quantity": 5.0,
           "actual_quantity": 5.0,
@@ -166,6 +188,84 @@ uv run python scripts/hanel_cli.py get_completed_movements \
 
 !!! note
     If `actual_quantity < nominal_quantity` in a position, stock was insufficient. Handling is the caller's responsibility.
+
+---
+
+### `get_all_orders`
+
+Retrieves all orders currently in the warehouse queue (any status, not only completed). No JSON input required.
+
+**Command:**
+```bash
+uv run python scripts/hanel_cli.py get_all_orders
+```
+
+**Expected output:**
+```json
+{
+  "ok": true,
+  "result": [
+    {
+      "job_number": "ORD-001",
+      "job_priority": 1,
+      "job_status": 0,
+      "job_date": "300425",
+      "job_time": "1430",
+      "positions": [
+        {
+          "article_number": "1001",
+          "operation": "+",
+          "nominal_quantity": 5.0,
+          "actual_quantity": 0.0,
+          "container_size": 1,
+          "position_status": 0
+        }
+      ]
+    }
+  ]
+}
+```
+
+!!! note
+    `job_status`: `0`=queued, `1`=in progress, `2`=partial, `3`=completed.
+
+---
+
+### `get_inventory`
+
+Retrieves stock levels for all articles in the warehouse. No JSON input required.
+
+This is the only mechanism to detect manual movements performed directly at the warehouse console.
+
+**Command:**
+```bash
+uv run python scripts/hanel_cli.py get_inventory
+```
+
+**Expected output:**
+```json
+{
+  "ok": true,
+  "result": [
+    {
+      "article_number": "1001",
+      "article_name": "M6 stainless bolt",
+      "lift_number": 1,
+      "shelf_number": 2,
+      "compartment_number": 3,
+      "compartment_depth_number": 1,
+      "container_size": 1,
+      "fifo": 0,
+      "inventory_at_storage_location": 42.0,
+      "minimum_inventory": 5.0,
+      "batch_number": null
+    }
+  ]
+}
+```
+
+!!! note
+    An article may appear in multiple records if distributed across several storage locations.
 
 ---
 
@@ -191,8 +291,11 @@ echo '{"order_number": "ORD-001"}' | \
 ```json
 {
   "ok": false,
-  "error": "...",
-  "type": "HanelGatewayApplicationError"
+  "type": "HanelGatewayApplicationError",
+  "message": "deleteJobReqV01 returned error code 1",
+  "operation": "deleteJobReqV01",
+  "detail": "returnValue=1 | response=...",
+  "return_value": 1
 }
 ```
 
@@ -209,13 +312,13 @@ ENDPOINT=http://localhost:8080/HanelService
 curl -s -X POST http://localhost:8080/admin/reset
 
 # 2. Register a new article
-echo '{"article_number": "ART-CLI-001", "article_name": "M6 stainless bolt"}' | \
+echo '{"article_number": "2001", "article_name": "M6 stainless bolt"}' | \
   uv run python scripts/hanel_cli.py register_article --endpoint $ENDPOINT
 
 # 3. Send a movement order
 echo '{
   "order_number": "ORD-CLI-001",
-  "positions": [{"article_number": "ART-001", "operation": "+", "nominal_quantity": 3.0}]
+  "positions": [{"article_number": "1001", "operation": "+", "nominal_quantity": 3.0}]
 }' | uv run python scripts/hanel_cli.py send_movement_order --endpoint $ENDPOINT
 
 # 4. Complete all pending orders (mock server admin endpoint)
@@ -244,13 +347,13 @@ ENDPOINT=http://localhost:8080/HanelService
 curl -s -X POST http://localhost:8080/admin/reset
 
 # 2. Register an article with a batch number (uses sendAPDV03)
-echo '{"article_number": "ART-CLI-001", "article_name": "M6 stainless bolt", "batch_number": "LOTTO-2026-A"}' | \
+echo '{"article_number": "2001", "article_name": "M6 stainless bolt", "batch_number": "LOTTO-2026-A"}' | \
   uv run python scripts/hanel_cli.py register_article --endpoint $ENDPOINT
 
 # 3. Send a movement order with batch number on each position (uses sendJobsV02)
 echo '{
   "order_number": "ORD-LOT-001",
-  "positions": [{"article_number": "ART-001", "operation": "+", "nominal_quantity": 3.0, "batch_number": "LOTTO-2026-A"}]
+  "positions": [{"article_number": "1001", "operation": "+", "nominal_quantity": 3.0, "batch_number": "LOTTO-2026-A"}]
 }' | uv run python scripts/hanel_cli.py send_movement_order --endpoint $ENDPOINT
 
 # 4. Complete all pending orders

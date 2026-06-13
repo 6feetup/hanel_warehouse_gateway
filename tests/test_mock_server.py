@@ -108,20 +108,20 @@ def reset_state():
 
 class TestSendAPD:
     def test_registers_new_article(self):
-        resp = send_apd("ART-NEW", "New Article")
+        resp = send_apd("1999", "New Article")
         assert resp.status_code == 200
         assert get_return_value(resp.text) == 0
 
     def test_article_appears_in_state(self):
-        send_apd("ART-NEW", "New Article")
+        send_apd("1999", "New Article")
         state = requests.get(f"{BASE_URL}/admin/state").json()
-        assert "ART-NEW" in state["articles"]
-        assert state["articles"]["ART-NEW"]["article_name"] == "New Article"
+        assert "1999" in state["articles"]
+        assert state["articles"]["1999"]["article_name"] == "New Article"
 
     def test_updates_existing_article(self):
-        send_apd("ART-001", "Updated Name")
+        send_apd("1001", "Updated Name")
         state = requests.get(f"{BASE_URL}/admin/state").json()
-        assert state["articles"]["ART-001"]["article_name"] == "Updated Name"
+        assert state["articles"]["1001"]["article_name"] == "Updated Name"
 
 
 # ---------------------------------------------------------------------------
@@ -131,7 +131,7 @@ class TestSendAPD:
 class TestSendJobs:
     def test_send_job_returns_0(self):
         lines = [
-            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 5.0}
+            {"article_number": "1001", "operation": "+", "nominal_quantity": 5.0}
         ]
         resp = send_jobs("JOB-TEST", lines)
         assert resp.status_code == 200
@@ -139,7 +139,7 @@ class TestSendJobs:
 
     def test_new_job_has_status_0(self):
         lines = [
-            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 5.0}
+            {"article_number": "1001", "operation": "+", "nominal_quantity": 5.0}
         ]
         send_jobs("JOB-TEST", lines)
         state = requests.get(f"{BASE_URL}/admin/state").json()
@@ -147,8 +147,8 @@ class TestSendJobs:
 
     def test_job_with_multiple_positions(self):
         positions = [
-            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 10.0},
-            {"article_number": "ART-002", "operation": "-", "nominal_quantity": 3.0},
+            {"article_number": "1001", "operation": "+", "nominal_quantity": 10.0},
+            {"article_number": "1002", "operation": "-", "nominal_quantity": 3.0},
         ]
         resp = send_jobs("JOB-MULTI", positions)
         assert get_return_value(resp.text) == 0
@@ -177,7 +177,7 @@ class TestReadAllJobs:
 
     def test_new_job_appears_in_mode_0(self):
         lines = [
-            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 1.0}
+            {"article_number": "1001", "operation": "+", "nominal_quantity": 1.0}
         ]
         send_jobs("JOB-NEW", lines)
         root = ET.fromstring(read_jobs(0).text)
@@ -189,7 +189,7 @@ class TestReadAllJobs:
 
     def test_new_job_not_in_mode_1(self):
         lines = [
-            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 1.0}
+            {"article_number": "1001", "operation": "+", "nominal_quantity": 1.0}
         ]
         send_jobs("JOB-NEW", lines)
         root = ET.fromstring(read_jobs(1).text)
@@ -201,7 +201,7 @@ class TestReadAllJobs:
 
     def test_after_complete_all_appears_in_mode_1(self):
         lines = [
-            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 1.0}
+            {"article_number": "1001", "operation": "+", "nominal_quantity": 1.0}
         ]
         send_jobs("JOB-NEW", lines)
         requests.post(f"{BASE_URL}/admin/complete-all")
@@ -280,15 +280,15 @@ class TestAdmin:
         assert "inventory" in data
 
     def test_reset_restores_initial_data(self):
-        send_apd("ART-EXTRA", "Extra")
+        send_apd("1998", "Extra")
         requests.post(f"{BASE_URL}/admin/reset")
         state = requests.get(f"{BASE_URL}/admin/state").json()
-        assert "ART-EXTRA" not in state["articles"]
+        assert "1998" not in state["articles"]
         assert len(state["articles"]) == 3
 
     def test_complete_all_completes_pending_jobs(self):
         lines = [
-            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 2.0}
+            {"article_number": "1001", "operation": "+", "nominal_quantity": 2.0}
         ]
         send_jobs("JOB-PEND", lines)
         resp = requests.post(f"{BASE_URL}/admin/complete-all")
@@ -368,23 +368,23 @@ def read_amd_v04() -> requests.Response:
 
 class TestSendAPDV03:
     def test_registers_article_without_batch(self):
-        resp = send_apd_v03("ART-V03", "V03 Article")
+        resp = send_apd_v03("3001", "V03 Article")
         assert resp.status_code == 200
         assert get_return_value(resp.text) == 0
 
     def test_registers_article_with_batch(self):
-        resp = send_apd_v03("ART-V03", "V03 Article", batch_number="LOT-001")
+        resp = send_apd_v03("3001", "V03 Article", batch_number="LOT-001")
         assert resp.status_code == 200
         assert get_return_value(resp.text) == 0
 
     def test_response_tag_is_sendAPDV03Response(self):
-        resp = send_apd_v03("ART-V03", "V03 Article", batch_number="LOT-X")
+        resp = send_apd_v03("3001", "V03 Article", batch_number="LOT-X")
         assert "sendAPDV03Response" in resp.text
 
     def test_article_appears_in_state(self):
-        send_apd_v03("ART-V03-NEW", "New V03 Article", batch_number="LOT-A")
+        send_apd_v03("3002", "New V03 Article", batch_number="LOT-A")
         state = requests.get(f"{BASE_URL}/admin/state").json()
-        assert "ART-V03-NEW" in state["articles"]
+        assert "3002" in state["articles"]
 
 
 # ---------------------------------------------------------------------------
@@ -394,7 +394,7 @@ class TestSendAPDV03:
 class TestSendJobsV02:
     def test_send_job_returns_0(self):
         positions = [
-            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 5.0, "batch_number": "LOT-B"}  # noqa: E501
+            {"article_number": "1001", "operation": "+", "nominal_quantity": 5.0, "batch_number": "LOT-B"}  # noqa: E501
         ]
         resp = send_jobs_v02("JOB-V02-1", positions)
         assert resp.status_code == 200
@@ -402,14 +402,14 @@ class TestSendJobsV02:
 
     def test_response_tag_is_sendJobsV02Response(self):
         positions = [
-            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 5.0}
+            {"article_number": "1001", "operation": "+", "nominal_quantity": 5.0}
         ]
         resp = send_jobs_v02("JOB-V02-2", positions)
         assert "sendJobsV02Response" in resp.text
 
     def test_job_with_batch_stored(self):
         positions = [
-            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 3.0, "batch_number": "LOT-C"}  # noqa: E501
+            {"article_number": "1001", "operation": "+", "nominal_quantity": 3.0, "batch_number": "LOT-C"}  # noqa: E501
         ]
         send_jobs_v02("JOB-V02-3", positions)
         state = requests.get(f"{BASE_URL}/admin/state").json()
@@ -418,7 +418,7 @@ class TestSendJobsV02:
 
     def test_job_without_batch_stored_as_none(self):
         positions = [
-            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 3.0}
+            {"article_number": "1001", "operation": "+", "nominal_quantity": 3.0}
         ]
         send_jobs_v02("JOB-V02-4", positions)
         state = requests.get(f"{BASE_URL}/admin/state").json()
@@ -444,7 +444,7 @@ class TestReadAllJobsV02:
 
     def test_batch_number_present_in_response(self):
         positions = [
-            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 2.0, "batch_number": "LOT-D"}  # noqa: E501
+            {"article_number": "1001", "operation": "+", "nominal_quantity": 2.0, "batch_number": "LOT-D"}  # noqa: E501
         ]
         send_jobs_v02("JOB-V02-LOT", positions)
         requests.post(f"{BASE_URL}/admin/complete-all")
@@ -461,7 +461,7 @@ class TestReadAllJobsV02:
 
     def test_mode_1_returns_completed_only(self):
         positions = [
-            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 1.0}
+            {"article_number": "1001", "operation": "+", "nominal_quantity": 1.0}
         ]
         send_jobs_v02("JOB-V02-PEND", positions)
         root_before = ET.fromstring(read_jobs_v02(1).text)
@@ -502,13 +502,13 @@ class TestReadAllAMDV04:
 
 class TestBackwardCompatibility:
     def test_v01_send_apd_still_works(self):
-        resp = send_apd("ART-COMPAT", "Compat Article")
+        resp = send_apd("1997", "Compat Article")
         assert resp.status_code == 200
         assert get_return_value(resp.text) == 0
 
     def test_v01_send_jobs_still_works(self):
         positions = [
-            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 1.0}
+            {"article_number": "1001", "operation": "+", "nominal_quantity": 1.0}
         ]
         resp = send_jobs("JOB-COMPAT-V01", positions)
         assert resp.status_code == 200
@@ -516,7 +516,7 @@ class TestBackwardCompatibility:
 
     def test_v01_and_v02_jobs_coexist_in_state(self):
         positions = [
-            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 1.0}
+            {"article_number": "1001", "operation": "+", "nominal_quantity": 1.0}
         ]
         send_jobs("JOB-V01-COEX", positions)
         send_jobs_v02("JOB-V02-COEX", positions)
@@ -526,7 +526,7 @@ class TestBackwardCompatibility:
 
     def test_v01_read_jobs_does_not_include_batch_tag(self):
         positions = [
-            {"article_number": "ART-001", "operation": "+", "nominal_quantity": 1.0, "batch_number": "LOT-X"}  # noqa: E501
+            {"article_number": "1001", "operation": "+", "nominal_quantity": 1.0, "batch_number": "LOT-X"}  # noqa: E501
         ]
         send_jobs_v02("JOB-MIXED", positions)
         requests.post(f"{BASE_URL}/admin/complete-all")

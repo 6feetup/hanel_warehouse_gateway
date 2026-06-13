@@ -13,21 +13,21 @@ from hanel_warehouse_gateway import (
 class TestMovementLine:
     def test_instantiation(self) -> None:
         line = MovementLine(
-            article_number="ART001", operation="+", nominal_quantity=10.0
+            article_number="1001", operation="+", nominal_quantity=10.0
         )
-        assert line.article_number == "ART001"
+        assert line.article_number == "1001"
         assert line.operation == "+"
         assert line.nominal_quantity == 10.0
 
     def test_batch_number_default_none(self) -> None:
         line = MovementLine(
-            article_number="ART001", operation="+", nominal_quantity=1.0
+            article_number="1001", operation="+", nominal_quantity=1.0
         )
         assert line.batch_number is None
 
     def test_batch_number_explicit(self) -> None:
         line = MovementLine(
-            article_number="ART001",
+            article_number="1001",
             operation="+",
             nominal_quantity=1.0,
             batch_number="LOT-A",
@@ -38,7 +38,7 @@ class TestMovementLine:
 class TestMovementLineResult:
     def test_instantiation(self) -> None:
         result = MovementLineResult(
-            article_number="ART001",
+            article_number="1001",
             operation="+",
             nominal_quantity=10.0,
             actual_quantity=8.0,
@@ -50,7 +50,7 @@ class TestMovementLineResult:
 
     def test_batch_number_default_none(self) -> None:
         result = MovementLineResult(
-            article_number="ART001",
+            article_number="1001",
             operation="+",
             nominal_quantity=10.0,
             actual_quantity=8.0,
@@ -61,7 +61,7 @@ class TestMovementLineResult:
 
     def test_batch_number_explicit(self) -> None:
         result = MovementLineResult(
-            article_number="ART001",
+            article_number="1001",
             operation="+",
             nominal_quantity=10.0,
             actual_quantity=8.0,
@@ -85,7 +85,7 @@ class TestMovementResult:
 
     def test_with_positions(self) -> None:
         line = MovementLineResult(
-            article_number="ART001",
+            article_number="1001",
             operation="+",
             nominal_quantity=5.0,
             actual_quantity=5.0,
@@ -106,7 +106,7 @@ class TestMovementResult:
 class TestStockRecord:
     def test_instantiation(self) -> None:
         record = StockRecord(
-            article_number="ART001",
+            article_number="1001",
             article_name="M6 Screw",
             lift_number=1,
             shelf_number=3,
@@ -117,12 +117,12 @@ class TestStockRecord:
             inventory_at_storage_location=50.0,
             minimum_inventory=10.0,
         )
-        assert record.article_number == "ART001"
+        assert record.article_number == "1001"
         assert record.inventory_at_storage_location == 50.0
 
     def test_batch_number_default_none(self) -> None:
         record = StockRecord(
-            article_number="ART001",
+            article_number="1001",
             article_name="M6 Screw",
             lift_number=1,
             shelf_number=3,
@@ -137,7 +137,7 @@ class TestStockRecord:
 
     def test_batch_number_explicit(self) -> None:
         record = StockRecord(
-            article_number="ART001",
+            article_number="1001",
             article_name="M6 Screw",
             lift_number=1,
             shelf_number=3,

@@ -13,7 +13,7 @@
           <xsd:jobDate>300426</xsd:jobDate>
           <xsd:jobTime>0900</xsd:jobTime>
           <xsd:JobPosition>
-            <xsd:articleNumber>ART-010</xsd:articleNumber>
+            <xsd:articleNumber>1010</xsd:articleNumber>
             <xsd:operation>+</xsd:operation>
             <xsd:nominalQuantity>20.0</xsd:nominalQuantity>
             <xsd:actualQuantity>0.0</xsd:actualQuantity>
@@ -28,7 +28,7 @@
           <xsd:jobDate>300426</xsd:jobDate>
           <xsd:jobTime>1000</xsd:jobTime>
           <xsd:JobPosition>
-            <xsd:articleNumber>ART-020</xsd:articleNumber>
+            <xsd:articleNumber>1020</xsd:articleNumber>
             <xsd:operation>-</xsd:operation>
             <xsd:nominalQuantity>10.0</xsd:nominalQuantity>
             <xsd:actualQuantity>5.0</xsd:actualQuantity>
@@ -43,7 +43,7 @@
           <xsd:jobDate>280426</xsd:jobDate>
           <xsd:jobTime>1430</xsd:jobTime>
           <xsd:JobPosition>
-            <xsd:articleNumber>ART-001</xsd:articleNumber>
+            <xsd:articleNumber>1001</xsd:articleNumber>
             <xsd:operation>+</xsd:operation>
             <xsd:nominalQuantity>50.0</xsd:nominalQuantity>
             <xsd:actualQuantity>50.0</xsd:actualQuantity>

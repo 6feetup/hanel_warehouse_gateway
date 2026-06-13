@@ -23,7 +23,7 @@ CLI script for testing the `HanelWarehouseGateway` manually against the mock ser
 ## Usage
 
 ```
-uv run python scripts/hanel_cli.py <operation> [--input FILE] [--endpoint URL] [--test-mode]
+uv run python scripts/hanel_cli.py <operation> [--input FILE] [--endpoint URL] [--test-mode] [--verbose]
 ```
 
 | Flag | Description |
@@ -32,11 +32,14 @@ uv run python scripts/hanel_cli.py <operation> [--input FILE] [--endpoint URL] [
 | `--input FILE` | JSON file with operation parameters. If omitted, reads from stdin. |
 | `--endpoint URL` | Overrides `HANEL_ENDPOINT_URL` from `.env`. |
 | `--test-mode` | Enables `test_mode=True` (prepends `TEST_` to order numbers). |
+| `--verbose`, `-v` | Logs SOAP request/response payloads and failures to stderr at DEBUG level. Use to debug calls and warehouse errors. |
 
-Output is always JSON on stdout:
+Output is always JSON on stdout. On error, every diagnostic attribute of the
+exception is included (keys vary by error type — e.g. `fault_code`,
+`http_status`, `return_value`, `detail`):
 ```json
 {"ok": true, "result": ...}
-{"ok": false, "error": "...", "type": "HanelGatewayApplicationError"}
+{"ok": false, "type": "HanelGatewayApplicationError", "message": "...", "operation": "...", "detail": "...", "return_value": 1}
 ```
 
 ---
@@ -50,7 +53,7 @@ Registers or updates an article in the warehouse catalogue.
 **JSON input:**
 ```json
 {
-  "article_number": "ART-CLI-001",
+  "article_number": "2001",
   "article_name": "Vite M6 Inox"
 }
 ```
@@ -63,7 +66,7 @@ uv run python scripts/hanel_cli.py register_article \
   --endpoint http://localhost:8080/HanelService
 
 # From stdin
-echo '{"article_number": "ART-CLI-001", "article_name": "Vite M6 Inox"}' | \
+echo '{"article_number": "2001", "article_name": "Vite M6 Inox"}' | \
   uv run python scripts/hanel_cli.py register_article \
   --endpoint http://localhost:8080/HanelService
 ```
@@ -87,7 +90,7 @@ Sends a movement order (pick `+` or load `-`) to the warehouse.
 {
   "order_number": "ORD-CLI-001",
   "positions": [
-    {"article_number": "ART-001", "operation": "+", "nominal_quantity": 5.0}
+    {"article_number": "1001", "operation": "+", "nominal_quantity": 5.0}
   ]
 }
 ```
@@ -97,8 +100,8 @@ Sends a movement order (pick `+` or load `-`) to the warehouse.
 {
   "order_number": "ORD-CLI-002",
   "positions": [
-    {"article_number": "ART-001", "operation": "+", "nominal_quantity": 5.0},
-    {"article_number": "ART-002", "operation": "-", "nominal_quantity": 2.0}
+    {"article_number": "1001", "operation": "+", "nominal_quantity": 5.0},
+    {"article_number": "1002", "operation": "-", "nominal_quantity": 2.0}
   ]
 }
 ```
@@ -145,7 +148,7 @@ uv run python scripts/hanel_cli.py get_completed_movements \
       "job_time": "1430",
       "positions": [
         {
-          "article_number": "ART-001",
+          "article_number": "1001",
           "operation": "+",
           "nominal_quantity": 10.0,
           "actual_quantity": 10.0,
@@ -192,8 +195,11 @@ echo '{"order_number": "ORD-001"}' | \
 ```json
 {
   "ok": false,
-  "error": "...",
-  "type": "HanelGatewayApplicationError"
+  "type": "HanelGatewayApplicationError",
+  "message": "deleteJobReqV01 returned error code 1",
+  "operation": "deleteJobReqV01",
+  "detail": "returnValue=1 | response=...",
+  "return_value": 1
 }
 ```
 
@@ -210,13 +216,13 @@ ENDPOINT=http://localhost:8080/HanelService
 curl -s -X POST http://localhost:8080/admin/reset
 
 # 2. Register a new article
-echo '{"article_number": "ART-CLI-001", "article_name": "Vite M6 Inox"}' | \
+echo '{"article_number": "2001", "article_name": "Vite M6 Inox"}' | \
   uv run python scripts/hanel_cli.py register_article --endpoint $ENDPOINT
 
 # 3. Send a movement order
 echo '{
   "order_number": "ORD-CLI-001",
-  "positions": [{"article_number": "ART-001", "operation": "+", "nominal_quantity": 3.0}]
+  "positions": [{"article_number": "1001", "operation": "+", "nominal_quantity": 3.0}]
 }' | uv run python scripts/hanel_cli.py send_movement_order --endpoint $ENDPOINT
 
 # 4. Complete all pending orders (mock server admin endpoint)

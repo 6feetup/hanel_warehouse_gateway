@@ -58,10 +58,17 @@ class HanelGatewaySoapFaultError(HanelGatewayError):
         timestamp: str,
         fault_string: str,
         fault_code: str,
+        fault_actor: str = "",
+        fault_detail: str = "",
     ) -> None:
         super().__init__(message, operation, detail, timestamp)
         self.fault_string = fault_string
         self.fault_code = fault_code
+        # Optional SOAP fault fields. The t-Server often carries the real
+        # warehouse error description inside <detail>, so it is captured here
+        # in addition to faultcode/faultstring.
+        self.fault_actor = fault_actor
+        self.fault_detail = fault_detail
 
 
 class HanelGatewayApplicationError(HanelGatewayError):

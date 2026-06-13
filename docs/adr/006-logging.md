@@ -31,11 +31,15 @@ Every sub-module uses the same logger (not per-module sub-loggers) for simplicit
 
 ### Level
 
-The logger level is set in `GatewayConfig.from_dict()` based on `config["log_level"]`:
+The logger level is applied once when the public `HanelWarehouseGateway` is
+instantiated, based on `config.log_level`:
 
 ```python
 logger.setLevel(getattr(logging, config.log_level, logging.INFO))
 ```
+
+`config.log_level` is also readable from the environment via `HANEL_LOG_LEVEL`
+(and `HANEL_LOG_SOAP_PAYLOADS` for payload logging).
 
 ### No default handlers
 

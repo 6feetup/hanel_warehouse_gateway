@@ -89,7 +89,7 @@ client = HanelWarehouseGateway(config)
 
 | Field | Type | Constraints | Notes |
 |---|---|---|---|
-| `article_number` | `str` | max 40 chars, alphanumeric | Unique article code |
+| `article_number` | `str` | max 40 chars, digits only (`0-9`) | Unique article code |
 | `article_name` | `str` | max 40 chars | Article description |
 
 > *Extended by REQ-LOT-001: adds optional `batch_number: str | None = None` input parameter. See §4.1 of that document.*
@@ -472,7 +472,15 @@ Each entry must include: `timestamp`, `level`, `operation`, `duration_ms` (where
 ## 7. Constraints and Implementation Notes
 
 ### Field Constraints
-- `articleNumber` and `articleName`: maximum **40 alphanumeric characters**. The module must validate and either truncate (with a warning) or raise `HanelGatewayValidationError` — the behaviour is configurable.
+- `articleNumber`: maximum 40 characters **and strictly numeric** (digits `0-9` only).
+  The article number is a numeric code; the t-Server rejects article codes containing letters,
+  hyphens, spaces, or symbols. The module enforces this **before sending**: a non-numeric
+  `articleNumber` always raises `HanelGatewayValidationError`, regardless of
+  `validation_truncate` (an article code cannot be auto-corrected by stripping characters
+  without changing its identity). The 40-character limit follows the configurable truncate/raise
+  behaviour below.
+- `articleName`: maximum **40 characters**. Only the length is constrained (truncate/raise,
+  configurable); the value may contain spaces and other characters.
 - `jobNumber`: must be unique for each order sent. The calling system is responsible for uniqueness; the module does not maintain an internal registry.
 
 ### Single Production Environment

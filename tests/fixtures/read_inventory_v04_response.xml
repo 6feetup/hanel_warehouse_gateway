@@ -7,7 +7,7 @@
     <main:readAllAMDV04Response>
       <main:return>
         <xsd:articleMasterDataRecord>
-          <xsd:articleNumber>ART-001</xsd:articleNumber>
+          <xsd:articleNumber>1001</xsd:articleNumber>
           <xsd:articleName>Bolt M6</xsd:articleName>
           <xsd:liftNumber>1</xsd:liftNumber>
           <xsd:shelfNumber>5</xsd:shelfNumber>
@@ -20,7 +20,7 @@
           <xsd:batchNumber>LOT-2024</xsd:batchNumber>
         </xsd:articleMasterDataRecord>
         <xsd:articleMasterDataRecord>
-          <xsd:articleNumber>ART-002</xsd:articleNumber>
+          <xsd:articleNumber>1002</xsd:articleNumber>
           <xsd:articleName>Washer 10mm</xsd:articleName>
           <xsd:liftNumber>0</xsd:liftNumber>
           <xsd:shelfNumber>0</xsd:shelfNumber>

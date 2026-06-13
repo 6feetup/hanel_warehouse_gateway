@@ -1,6 +1,6 @@
 [
   {
-    "article_number": "ART-001",
+    "article_number": "1001",
     "article_name": "Vite M6x20",
     "lift_number": 1,
     "shelf_number": 12,
@@ -12,7 +12,7 @@
     "minimum_inventory": 20.0
   },
   {
-    "article_number": "ART-001",
+    "article_number": "1001",
     "article_name": "Vite M6x20",
     "lift_number": 1,
     "shelf_number": 15,
@@ -24,7 +24,7 @@
     "minimum_inventory": 20.0
   },
   {
-    "article_number": "ART-002",
+    "article_number": "1002",
     "article_name": "Dado M6",
     "lift_number": 1,
     "shelf_number": 8,
@@ -36,7 +36,7 @@
     "minimum_inventory": 30.0
   },
   {
-    "article_number": "ART-002",
+    "article_number": "1002",
     "article_name": "Dado M6",
     "lift_number": 0,
     "shelf_number": 0,
@@ -48,7 +48,7 @@
     "minimum_inventory": 30.0
   },
   {
-    "article_number": "ART-003",
+    "article_number": "1003",
     "article_name": "Rondella M6",
     "lift_number": 1,
     "shelf_number": 4,
@@ -60,7 +60,7 @@
     "minimum_inventory": 50.0
   },
   {
-    "article_number": "ART-003",
+    "article_number": "1003",
     "article_name": "Rondella M6",
     "lift_number": 1,
     "shelf_number": 4,
