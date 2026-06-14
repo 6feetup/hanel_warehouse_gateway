@@ -30,7 +30,7 @@ uv run python scripts/hanel_cli.py <operation> [--input FILE] [--endpoint URL] [
 
 | Flag | Description |
 |------|-------------|
-| `operation` | One of: `register_article`, `send_movement_order`, `get_completed_movements`, `get_all_orders`, `get_inventory`, `cancel_order` |
+| `operation` | One of: `register_article`, `send_movement_order`, `get_completed_movements`, `get_all_orders`, `get_inventory`, `cancel_order`, `ping` |
 | `--input FILE` | JSON file with operation parameters. If omitted, reads from stdin. |
 | `--endpoint URL` | Overrides `HANEL_ENDPOINT_URL` from `.env`. |
 | `--test-mode` | Enables `test_mode=True` (prepends `TEST_` to order numbers). |
@@ -296,6 +296,41 @@ echo '{"order_number": "ORD-001"}' | \
   "operation": "deleteJobReqV01",
   "detail": "returnValue=1 | response=...",
   "return_value": 1
+}
+```
+
+---
+
+### `ping`
+
+Connectivity health-check. Sends the lightweight read-only `readAllJobs`
+request (the Hanel t-Server has no dedicated echo/ping operation) and reports
+whether the server is reachable. Any HTTP reply — including a SOAP fault or a
+non-2xx status — counts as alive; only a network failure (connection refused or
+timeout) is reported as unreachable. To stay fast, the probe uses a single
+attempt and a capped timeout instead of the operational retry/timeout settings,
+so an unreachable server is reported within a few seconds. Takes no JSON input
+and never fails: it returns a boolean result.
+
+**Command:**
+```bash
+uv run python scripts/hanel_cli.py ping \
+  --endpoint http://localhost:8080/HanelService
+```
+
+**Output when the server is reachable:**
+```json
+{
+  "ok": true,
+  "result": true
+}
+```
+
+**Output when the server is unreachable:**
+```json
+{
+  "ok": true,
+  "result": false
 }
 ```
 

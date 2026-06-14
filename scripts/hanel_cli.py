@@ -23,6 +23,7 @@ OPERATIONS = {
     "get_all_orders",
     "get_inventory",
     "cancel_order",
+    "ping",
 }
 
 
@@ -57,6 +58,8 @@ def run(operation: str, data: dict, gw: HanelWarehouseGateway) -> object:
         return [dataclasses.asdict(r) for r in gw.get_inventory()]
     if operation == "cancel_order":
         return gw.cancel_order(data["order_number"])
+    if operation == "ping":
+        return gw.ping()
     raise ValueError(f"Unknown operation: {operation}")
 
 

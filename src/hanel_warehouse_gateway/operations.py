@@ -7,13 +7,19 @@ Does not make HTTP calls directly: delegates to SoapTransport.
 
 from __future__ import annotations
 
+import dataclasses
 import datetime
 import logging
 import re
 
 from . import _xml
 from .config import GatewayConfig
-from .exceptions import HanelGatewayApplicationError, HanelGatewayValidationError
+from .exceptions import (
+    HanelGatewayApplicationError,
+    HanelGatewayError,
+    HanelGatewayNetworkError,
+    HanelGatewayValidationError,
+)
 from .models import MovementLine, MovementLineResult, MovementResult, StockRecord
 from .transport import SoapTransport
 
@@ -26,6 +32,11 @@ logger = logging.getLogger("hanel_warehouse_gateway")
 _RETURN_CODE_DESCRIPTIONS: dict[int, str] = {
     -1: "Generic warehouse error (unspecified)",
 }
+
+# Upper bound on the per-attempt timeout used by ping(). A connectivity probe
+# must answer quickly, so it caps the configured timeout instead of inheriting
+# the (potentially large) value used for real operations.
+_PING_TIMEOUT_SECONDS = 5
 
 
 def _validate_field_length(
@@ -446,4 +457,54 @@ class SoapOperations:
             operation,
             order_number,
         )
+        return True
+
+    def ping(self) -> bool:
+        """Check whether the warehouse t-Server is reachable.
+
+        Health-check that sends the lightweight read-only readAllJobs request
+        (no dedicated echo/ping operation exists on the Hanel t-Server). Any
+        HTTP reply (including a SOAP fault or a non-2xx status) proves the
+        server is alive; only a network failure (connection refused / timeout)
+        is treated as unreachable.
+
+        Unlike the regular operations, the probe must answer quickly, so it
+        runs against a derived config with a single attempt and a capped
+        timeout: otherwise an unreachable server would block for the full
+        retry sequence (retry_attempts x timeout_seconds plus the delays
+        between attempts). The response body is intentionally not parsed —
+        reachability only depends on whether an HTTP reply came back at all.
+
+        Returns:
+            True if the server responded with any HTTP reply; False if it
+            could not be reached over the network.
+        """
+        # Copy the config but collapse retries to one and cap the timeout, so a
+        # dead server fails fast instead of inheriting the operational settings.
+        probe_config = dataclasses.replace(
+            self._config,
+            retry_attempts=1,
+            timeout_seconds=min(self._config.timeout_seconds, _PING_TIMEOUT_SECONDS),
+        )
+        # Short-lived transport bound to the probe config; the instance's own
+        # transport (and its operational timeout/retry) is left untouched.
+        probe_transport = SoapTransport(probe_config)
+        envelope = _xml.build_read_jobs_envelope(
+            mode=0,
+            namespace_main=self._config.namespace_main,
+            namespace_xsd=self._config.namespace_xsd,
+        )
+        logger.info("ping: probing connectivity via readAllJobs")
+        try:
+            probe_transport.post(envelope, "ping")
+        except HanelGatewayNetworkError:
+            # No HTTP reply reached us: the server is unreachable.
+            logger.warning("ping: warehouse unreachable (network error)")
+            return False
+        except HanelGatewayError:
+            # The server replied (HTTP error, SOAP fault, ...): it is alive even
+            # though this particular response was not a clean success.
+            logger.info("ping: warehouse reachable (non-success response)")
+            return True
+        logger.info("ping: warehouse reachable")
         return True
