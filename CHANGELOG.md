@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.6](https://github.com/6feetup/hanel_warehouse_gateway/compare/v0.1.5...v0.1.6) (2026-06-14)
+
+
+### Documentation
+
+* clarify model fields and Python-object configuration ([#35](https://github.com/6feetup/hanel_warehouse_gateway/issues/35)) ([e4964d4](https://github.com/6feetup/hanel_warehouse_gateway/commit/e4964d433c6948d8bc1cbb1e60402cb48c7e1c8f))
+
 ## [0.1.5](https://github.com/6feetup/hanel_warehouse_gateway/compare/v0.1.4...v0.1.5) (2026-06-14)
 
 
