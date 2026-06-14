@@ -122,6 +122,7 @@ Static parameters with defaults (can be passed as overrides):
 | [014](docs/adr/014-documentation-toolchain.md) | MkDocs + mkdocstrings for API docs |
 | [015](docs/adr/015-lot-management.md) | Lot management via feature flag + V02/V03/V04 ops |
 | [016](docs/adr/016-lot-tag-names-provisional.md) | Provisional XML tag names for lot management |
+| [017](docs/adr/017-pypi-publishing.md) | Publish to PyPI via Trusted Publishing (OIDC) |
 | [Contributing docs](docs/contributing/) | Development workflow, Claude agents, slash commands |
 
 ## Available slash commands
