@@ -16,7 +16,30 @@ pip install hanel-warehouse-gateway
 
 ## Configuration
 
-Create a `.env` file in your project root (never commit it):
+The gateway is configured with a `GatewayConfig` object. `endpoint_url` is the
+only required field; every other parameter has a sensible default (see the
+[Configuration reference](api/config.md) for the full list). There are three
+ways to build it.
+
+### 1. Direct instantiation (Python object)
+
+The most common option when integrating the module into an existing
+application — pass values straight from your own configuration system:
+
+```python
+from hanel_warehouse_gateway import HanelWarehouseGateway, GatewayConfig
+
+config = GatewayConfig(
+    endpoint_url="http://192.168.1.100:8080/HanelService",
+    test_mode=True,
+)
+gateway = HanelWarehouseGateway(config)
+```
+
+### 2. From `.env` / environment variables
+
+Useful to keep volatile parameters and secrets out of source code. Create a
+`.env` file in your project root (never commit it):
 
 ```dotenv
 HANEL_ENDPOINT_URL=http://192.168.1.100:8080/HanelService
@@ -24,12 +47,24 @@ HANEL_TEST_MODE=false
 HANEL_TEST_PREFIX=TEST_
 ```
 
-Then load the configuration and instantiate the gateway:
+Then load it:
 
 ```python
-from hanel_warehouse_gateway import HanelWarehouseGateway, GatewayConfig
-
 config = GatewayConfig.from_env()
+gateway = HanelWarehouseGateway(config)
+```
+
+### 3. From environment with overrides
+
+Reads `.env` / environment variables, then applies the given overrides on top
+(handy in tests or for per-environment tweaks):
+
+```python
+config = GatewayConfig.from_env({
+    "endpoint_url": "http://localhost:8080/HanelService",
+    "test_mode": True,
+    "timeout_seconds": 5,
+})
 gateway = HanelWarehouseGateway(config)
 ```
 
