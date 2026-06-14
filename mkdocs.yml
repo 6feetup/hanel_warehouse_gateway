@@ -51,6 +51,7 @@ nav:
     - ADR-014 Documentation: adr/014-documentation-toolchain.md
     - ADR-015 Lot Management: adr/015-lot-management.md
     - ADR-016 Lot Tag Names (Provisional): adr/016-lot-tag-names-provisional.md
+    - ADR-017 PyPI Publishing: adr/017-pypi-publishing.md
   - Contributing:
     - Development Workflow: contributing/development-workflow.md
     - Claude Agents: contributing/claude-agents.md

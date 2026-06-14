@@ -8,11 +8,29 @@ version = "0.1.4"
 description = "Python gateway for the Hanel automated warehouse SOAP interface"
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "Proprietary" }
+license = "LGPL-3.0-or-later"
+license-files = ["LICENSE", "LICENSE.GPL"]
+authors = [{ name = "Giorgio Borelli" }]
+keywords = ["hanel", "warehouse", "soap", "gateway", "logistics"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
 dependencies = [
     "requests>=2.31",
     "python-dotenv>=1.0",
 ]
+
+[project.urls]
+Homepage = "https://hanel-warehouse-gateway.pages.dev"
+Documentation = "https://hanel-warehouse-gateway.pages.dev"
+Repository = "https://github.com/6feetup/hanel_warehouse_gateway"
+Changelog = "https://github.com/6feetup/hanel_warehouse_gateway/blob/main/CHANGELOG.md"
 
 [dependency-groups]
 dev = [
@@ -29,6 +47,19 @@ dev = [
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/hanel_warehouse_gateway"]
+
+# Restrict the sdist to source + essential metadata only.
+# Without this, hatchling defaults to including all VCS-tracked files
+# (docs/, .claude/, .github/, tests/, ...) in the source distribution.
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src/hanel_warehouse_gateway",
+    "/README.md",
+    "/CHANGELOG.md",
+    "/LICENSE",
+    "/LICENSE.GPL",
+    "/pyproject.toml",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

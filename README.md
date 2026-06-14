@@ -1,4 +1,4 @@
-# hanel_warehouse_gateway
+# Hanel Warehouse Gateway
 
 Python module for communicating with the Hanel automatic warehouse via SOAP. Exposes a fully typed Python interface and hides all SOAP details from the caller.
 
@@ -184,3 +184,9 @@ docker compose up --build
 The server listens at `http://localhost:8080/HanelService`.
 
 See [`mock_server/README.md`](mock_server/README.md) for full documentation, including data formats, environment variables, and example curl requests for each operation.
+
+## License
+
+This project is licensed under the **GNU Lesser General Public License v3.0 or later
+(LGPL-3.0-or-later)**. See the [`LICENSE`](LICENSE) file for the full text; the LGPL
+is supplemented by the GNU GPL v3 it incorporates, provided in [`LICENSE.GPL`](LICENSE.GPL).
