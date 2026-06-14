@@ -7,6 +7,7 @@ from unittest.mock import MagicMock
 
 import pytest
 import responses as responses_lib
+from responses import ConnectionError as MockConnectionError
 
 from hanel_warehouse_gateway import GatewayConfig
 from hanel_warehouse_gateway.exceptions import (
@@ -319,6 +320,56 @@ class TestCancelOrder:
         payload = responses_lib.calls[0].request.body.decode("utf-8")
         assert "X" * 40 in payload
         assert "X" * 41 not in payload
+
+
+class TestPing:
+    @responses_lib.activate
+    def test_returns_true_on_successful_read(self) -> None:
+        responses_lib.add(
+            responses_lib.POST,
+            _ENDPOINT,
+            body=_fixture("read_jobs_response_mode0.xml"),
+            status=200,
+        )
+        assert _ops(_config()).ping() is True
+
+    @responses_lib.activate
+    def test_returns_false_on_network_error(self) -> None:
+        responses_lib.add(
+            responses_lib.POST, _ENDPOINT, body=MockConnectionError()
+        )
+        assert _ops(_config()).ping() is False
+
+    @responses_lib.activate
+    def test_returns_true_on_http_error(self) -> None:
+        # A non-2xx status still proves the server is alive and responding.
+        responses_lib.add(
+            responses_lib.POST, _ENDPOINT, body="Server Error", status=500
+        )
+        assert _ops(_config()).ping() is True
+
+    @responses_lib.activate
+    def test_returns_true_on_soap_fault(self) -> None:
+        # A SOAP fault is still a reply from a reachable server.
+        responses_lib.add(
+            responses_lib.POST,
+            _ENDPOINT,
+            body=_fixture("soap_fault.xml"),
+            status=200,
+        )
+        assert _ops(_config()).ping() is True
+
+    @responses_lib.activate
+    def test_does_not_retry_on_unreachable_server(self) -> None:
+        # The probe must fail fast: even with retry_attempts=3 configured, it
+        # derives a single-attempt config, so an unreachable server triggers
+        # exactly one HTTP call instead of the full retry sequence.
+        responses_lib.add(
+            responses_lib.POST, _ENDPOINT, body=MockConnectionError()
+        )
+        config = _config(retry_attempts=3, retry_delay_seconds=10.0)
+        assert _ops(config).ping() is False
+        assert len(responses_lib.calls) == 1
 
 
 _SUCCESS_XML = _fixture("send_movement_order_success.xml")

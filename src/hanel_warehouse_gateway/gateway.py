@@ -103,3 +103,14 @@ class HanelWarehouseGateway:
             True if the operation succeeded (returnValue == 0).
         """
         return self._operations.cancel_order(order_number)
+
+    def ping(self) -> bool:
+        """Check whether the warehouse t-Server is reachable.
+
+        Lightweight connectivity probe that sends a read-only request with a
+        single attempt and a capped timeout, so an unreachable server fails
+        fast instead of blocking for the full retry sequence. Returns True if
+        the server responds with any HTTP reply, False if it cannot be reached
+        over the network. Does not raise on an unreachable server.
+        """
+        return self._operations.ping()
