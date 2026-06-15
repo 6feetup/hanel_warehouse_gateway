@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.7](https://github.com/6feetup/hanel_warehouse_gateway/compare/v0.1.6...v0.1.7) (2026-06-15)
+
+
+### Bug Fixes
+
+* **operations:** prefix test_mode TEST_ on order line article numbers ([#37](https://github.com/6feetup/hanel_warehouse_gateway/issues/37)) ([824c670](https://github.com/6feetup/hanel_warehouse_gateway/commit/824c670c9a6a9670fbd9cc2b7461902cd83b9396))
+
 ## [0.1.6](https://github.com/6feetup/hanel_warehouse_gateway/compare/v0.1.5...v0.1.6) (2026-06-14)
 
 
