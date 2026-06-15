@@ -9,6 +9,7 @@ from __future__ import annotations
 import datetime
 import logging
 import xml.etree.ElementTree as ET
+from typing import cast
 
 from .exceptions import HanelGatewayParseError, HanelGatewaySoapFaultError
 
@@ -168,6 +169,11 @@ def build_register_article_envelope_v03(
     )
 
 
+def _nominal_quantity_int(position: dict[str, object]) -> int:
+    """Coerce a position's nominal_quantity to int for XML serialisation."""
+    return int(cast("float", position["nominal_quantity"]))
+
+
 def build_send_movement_order_envelope(
     job_number: str,
     positions: list[dict[str, object]],
@@ -180,7 +186,7 @@ def build_send_movement_order_envelope(
         f"<xsd:JobPosition>"
         f"<xsd:articleNumber>{_xml_escape(str(p['article_number']))}</xsd:articleNumber>"
         f"<xsd:operation>{_xml_escape(str(p['operation']))}</xsd:operation>"
-        f"<xsd:nominalQuantity>{p['nominal_quantity']}</xsd:nominalQuantity>"
+        f"<xsd:nominalQuantity>{_nominal_quantity_int(p)}</xsd:nominalQuantity>"
         f"</xsd:JobPosition>"
         for p in positions
     )
@@ -223,7 +229,7 @@ def build_send_movement_order_envelope_v02(
             f"<xsd:JobPosition>"
             f"<xsd:articleNumber>{_xml_escape(str(p['article_number']))}</xsd:articleNumber>"
             f"<xsd:operation>{_xml_escape(str(p['operation']))}</xsd:operation>"
-            f"<xsd:nominalQuantity>{p['nominal_quantity']}</xsd:nominalQuantity>"
+            f"<xsd:nominalQuantity>{_nominal_quantity_int(p)}</xsd:nominalQuantity>"
             f"{batch_xml}"
             f"</xsd:JobPosition>"
         )

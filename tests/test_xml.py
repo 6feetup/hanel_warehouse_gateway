@@ -186,7 +186,7 @@ class TestParseReturnValue:
 
 
 _ONE_POSITION = [
-    {"article_number": "1001", "operation": "+", "nominal_quantity": 5.0}
+    {"article_number": "1001", "operation": "+", "nominal_quantity": 5}
 ]
 
 
@@ -207,12 +207,12 @@ class TestBuildSendMovementOrderEnvelope:
         xml = _build_smo("JOB-1", _ONE_POSITION)
         assert "<xsd:articleNumber>1001</xsd:articleNumber>" in xml
         assert "<xsd:operation>+</xsd:operation>" in xml
-        assert "<xsd:nominalQuantity>5.0</xsd:nominalQuantity>" in xml
+        assert "<xsd:nominalQuantity>5</xsd:nominalQuantity>" in xml
 
     def test_multiple_positions_all_present(self) -> None:
         positions = [
-            {"article_number": "1001", "operation": "+", "nominal_quantity": 10.0},
-            {"article_number": "1002", "operation": "-", "nominal_quantity": 3.5},
+            {"article_number": "1001", "operation": "+", "nominal_quantity": 10},
+            {"article_number": "1002", "operation": "-", "nominal_quantity": 3},
         ]
         xml = _build_smo("JOB-MULTI", positions)
         assert "1001" in xml
@@ -244,7 +244,7 @@ class TestBuildSendMovementOrderEnvelope:
         import xml.etree.ElementTree as ET
 
         positions = [
-            {"article_number": "ART&01", "operation": "+", "nominal_quantity": 1.0}
+            {"article_number": "ART&01", "operation": "+", "nominal_quantity": 1}
         ]
         xml = _build_smo("JOB-1", positions)
         root = ET.fromstring(xml)
@@ -408,7 +408,7 @@ class TestBuildRegisterArticleEnvelopeV03:
 
 
 _ONE_POSITION_V02 = [
-    {"article_number": "1001", "operation": "+", "nominal_quantity": 5.0}
+    {"article_number": "1001", "operation": "+", "nominal_quantity": 5}
 ]
 
 
@@ -422,7 +422,7 @@ class TestBuildSendMovementOrderEnvelopeV02:
             {
                 "article_number": "1001",
                 "operation": "+",
-                "nominal_quantity": 5.0,
+                "nominal_quantity": 5,
                 "batch_number": "LOT-A",
             }
         ]
@@ -434,7 +434,7 @@ class TestBuildSendMovementOrderEnvelopeV02:
             {
                 "article_number": "1001",
                 "operation": "+",
-                "nominal_quantity": 5.0,
+                "nominal_quantity": 5,
                 "batch_number": None,
             }
         ]
@@ -451,7 +451,7 @@ class TestBuildSendMovementOrderEnvelopeV02:
             {
                 "article_number": "1001",
                 "operation": "+",
-                "nominal_quantity": 5.0,
+                "nominal_quantity": 5,
                 "batch_number": "L1",
             }
         ]

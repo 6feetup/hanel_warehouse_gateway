@@ -90,7 +90,7 @@ Sends a movement order (pick `+` or load `-`) to the warehouse.
 {
   "order_number": "ORD-CLI-001",
   "positions": [
-    {"article_number": "1001", "operation": "+", "nominal_quantity": 5.0}
+    {"article_number": "1001", "operation": "+", "nominal_quantity": 5}
   ]
 }
 ```
@@ -100,8 +100,8 @@ Sends a movement order (pick `+` or load `-`) to the warehouse.
 {
   "order_number": "ORD-CLI-002",
   "positions": [
-    {"article_number": "1001", "operation": "+", "nominal_quantity": 5.0},
-    {"article_number": "1002", "operation": "-", "nominal_quantity": 2.0}
+    {"article_number": "1001", "operation": "+", "nominal_quantity": 5},
+    {"article_number": "1002", "operation": "-", "nominal_quantity": 2}
   ]
 }
 ```
@@ -222,7 +222,7 @@ echo '{"article_number": "2001", "article_name": "Vite M6 Inox"}' | \
 # 3. Send a movement order
 echo '{
   "order_number": "ORD-CLI-001",
-  "positions": [{"article_number": "1001", "operation": "+", "nominal_quantity": 3.0}]
+  "positions": [{"article_number": "1001", "operation": "+", "nominal_quantity": 3}]
 }' | uv run python scripts/hanel_cli.py send_movement_order --endpoint $ENDPOINT
 
 # 4. Complete all pending orders (mock server admin endpoint)

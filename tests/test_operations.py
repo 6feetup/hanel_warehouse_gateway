@@ -375,7 +375,7 @@ class TestPing:
 _SUCCESS_XML = _fixture("send_movement_order_success.xml")
 
 _ONE_LINE = [
-    MovementLine(article_number="1001", operation="+", nominal_quantity=5.0)
+    MovementLine(article_number="1001", operation="+", nominal_quantity=5)
 ]
 
 
@@ -408,12 +408,12 @@ class TestSendMovementOrder:
         ops.send_movement_order("JOB-1", _ONE_LINE)
         envelope, _ = transport.post.call_args[0]
         assert "<xsd:operation>+</xsd:operation>" in envelope
-        assert "5.0" in envelope
+        assert "<xsd:nominalQuantity>5</xsd:nominalQuantity>" in envelope
 
     def test_multiple_positions_all_in_envelope(self) -> None:
         positions = [
-            MovementLine("1001", "+", 10.0),
-            MovementLine("1002", "-", 3.5),
+            MovementLine("1001", "+", 10),
+            MovementLine("1002", "-", 3),
         ]
         ops, transport = _make_operations(_SUCCESS_XML)
         ops.send_movement_order("JOB-MULTI", positions)
@@ -512,6 +512,37 @@ class TestSendMovementOrder:
             ops.send_movement_order("JOB-1", bad)
         assert "nominal_quantity" in exc_info.value.field
         transport.post.assert_not_called()
+
+    def test_fractional_quantity_raises_validation_error(self) -> None:
+        ops, transport = _make_operations()
+        bad = [
+            MovementLine(article_number="1001", operation="+", nominal_quantity=3.5)
+        ]
+        with pytest.raises(HanelGatewayValidationError) as exc_info:
+            ops.send_movement_order("JOB-1", bad)
+        assert exc_info.value.field == "positions[0].nominal_quantity"
+        transport.post.assert_not_called()
+
+    def test_bool_quantity_raises_validation_error(self) -> None:
+        # bool is a subclass of int; True must not be accepted as quantity 1.
+        ops, transport = _make_operations()
+        bad = [
+            MovementLine(article_number="1001", operation="+", nominal_quantity=True)
+        ]
+        with pytest.raises(HanelGatewayValidationError) as exc_info:
+            ops.send_movement_order("JOB-1", bad)
+        assert exc_info.value.field == "positions[0].nominal_quantity"
+        transport.post.assert_not_called()
+
+    def test_whole_float_quantity_is_normalised_to_int(self) -> None:
+        # A whole float (5.0) is tolerated and serialised as an integer.
+        ops, transport = _make_operations(_SUCCESS_XML)
+        positions = [
+            MovementLine(article_number="1001", operation="+", nominal_quantity=5.0)
+        ]
+        ops.send_movement_order("JOB-1", positions)
+        envelope, _ = transport.post.call_args[0]
+        assert "<xsd:nominalQuantity>5</xsd:nominalQuantity>" in envelope
 
     def test_order_number_too_long_raises_validation_error(self) -> None:
         ops, transport = _make_operations()

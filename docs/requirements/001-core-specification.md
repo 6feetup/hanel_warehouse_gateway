@@ -141,7 +141,7 @@ client = HanelWarehouseGateway(config)
 |---|---|---|---|
 | `article_number` | `str` | max 40 chars | Must match a previously registered article |
 | `operation` | `str` | `+` = pick, `-` = load | Movement direction |
-| `nominal_quantity` | `float` | > 0 | Requested quantity |
+| `nominal_quantity` | `int` | > 0, integer | Requested quantity (the warehouse only accepts integer quantities; fractional values are rejected on send) |
 
 > *Extended by REQ-LOT-001: adds optional `batch_number: str | None = None` to `MovementLine`. See §4.2 and §5 of that document.*
 
@@ -541,7 +541,7 @@ class HanelWarehouseGateway:
 class MovementLine:
     article_number: str
     operation: str          # '+' = pick, '-' = load
-    nominal_quantity: float
+    nominal_quantity: int   # > 0; fractional values rejected on send
 
 @dataclass
 class MovementLineResult:
