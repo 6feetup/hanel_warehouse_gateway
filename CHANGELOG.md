@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.2.0](https://github.com/6feetup/hanel_warehouse_gateway/compare/v0.1.7...v0.2.0) (2026-06-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* MovementLine.nominal_quantity is now int and fractional quantities raise HanelGatewayValidationError.
+
+### Features
+
+* require integer nominal_quantity on movement orders ([#40](https://github.com/6feetup/hanel_warehouse_gateway/issues/40)) ([4da80c4](https://github.com/6feetup/hanel_warehouse_gateway/commit/4da80c4b17a5620b17ebd386b1cd4a6057b99849))
+
 ## [0.1.7](https://github.com/6feetup/hanel_warehouse_gateway/compare/v0.1.6...v0.1.7) (2026-06-15)
 
 
