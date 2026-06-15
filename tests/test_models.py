@@ -13,15 +13,15 @@ from hanel_warehouse_gateway import (
 class TestMovementLine:
     def test_instantiation(self) -> None:
         line = MovementLine(
-            article_number="1001", operation="+", nominal_quantity=10.0
+            article_number="1001", operation="+", nominal_quantity=10
         )
         assert line.article_number == "1001"
         assert line.operation == "+"
-        assert line.nominal_quantity == 10.0
+        assert line.nominal_quantity == 10
 
     def test_batch_number_default_none(self) -> None:
         line = MovementLine(
-            article_number="1001", operation="+", nominal_quantity=1.0
+            article_number="1001", operation="+", nominal_quantity=1
         )
         assert line.batch_number is None
 
@@ -29,7 +29,7 @@ class TestMovementLine:
         line = MovementLine(
             article_number="1001",
             operation="+",
-            nominal_quantity=1.0,
+            nominal_quantity=1,
             batch_number="LOT-A",
         )
         assert line.batch_number == "LOT-A"

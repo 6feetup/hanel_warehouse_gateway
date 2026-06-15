@@ -239,6 +239,23 @@ class SoapOperations:
                     field=f"positions[{i}].nominal_quantity",
                     value=str(pos.nominal_quantity),
                 )
+            # The warehouse only accepts integer quantities. Reject bools and any
+            # value carrying a fractional part (e.g. 3.5); whole floats like 5.0
+            # are tolerated and normalised to int when the envelope is built.
+            # Widen to object so the runtime type checks narrow correctly even
+            # though the field is annotated int (a caller may pass a float).
+            quantity: object = pos.nominal_quantity
+            if isinstance(quantity, bool) or (
+                isinstance(quantity, float) and not quantity.is_integer()
+            ):
+                raise HanelGatewayValidationError(
+                    message=f"nominal_quantity must be an integer in position {i}",
+                    operation=operation,
+                    detail=f"got: {pos.nominal_quantity!r}",
+                    timestamp=datetime.datetime.utcnow().isoformat(),
+                    field=f"positions[{i}].nominal_quantity",
+                    value=str(pos.nominal_quantity),
+                )
 
         if self._config.test_mode:
             order_number = f"{self._config.test_prefix}{order_number}"
@@ -265,7 +282,7 @@ class SoapOperations:
             pos_dict: dict[str, object] = {
                 "article_number": article_number,
                 "operation": pos.operation,
-                "nominal_quantity": pos.nominal_quantity,
+                "nominal_quantity": int(pos.nominal_quantity),
             }
             if lot:
                 pos_dict["batch_number"] = pos.batch_number

@@ -87,7 +87,7 @@ gateway.register_article("1001", "M6 stainless bolt")
 # Send a pick order
 gateway.send_movement_order(
     order_number="ORD-001",
-    positions=[MovementLine(article_number="1001", operation="+", nominal_quantity=5.0)],
+    positions=[MovementLine(article_number="1001", operation="+", nominal_quantity=5)],
 )
 
 # Retrieve completed orders

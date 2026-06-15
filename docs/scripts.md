@@ -113,7 +113,7 @@ Sends a movement order to the warehouse.
 {
   "order_number": "ORD-CLI-001",
   "positions": [
-    {"article_number": "1001", "operation": "+", "nominal_quantity": 5.0}
+    {"article_number": "1001", "operation": "+", "nominal_quantity": 5}
   ]
 }
 ```
@@ -123,8 +123,8 @@ Sends a movement order to the warehouse.
 {
   "order_number": "ORD-CLI-002",
   "positions": [
-    {"article_number": "1001", "operation": "+", "nominal_quantity": 5.0},
-    {"article_number": "1002", "operation": "-", "nominal_quantity": 2.0}
+    {"article_number": "1001", "operation": "+", "nominal_quantity": 5},
+    {"article_number": "1002", "operation": "-", "nominal_quantity": 2}
   ]
 }
 ```
@@ -134,7 +134,7 @@ Sends a movement order to the warehouse.
 {
   "order_number": "ORD-LOT-001",
   "positions": [
-    {"article_number": "1001", "operation": "+", "nominal_quantity": 5.0, "batch_number": "LOTTO-2026-A"}
+    {"article_number": "1001", "operation": "+", "nominal_quantity": 5, "batch_number": "LOTTO-2026-A"}
   ]
 }
 ```
@@ -353,7 +353,7 @@ echo '{"article_number": "2001", "article_name": "M6 stainless bolt"}' | \
 # 3. Send a movement order
 echo '{
   "order_number": "ORD-CLI-001",
-  "positions": [{"article_number": "1001", "operation": "+", "nominal_quantity": 3.0}]
+  "positions": [{"article_number": "1001", "operation": "+", "nominal_quantity": 3}]
 }' | uv run python scripts/hanel_cli.py send_movement_order --endpoint $ENDPOINT
 
 # 4. Complete all pending orders (mock server admin endpoint)
@@ -388,7 +388,7 @@ echo '{"article_number": "2001", "article_name": "M6 stainless bolt", "batch_num
 # 3. Send a movement order with batch number on each position (uses sendJobsV02)
 echo '{
   "order_number": "ORD-LOT-001",
-  "positions": [{"article_number": "1001", "operation": "+", "nominal_quantity": 3.0, "batch_number": "LOTTO-2026-A"}]
+  "positions": [{"article_number": "1001", "operation": "+", "nominal_quantity": 3, "batch_number": "LOTTO-2026-A"}]
 }' | uv run python scripts/hanel_cli.py send_movement_order --endpoint $ENDPOINT
 
 # 4. Complete all pending orders

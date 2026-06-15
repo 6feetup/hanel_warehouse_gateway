@@ -17,7 +17,8 @@ class MovementLine:
             already registered via ``register_article``.
         operation: Movement direction. ``"+"`` = pick (retrieve from the
             warehouse), ``"-"`` = load (store into the warehouse).
-        nominal_quantity: Requested quantity. Must be greater than 0.
+        nominal_quantity: Requested quantity. Must be a positive integer
+            (greater than 0); fractional quantities are rejected on send.
         batch_number: Lot/batch number (max 40 chars). Only used when
             ``lot_management_enabled=True`` in ``GatewayConfig``; if omitted,
             the warehouse selects the lot autonomously (e.g. FIFO).
@@ -25,7 +26,7 @@ class MovementLine:
 
     article_number: str
     operation: str
-    nominal_quantity: float
+    nominal_quantity: int
     batch_number: str | None = None
 
 
