@@ -1,0 +1,22 @@
+name: PR Title Lint
+
+# The repo squashes PRs with squash_merge_commit_title = COMMIT_OR_PR_TITLE.
+# For multi-commit PRs GitHub uses the PR title as the squash commit subject,
+# which is what release-please parses. A non-conventional PR title therefore
+# silently skips the release. This job enforces a conventional PR title so the
+# squashed commit is always release-please-friendly.
+
+on:
+  pull_request_target:
+    types: [opened, edited, reopened, synchronize]
+
+permissions:
+  pull-requests: read
+
+jobs:
+  pr-title:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
