@@ -33,7 +33,7 @@ uv run python scripts/hanel_cli.py <operation> [--input FILE] [--endpoint URL] [
 | `operation` | One of: `register_article`, `send_movement_order`, `get_completed_movements`, `get_all_orders`, `get_inventory`, `cancel_order`, `ping` |
 | `--input FILE` | JSON file with operation parameters. If omitted, reads from stdin. |
 | `--endpoint URL` | Overrides `HANEL_ENDPOINT_URL` from `.env`. |
-| `--test-mode` | Enables `test_mode=True` (prepends `TEST_` to order numbers). |
+| `--test-mode` | Enables `test_mode=True` (prepends `TEST_` to order numbers and to article numbers — both at registration and inside order lines — so test operations are identifiable warehouse-side). |
 | `--verbose`, `-v` | Logs the full SOAP request/response payloads and any failure to stderr at DEBUG level (sets `log_soap_payloads=True`). Use this to debug calls and warehouse errors. |
 
 Output is always JSON on stdout. On success:

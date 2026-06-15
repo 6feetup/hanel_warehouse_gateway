@@ -250,9 +250,17 @@ class SoapOperations:
         positions_dicts: list[dict[str, object]] = []
         for i, pos in enumerate(positions):
             field_name = f"positions[{i}].article_number"
+            # Charset check on the caller-supplied value, before the test_prefix
+            # is prepended: mirrors register_article so a test article registered
+            # as e.g. "TEST_123" is referenced by the same id in the order line.
             _validate_article_number_charset(pos.article_number, field_name, operation)
+            position_article_number = pos.article_number
+            if self._config.test_mode:
+                position_article_number = (
+                    f"{self._config.test_prefix}{position_article_number}"
+                )
             article_number = _validate_field_length(
-                pos.article_number, field_name, operation, self._config
+                position_article_number, field_name, operation, self._config
             )
             pos_dict: dict[str, object] = {
                 "article_number": article_number,
