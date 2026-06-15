@@ -436,6 +436,48 @@ class TestSendMovementOrder:
         envelope, _ = transport.post.call_args[0]
         assert "<xsd:jobNumber>JOB-1</xsd:jobNumber>" in envelope
 
+    def test_test_mode_prepends_prefix_to_position_article_numbers(self) -> None:
+        # The prefix must reach the article numbers inside the order lines too,
+        # not just the job number: otherwise a test article registered as
+        # "TEST_1001" would not be found by a line referencing "1001".
+        ops, transport = _make_operations(
+            _SUCCESS_XML, test_mode=True, test_prefix="TEST_"
+        )
+        ops.send_movement_order("JOB-1", _ONE_LINE)
+        envelope, _ = transport.post.call_args[0]
+        assert "<xsd:articleNumber>TEST_1001</xsd:articleNumber>" in envelope
+        assert "<xsd:articleNumber>1001</xsd:articleNumber>" not in envelope
+
+    def test_test_mode_false_no_prefix_on_article_numbers(self) -> None:
+        ops, transport = _make_operations(_SUCCESS_XML, test_mode=False)
+        ops.send_movement_order("JOB-1", _ONE_LINE)
+        envelope, _ = transport.post.call_args[0]
+        assert "<xsd:articleNumber>1001</xsd:articleNumber>" in envelope
+
+    def test_test_mode_prepends_prefix_to_article_numbers_lot_mode(self) -> None:
+        ops, transport = _make_operations(
+            _SUCCESS_XML,
+            test_mode=True,
+            test_prefix="TEST_",
+            lot_management_enabled=True,
+        )
+        ops.send_movement_order("JOB-1", _ONE_LINE)
+        envelope, call_operation = transport.post.call_args[0]
+        assert call_operation == "sendJobsV02"
+        assert "<xsd:articleNumber>TEST_1001</xsd:articleNumber>" in envelope
+
+    def test_test_mode_prefix_counts_toward_article_number_length_limit(self) -> None:
+        # The prefix is included in the 40-char check for line article numbers,
+        # consistently with the job number and with register_article.
+        ops, transport = _make_operations(test_mode=True, test_prefix="TEST_")
+        bad = [
+            MovementLine(article_number="1" * 36, operation="+", nominal_quantity=1.0)
+        ]
+        with pytest.raises(HanelGatewayValidationError) as exc_info:
+            ops.send_movement_order("JOB-1", bad)
+        assert "article_number" in exc_info.value.field
+        transport.post.assert_not_called()
+
     def test_empty_positions_raises_validation_error(self) -> None:
         ops, transport = _make_operations()
         with pytest.raises(HanelGatewayValidationError) as exc_info:
