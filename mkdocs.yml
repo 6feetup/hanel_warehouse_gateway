@@ -50,8 +50,9 @@ nav:
     - ADR-013 uv Package Manager: adr/013-uv-package-manager.md
     - ADR-014 Documentation: adr/014-documentation-toolchain.md
     - ADR-015 Lot Management: adr/015-lot-management.md
-    - ADR-016 Lot Tag Names (Provisional): adr/016-lot-tag-names-provisional.md
+    - ADR-016 Lot Tag Names: adr/016-lot-tag-names-provisional.md
     - ADR-017 PyPI Publishing: adr/017-pypi-publishing.md
+    - ADR-018 Inventory Article Tag: adr/018-inventory-article-tag-and-h10-special-field.md
   - Contributing:
     - Development Workflow: contributing/development-workflow.md
     - Claude Agents: contributing/claude-agents.md

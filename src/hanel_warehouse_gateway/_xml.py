@@ -225,12 +225,13 @@ def build_send_movement_order_envelope_v02(
             batch_xml = (
                 f"<xsd:batchNumber>{_xml_escape(str(batch_number))}</xsd:batchNumber>"
             )
+        # XXX: Do not change the order of these elements!!!
         parts.append(
             f"<xsd:JobPosition>"
             f"<xsd:articleNumber>{_xml_escape(str(p['article_number']))}</xsd:articleNumber>"
+            f"{batch_xml}"
             f"<xsd:operation>{_xml_escape(str(p['operation']))}</xsd:operation>"
             f"<xsd:nominalQuantity>{_nominal_quantity_int(p)}</xsd:nominalQuantity>"
-            f"{batch_xml}"
             f"</xsd:JobPosition>"
         )
     positions_xml = "".join(parts)
@@ -430,7 +431,7 @@ def parse_stock_records(
     _check_soap_fault(root, operation, ns)
 
     results = []
-    for rec_el in root.findall(".//xsd:articleMasterDataRecord", ns):
+    for rec_el in root.findall(".//xsd:article", ns):
         results.append({
             "article_number": rec_el.findtext("xsd:articleNumber", "", ns),
             "article_name": rec_el.findtext("xsd:articleName", "", ns),
@@ -451,5 +452,8 @@ def parse_stock_records(
                 rec_el.findtext("xsd:minimumInventory", "0", ns)
             ),
             "batch_number": rec_el.findtext("xsd:batchNumber", None, ns),
+            "h10_special_field": (
+                rec_el.findtext("xsd:h10SpecialField", "", ns) or None
+            ),
         })
     return results

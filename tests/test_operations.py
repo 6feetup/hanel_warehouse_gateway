@@ -775,6 +775,12 @@ class TestGetInventory:
         assert results[1].shelf_number == 0
         assert results[1].inventory_at_storage_location == 0.0
 
+    def test_maps_h10_special_field(self) -> None:
+        ops, _ = _make_operations(_fixture("read_inventory_response.xml"))
+        results = ops.get_inventory()
+        assert results[0].h10_special_field == "8032611721991"
+        assert results[1].h10_special_field is None
+
     def test_soap_fault_propagates(self) -> None:
         ops, _ = _make_operations(_fixture("soap_fault.xml"))
         with pytest.raises(HanelGatewaySoapFaultError):

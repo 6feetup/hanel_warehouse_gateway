@@ -119,6 +119,23 @@ class TestStockRecord:
         )
         assert record.article_number == "1001"
         assert record.inventory_at_storage_location == 50.0
+        assert record.h10_special_field is None
+
+    def test_h10_special_field_explicit(self) -> None:
+        record = StockRecord(
+            article_number="1001",
+            article_name="M6 Screw",
+            lift_number=1,
+            shelf_number=3,
+            compartment_number=2,
+            compartment_depth_number=1,
+            container_size=1,
+            fifo=0,
+            inventory_at_storage_location=50.0,
+            minimum_inventory=10.0,
+            h10_special_field="8032611721991",
+        )
+        assert record.h10_special_field == "8032611721991"
 
     def test_batch_number_default_none(self) -> None:
         record = StockRecord(

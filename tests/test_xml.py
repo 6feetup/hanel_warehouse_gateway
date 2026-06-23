@@ -352,20 +352,38 @@ class TestParseMovementResults:
 
 
 class TestParseStockRecords:
+    def test_records_are_found(self) -> None:
+        xml = _fixture("read_inventory_v04_response.xml")
+        results = parse_stock_records(xml, "readAllAMDV04", _NS_XSD)
+        assert len(results) == 2
+        assert results[0]["article_number"] == "1001"
+        assert results[0]["article_name"] == "Bolt M6"
+
+    def test_v01_records_are_found(self) -> None:
+        xml = _fixture("read_inventory_response.xml")
+        results = parse_stock_records(xml, "readAllAMDReqV01", _NS_XSD)
+        assert len(results) == 2
+        assert results[0]["article_number"] == "1001"
+
     def test_batch_number_present_in_v04_fixture(self) -> None:
         xml = _fixture("read_inventory_v04_response.xml")
         results = parse_stock_records(xml, "readAllAMDV04", _NS_XSD)
         assert results[0]["batch_number"] == "LOT-2024"
 
-    def test_batch_number_absent_returns_none(self) -> None:
-        xml = _fixture("read_inventory_v04_response.xml")
-        results = parse_stock_records(xml, "readAllAMDV04", _NS_XSD)
-        assert results[1]["batch_number"] is None
-
     def test_v01_fixture_batch_number_is_none(self) -> None:
         xml = _fixture("read_inventory_response.xml")
         results = parse_stock_records(xml, "readAllAMDReqV01", _NS_XSD)
         assert results[0]["batch_number"] is None
+
+    def test_h10_special_field_present(self) -> None:
+        xml = _fixture("read_inventory_v04_response.xml")
+        results = parse_stock_records(xml, "readAllAMDV04", _NS_XSD)
+        assert results[0]["h10_special_field"] == "8032611721991"
+
+    def test_h10_special_field_empty_returns_none(self) -> None:
+        xml = _fixture("read_inventory_v04_response.xml")
+        results = parse_stock_records(xml, "readAllAMDV04", _NS_XSD)
+        assert results[1]["h10_special_field"] is None
 
 
 def _build_apd_v03(

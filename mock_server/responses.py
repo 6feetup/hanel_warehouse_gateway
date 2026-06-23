@@ -84,24 +84,29 @@ def read_jobs_v02_response(jobs: List[Job]) -> str:
 
 def _amd_record_xml(r: ArticleMasterData, include_batch: bool = False) -> str:
     batch_xml = (
-        f"<xsd:batchNumber>{_esc(r.batch_number)}</xsd:batchNumber>"
+        f"<batchNumber>{_esc(r.batch_number)}</batchNumber>"
         if include_batch and r.batch_number is not None
         else ""
     )
+    h10_value = _esc(r.h10_special_field) if r.h10_special_field is not None else ""
+    # Each record is wrapped in <article> with the xsd namespace declared as the
+    # default namespace, mirroring the real t-Server response (see
+    # docs/inventory_response.xml).
     return (
-        f"<xsd:articleMasterDataRecord>"
-        f"<xsd:articleNumber>{_esc(r.article_number)}</xsd:articleNumber>"
-        f"<xsd:articleName>{_esc(r.article_name)}</xsd:articleName>"
-        f"<xsd:liftNumber>{r.lift_number}</xsd:liftNumber>"
-        f"<xsd:shelfNumber>{r.shelf_number}</xsd:shelfNumber>"
-        f"<xsd:compartmentNumber>{r.compartment_number}</xsd:compartmentNumber>"
-        f"<xsd:compartmentDepthNumber>{r.compartment_depth_number}</xsd:compartmentDepthNumber>"
-        f"<xsd:containerSize>{r.container_size}</xsd:containerSize>"
-        f"<xsd:fifo>{r.fifo}</xsd:fifo>"
-        f"<xsd:inventoryAtStorageLocation>{r.inventory_at_storage_location}</xsd:inventoryAtStorageLocation>"
-        f"<xsd:minimumInventory>{r.minimum_inventory}</xsd:minimumInventory>"
+        f'<article xmlns="{NS_XSD}">'
+        f"<articleNumber>{_esc(r.article_number)}</articleNumber>"
+        f"<articleName>{_esc(r.article_name)}</articleName>"
         f"{batch_xml}"
-        f"</xsd:articleMasterDataRecord>"
+        f"<liftNumber>{r.lift_number}</liftNumber>"
+        f"<shelfNumber>{r.shelf_number}</shelfNumber>"
+        f"<compartmentNumber>{r.compartment_number}</compartmentNumber>"
+        f"<compartmentDepthNumber>{r.compartment_depth_number}</compartmentDepthNumber>"
+        f"<containerSize>{r.container_size}</containerSize>"
+        f"<fifo>{r.fifo}</fifo>"
+        f"<inventoryAtStorageLocation>{r.inventory_at_storage_location}</inventoryAtStorageLocation>"
+        f"<minimumInventory>{r.minimum_inventory}</minimumInventory>"
+        f"<h10SpecialField>{h10_value}</h10SpecialField>"
+        f"</article>"
     )
 
 
@@ -109,9 +114,9 @@ def read_amd_response(records: List[ArticleMasterData]) -> str:
     records_xml = "".join(_amd_record_xml(r, include_batch=False) for r in records)
     return (
         _ENVELOPE_OPEN
-        + "<main:readAllAMDReqV01Response><main:return>"
+        + "<main:readAllAMDResV01><main:return>"
         + records_xml
-        + "</main:return></main:readAllAMDReqV01Response>"
+        + "</main:return></main:readAllAMDResV01>"
         + _ENVELOPE_CLOSE
     )
 
@@ -120,9 +125,9 @@ def read_amd_v04_response(records: List[ArticleMasterData]) -> str:
     records_xml = "".join(_amd_record_xml(r, include_batch=True) for r in records)
     return (
         _ENVELOPE_OPEN
-        + "<main:readAllAMDV04Response><main:return>"
+        + "<main:readAllAMDResV04><main:return>"
         + records_xml
-        + "</main:return></main:readAllAMDV04Response>"
+        + "</main:return></main:readAllAMDResV04>"
         + _ENVELOPE_CLOSE
     )
 

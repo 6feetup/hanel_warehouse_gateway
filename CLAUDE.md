@@ -121,8 +121,9 @@ Static parameters with defaults (can be passed as overrides):
 | [013](docs/adr/013-uv-package-manager.md) | `uv` as official package manager |
 | [014](docs/adr/014-documentation-toolchain.md) | MkDocs + mkdocstrings for API docs |
 | [015](docs/adr/015-lot-management.md) | Lot management via feature flag + V02/V03/V04 ops |
-| [016](docs/adr/016-lot-tag-names-provisional.md) | Provisional XML tag names for lot management |
+| [016](docs/adr/016-lot-tag-names-provisional.md) | XML tag names for lot management (`batchNumber`, confirmed) |
 | [017](docs/adr/017-pypi-publishing.md) | Publish to PyPI via Trusted Publishing (OIDC) |
+| [018](docs/adr/018-inventory-article-tag-and-h10-special-field.md) | Inventory `<article>` tag + `h10_special_field` on `StockRecord` |
 | [Contributing docs](docs/contributing/) | Development workflow, Claude agents, slash commands |
 
 ## Available slash commands

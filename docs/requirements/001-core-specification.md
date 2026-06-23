@@ -295,6 +295,7 @@ client = HanelWarehouseGateway(config)
 | `fifo` | `int` | FIFO ordering value |
 | `inventory_at_storage_location` | `float` | Quantity at this location |
 | `minimum_inventory` | `float` | Configured minimum threshold |
+| `h10_special_field` | `str \| None` | Optional EAN/barcode for the location (`h10SpecialField`); `None` when empty. See ADR-018 |
 
 > *Extended by REQ-LOT-001: adds `batch_number: str | None` to `StockRecord`. When lot management is active, an article appears in multiple records (one per lot × location). See §4.4 and §5 of that document.*
 

@@ -112,6 +112,9 @@ class StockRecord:
             ``lot_management_enabled=True`` in ``GatewayConfig``; with lot
             management active an article appears in one record per lot ×
             location.
+        h10_special_field: Optional EAN/barcode associated with the storage
+            location (the t-Server's ``h10SpecialField``). ``None`` when the
+            warehouse leaves it empty.
     """
 
     article_number: str
@@ -125,3 +128,4 @@ class StockRecord:
     inventory_at_storage_location: float
     minimum_inventory: float
     batch_number: str | None = None
+    h10_special_field: str | None = None

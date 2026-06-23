@@ -444,6 +444,7 @@ class SoapOperations:
                 inventory_at_storage_location=float(r["inventory_at_storage_location"]),  # type: ignore[arg-type]
                 minimum_inventory=float(r["minimum_inventory"]),  # type: ignore[arg-type]
                 batch_number=r["batch_number"],  # type: ignore[arg-type]
+                h10_special_field=r["h10_special_field"],  # type: ignore[arg-type]
             )
             for r in raw_records
         ]

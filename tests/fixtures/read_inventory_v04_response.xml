@@ -1,37 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-                  xmlns:main="http://main.jws.com.hanel.de"
-                  xmlns:xsd="http://main.jws.com.hanel.de/xsd">
-  <soapenv:Header/>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
   <soapenv:Body>
-    <main:readAllAMDV04Response>
-      <main:return>
-        <xsd:articleMasterDataRecord>
-          <xsd:articleNumber>1001</xsd:articleNumber>
-          <xsd:articleName>Bolt M6</xsd:articleName>
-          <xsd:liftNumber>1</xsd:liftNumber>
-          <xsd:shelfNumber>5</xsd:shelfNumber>
-          <xsd:compartmentNumber>12</xsd:compartmentNumber>
-          <xsd:compartmentDepthNumber>3</xsd:compartmentDepthNumber>
-          <xsd:containerSize>1</xsd:containerSize>
-          <xsd:fifo>0</xsd:fifo>
-          <xsd:inventoryAtStorageLocation>250.0</xsd:inventoryAtStorageLocation>
-          <xsd:minimumInventory>50.0</xsd:minimumInventory>
-          <xsd:batchNumber>LOT-2024</xsd:batchNumber>
-        </xsd:articleMasterDataRecord>
-        <xsd:articleMasterDataRecord>
-          <xsd:articleNumber>1002</xsd:articleNumber>
-          <xsd:articleName>Washer 10mm</xsd:articleName>
-          <xsd:liftNumber>0</xsd:liftNumber>
-          <xsd:shelfNumber>0</xsd:shelfNumber>
-          <xsd:compartmentNumber>0</xsd:compartmentNumber>
-          <xsd:compartmentDepthNumber>0</xsd:compartmentDepthNumber>
-          <xsd:containerSize>2</xsd:containerSize>
-          <xsd:fifo>1</xsd:fifo>
-          <xsd:inventoryAtStorageLocation>0.0</xsd:inventoryAtStorageLocation>
-          <xsd:minimumInventory>10.0</xsd:minimumInventory>
-        </xsd:articleMasterDataRecord>
-      </main:return>
-    </main:readAllAMDV04Response>
+    <ns2:readAllAMDResV04 xmlns:ns2="http://main.jws.com.hanel.de">
+      <ns2:return>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>1001</articleNumber>
+          <articleName>Bolt M6</articleName>
+          <batchNumber>LOT-2024</batchNumber>
+          <liftNumber>1</liftNumber>
+          <shelfNumber>5</shelfNumber>
+          <compartmentNumber>12</compartmentNumber>
+          <compartmentDepthNumber>3</compartmentDepthNumber>
+          <containerSize>1</containerSize>
+          <fifo>0</fifo>
+          <inventoryAtStorageLocation>250</inventoryAtStorageLocation>
+          <minimumInventory>50</minimumInventory>
+          <h10SpecialField>8032611721991</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>1002</articleNumber>
+          <articleName>Washer 10mm</articleName>
+          <liftNumber>0</liftNumber>
+          <shelfNumber>0</shelfNumber>
+          <compartmentNumber>0</compartmentNumber>
+          <compartmentDepthNumber>0</compartmentDepthNumber>
+          <containerSize>2</containerSize>
+          <fifo>1</fifo>
+          <inventoryAtStorageLocation>0</inventoryAtStorageLocation>
+          <minimumInventory>10</minimumInventory>
+          <h10SpecialField></h10SpecialField>
+        </article>
+      </ns2:return>
+    </ns2:readAllAMDResV04>
   </soapenv:Body>
 </soapenv:Envelope>

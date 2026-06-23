@@ -222,13 +222,13 @@ class TestReadAllAMD:
         resp = read_amd()
         assert resp.status_code == 200
         root = ET.fromstring(resp.text)
-        records = root.findall(f".//{{{NS_XSD}}}articleMasterDataRecord")
+        records = root.findall(f".//{{{NS_XSD}}}article")
         assert len(records) == 6
 
     def test_record_with_lift_zero_present(self):
         root = ET.fromstring(read_amd().text)
         lift_zeros = [
-            r for r in root.findall(f".//{{{NS_XSD}}}articleMasterDataRecord")
+            r for r in root.findall(f".//{{{NS_XSD}}}article")
             if r.findtext(f"{{{NS_XSD}}}liftNumber") == "0"
         ]
         assert len(lift_zeros) >= 1
@@ -488,12 +488,12 @@ class TestReadAllAMDV04:
         resp = read_amd_v04()
         assert resp.status_code == 200
         root = ET.fromstring(resp.text)
-        records = root.findall(f".//{{{NS_XSD}}}articleMasterDataRecord")
+        records = root.findall(f".//{{{NS_XSD}}}article")
         assert len(records) >= 1
 
-    def test_response_tag_is_readAllAMDV04Response(self):
+    def test_response_tag_is_readAllAMDResV04(self):
         resp = read_amd_v04()
-        assert "readAllAMDV04Response" in resp.text
+        assert "readAllAMDResV04" in resp.text
 
 
 # ---------------------------------------------------------------------------
