@@ -25,7 +25,7 @@ _SOAP_BODY = "{http://schemas.xmlsoap.org/soap/envelope/}Body"
 
 _DISPATCH = {
     "sendAPDReqV01": handle_send_apd,
-    "sendAPDV03": handle_send_apd_v03,
+    "sendAPDReqV03": handle_send_apd_v03,
     "sendJobsReqV01": handle_send_jobs,
     "sendJobsV02": handle_send_jobs_v02,
     "readAllJobsReqV01": handle_read_jobs,

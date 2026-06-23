@@ -222,7 +222,7 @@ curl -s -X POST http://localhost:8080/HanelService \
 
 Le seguenti operazioni estendono le rispettive V01 aggiungendo il supporto al campo `batchNumber`. Vengono usate automaticamente dal gateway quando `lot_management_enabled=True` (env var `HANEL_LOT_MANAGEMENT_ENABLED`).
 
-### Registrazione articolo con lotto — `sendAPDV03`
+### Registrazione articolo con lotto — `sendAPDReqV03`
 
 ```bash
 curl -s -X POST http://localhost:8080/HanelService \
@@ -232,7 +232,7 @@ curl -s -X POST http://localhost:8080/HanelService \
         xmlns:xsd="http://main.jws.com.hanel.de/xsd">
     <soapenv:Header/>
     <soapenv:Body>
-      <main:sendAPDV03>
+      <main:sendAPDReqV03>
         <main:param>
           <xsd:articlePoolDataRecord>
             <xsd:articleNumber>1999</xsd:articleNumber>
@@ -240,7 +240,7 @@ curl -s -X POST http://localhost:8080/HanelService \
             <xsd:batchNumber>LOTTO-2026-A</xsd:batchNumber>
           </xsd:articlePoolDataRecord>
         </main:param>
-      </main:sendAPDV03>
+      </main:sendAPDReqV03>
     </soapenv:Body>
   </soapenv:Envelope>'
 ```

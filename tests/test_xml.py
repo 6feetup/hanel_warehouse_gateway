@@ -387,7 +387,7 @@ def _build_smo_v02(job_number: str, positions: list[dict[str, object]]) -> str:
 class TestBuildRegisterArticleEnvelopeV03:
     def test_contains_operation_tag(self) -> None:
         xml = _build_apd_v03("1001", "Bolt M6", None)
-        assert "sendAPDV03" in xml
+        assert "sendAPDReqV03" in xml
 
     def test_contains_article_number(self) -> None:
         xml = _build_apd_v03("1001", "Bolt M6", None)

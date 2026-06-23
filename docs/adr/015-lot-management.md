@@ -17,7 +17,7 @@ The existing module only supports V01 operations.
 - When `lot_management_enabled=False` (default), all behaviour is identical to the
   pre-existing V01 implementation — full backward compatibility is preserved.
 - When `lot_management_enabled=True`, the gateway uses:
-  - `sendAPDV03` instead of `sendAPDReqV01` for `register_article`
+  - `sendAPDReqV03` instead of `sendAPDReqV01` for `register_article`
   - `sendJobsV02` instead of `sendJobsReqV01` for `send_movement_order`
   - `readAllJobsV02` instead of `readAllJobsReqV01` for `get_completed_movements` / `get_all_orders`
   - `readAllAMDV04` instead of `readAllAMDReqV01` for `get_inventory`
