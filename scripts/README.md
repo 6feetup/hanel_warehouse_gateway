@@ -23,7 +23,7 @@ CLI script for testing the `HanelWarehouseGateway` manually against the mock ser
 ## Usage
 
 ```
-uv run python scripts/hanel_cli.py <operation> [--input FILE] [--endpoint URL] [--test-mode] [--verbose]
+uv run python scripts/hanel_cli.py <operation> [--input FILE] [config overrides...]
 ```
 
 | Flag | Description |
@@ -31,8 +31,27 @@ uv run python scripts/hanel_cli.py <operation> [--input FILE] [--endpoint URL] [
 | `operation` | One of: `register_article`, `send_movement_order`, `get_completed_movements`, `cancel_order` |
 | `--input FILE` | JSON file with operation parameters. If omitted, reads from stdin. |
 | `--endpoint URL` | Overrides `HANEL_ENDPOINT_URL` from `.env`. |
-| `--test-mode` | Enables `test_mode=True` (prepends `TEST_` to order numbers). |
-| `--verbose`, `-v` | Logs SOAP request/response payloads and failures to stderr at DEBUG level. Use to debug calls and warehouse errors. |
+| `--test-mode` / `--no-test-mode` | Overrides `HANEL_TEST_MODE` (prepends the test prefix to order/article numbers). |
+| `--test-prefix STR` | Overrides `HANEL_TEST_PREFIX` from `.env`. |
+| `--lot-management` / `--no-lot-management` | Overrides `HANEL_LOT_MANAGEMENT_ENABLED` (V02/V03/V04 ops with `batch_number`). |
+| `--log-level {DEBUG,INFO,WARNING,ERROR}` | Overrides `HANEL_LOG_LEVEL` from `.env`. |
+| `--log-soap-payloads` / `--no-log-soap-payloads` | Overrides `HANEL_LOG_SOAP_PAYLOADS` from `.env`. |
+| `--verbose`, `-v` | Shortcut for `--log-level DEBUG --log-soap-payloads` (explicit `--log-*` flags take precedence). |
+
+### Configuration: `.env` → CLI mapping
+
+Every variable is read from `.env` (or the environment) via `GatewayConfig.from_env()`; the
+matching CLI flag, when provided, **overrides** the `.env` value (CLI wins). Omit the flag to
+keep the `.env`/environment value.
+
+| `.env` variable | CLI override |
+|---|---|
+| `HANEL_ENDPOINT_URL` | `--endpoint URL` |
+| `HANEL_TEST_MODE` | `--test-mode` / `--no-test-mode` |
+| `HANEL_TEST_PREFIX` | `--test-prefix STR` |
+| `HANEL_LOT_MANAGEMENT_ENABLED` | `--lot-management` / `--no-lot-management` |
+| `HANEL_LOG_LEVEL` | `--log-level {DEBUG,INFO,WARNING,ERROR}` |
+| `HANEL_LOG_SOAP_PAYLOADS` | `--log-soap-payloads` / `--no-log-soap-payloads` |
 
 Output is always JSON on stdout. On error, every diagnostic attribute of the
 exception is included (keys vary by error type — e.g. `fault_code`,

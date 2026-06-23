@@ -31,12 +31,20 @@ def build_config(args: argparse.Namespace) -> GatewayConfig:
     overrides: dict[str, object] = {}
     if args.endpoint:
         overrides["endpoint_url"] = args.endpoint
-    if args.test_mode:
-        overrides["test_mode"] = True
+    if args.test_mode is not None:
+        overrides["test_mode"] = args.test_mode
+    if args.test_prefix is not None:
+        overrides["test_prefix"] = args.test_prefix
+    if args.lot_management is not None:
+        overrides["lot_management_enabled"] = args.lot_management
+    # --verbose is a shortcut; explicit --log-* flags below override it.
     if args.verbose:
-        # Surface the full request/response payloads and ERROR failure logs.
         overrides["log_level"] = "DEBUG"
         overrides["log_soap_payloads"] = True
+    if args.log_level is not None:
+        overrides["log_level"] = args.log_level
+    if args.log_soap_payloads is not None:
+        overrides["log_soap_payloads"] = args.log_soap_payloads
     return GatewayConfig.from_env(overrides if overrides else None)
 
 
@@ -82,12 +90,35 @@ def main() -> None:
     parser.add_argument("operation", choices=sorted(OPERATIONS))
     parser.add_argument("--input", metavar="FILE", help="JSON file with operation parameters (default: stdin)")
     parser.add_argument("--endpoint", metavar="URL", help="Override HANEL_ENDPOINT_URL from .env")
-    parser.add_argument("--test-mode", action="store_true", help="Enable test_mode (prepends test prefix to order numbers)")
+    parser.add_argument(
+        "--test-mode",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="Override HANEL_TEST_MODE (prepends test prefix to order/article numbers)",
+    )
+    parser.add_argument("--test-prefix", metavar="STR", help="Override HANEL_TEST_PREFIX from .env")
+    parser.add_argument(
+        "--lot-management",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="Override HANEL_LOT_MANAGEMENT_ENABLED (V02/V03/V04 ops with batch_number)",
+    )
+    parser.add_argument(
+        "--log-level",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR"],
+        help="Override HANEL_LOG_LEVEL from .env",
+    )
+    parser.add_argument(
+        "--log-soap-payloads",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="Override HANEL_LOG_SOAP_PAYLOADS from .env",
+    )
     parser.add_argument(
         "--verbose",
         "-v",
         action="store_true",
-        help="Log SOAP request/response payloads and failures to stderr (DEBUG)",
+        help="Shortcut for --log-level DEBUG --log-soap-payloads",
     )
     args = parser.parse_args()
 
