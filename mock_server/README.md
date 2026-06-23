@@ -72,7 +72,7 @@ I file possono essere modificati liberamente. Per applicare le modifiche senza r
 ```
 
 `job_status`: `0`=in coda, `1`=in lavorazione, `2`=parziale, `3`=completato  
-`operation`: `+`=prelievo, `-`=carico  
+`operation`: `+`=carico, `-`=prelievo  
 `position_status`: `0`=pending, `1`=completato  
 `batch_number`: opzionale — numero lotto/batch (solo per operazioni V02/V03/V04).
 

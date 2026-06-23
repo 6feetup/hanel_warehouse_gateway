@@ -60,22 +60,25 @@ def _validate_field_length(
     )
 
 
-_ARTICLE_NUMBER_RE = re.compile(r"^[0-9]+$")
+_ARTICLE_NUMBER_RE = re.compile(r"^[A-Za-z0-9]+$")
 
 
 def _validate_article_number_charset(value: str, field: str, operation: str) -> None:
-    """Reject article numbers that contain non-digit characters (ADR-008).
+    """Reject article numbers that contain non-alphanumeric characters (ADR-008).
 
-    The article number is a numeric code: the Hanel t-Server rejects article
-    codes containing letters, hyphens, spaces, or symbols. This check always
-    raises on violation, regardless of validation_truncate: an article number
-    cannot be auto-corrected by stripping characters without changing the
-    article identity. The empty string is also rejected (``+`` requires at
-    least one digit).
+    The article number is an alphanumeric code: the Hanel t-Server rejects
+    article codes containing special characters (hyphens, spaces, symbols).
+    This check always raises on violation, regardless of validation_truncate: an
+    article number cannot be auto-corrected by stripping characters without
+    changing the article identity. The empty string is also rejected (``+``
+    requires at least one character).
     """
     if not _ARTICLE_NUMBER_RE.match(value):
         raise HanelGatewayValidationError(
-            message=f"Field '{field}' must contain only digits (0-9)",
+            message=(
+                f"Field '{field}' must contain only alphanumeric "
+                "characters (A-Z, a-z, 0-9)"
+            ),
             operation=operation,
             detail=f"value: {value!r}",
             timestamp=datetime.datetime.utcnow().isoformat(),
@@ -225,7 +228,7 @@ class SoapOperations:
                 raise HanelGatewayValidationError(
                     message=f"invalid operation in position {i}: {pos.operation!r}",
                     operation=operation,
-                    detail="operation must be '+' (pick) or '-' (load)",
+                    detail="operation must be '+' (load) or '-' (pick)",
                     timestamp=datetime.datetime.utcnow().isoformat(),
                     field=f"positions[{i}].operation",
                     value=str(pos.operation),

@@ -15,8 +15,8 @@ class MovementLine:
     Attributes:
         article_number: Article code (max 40 chars). Must match an article
             already registered via ``register_article``.
-        operation: Movement direction. ``"+"`` = pick (retrieve from the
-            warehouse), ``"-"`` = load (store into the warehouse).
+        operation: Movement direction. ``"+"`` = load (store into the
+            warehouse), ``"-"`` = pick (retrieve from the warehouse).
         nominal_quantity: Requested quantity. Must be a positive integer
             (greater than 0); fractional quantities are rejected on send.
         batch_number: Lot/batch number (max 40 chars). Only used when
@@ -40,7 +40,7 @@ class MovementLineResult:
 
     Attributes:
         article_number: Article code.
-        operation: Movement direction. ``"+"`` = pick, ``"-"`` = load.
+        operation: Movement direction. ``"+"`` = load, ``"-"`` = pick.
         nominal_quantity: Quantity originally requested in the order.
         actual_quantity: Quantity actually moved by the warehouse. When
             ``actual_quantity < nominal_quantity`` the warehouse moved less

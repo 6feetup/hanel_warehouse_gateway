@@ -136,7 +136,7 @@ Nella risposta, il campo lotto per ciascuna posizione indica il lotto effettivam
 @dataclass
 class MovementLine:
     article_number: str
-    operation: str            # '+' = pick, '-' = load
+    operation: str            # '+' = load, '-' = pick
     nominal_quantity: int     # > 0; i valori frazionari sono rifiutati all'invio
     batch_number: str | None = None   # NUOVO — opzionale
 

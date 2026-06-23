@@ -46,7 +46,7 @@ class HanelWarehouseGateway:
         """Register or update an article in the warehouse catalogue.
 
         Args:
-            article_number: Unique article code (max 40 digits, numeric only).
+            article_number: Unique article code (max 40 chars, alphanumeric only).
             article_name: Article description (max 40 chars).
             batch_number: Lot/batch number (max 40 chars). Only used when
                 lot_management_enabled=True in GatewayConfig.

@@ -83,7 +83,7 @@ echo '{"article_number": "2001", "article_name": "Vite M6 Inox"}' | \
 
 ### `send_movement_order`
 
-Sends a movement order (pick `+` or load `-`) to the warehouse.
+Sends a movement order (load `+` or pick `-`) to the warehouse.
 
 **JSON input — single position:**
 ```json
@@ -106,7 +106,7 @@ Sends a movement order (pick `+` or load `-`) to the warehouse.
 }
 ```
 
-> `operation`: `"+"` = pick (take from warehouse), `"-"` = load (put into warehouse)
+> `operation`: `"+"` = load (put into warehouse), `"-"` = pick (take from warehouse)
 
 **Command:**
 ```bash

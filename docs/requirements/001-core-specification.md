@@ -89,7 +89,7 @@ client = HanelWarehouseGateway(config)
 
 | Field | Type | Constraints | Notes |
 |---|---|---|---|
-| `article_number` | `str` | max 40 chars, digits only (`0-9`) | Unique article code |
+| `article_number` | `str` | max 40 chars, alphanumeric only (`A-Za-z0-9`) | Unique article code |
 | `article_name` | `str` | max 40 chars | Article description |
 
 > *Extended by REQ-LOT-001: adds optional `batch_number: str | None = None` input parameter. See §4.1 of that document.*
@@ -140,7 +140,7 @@ client = HanelWarehouseGateway(config)
 | Field | Type | Values | Notes |
 |---|---|---|---|
 | `article_number` | `str` | max 40 chars | Must match a previously registered article |
-| `operation` | `str` | `+` = pick, `-` = load | Movement direction |
+| `operation` | `str` | `+` = load, `-` = pick | Movement direction |
 | `nominal_quantity` | `int` | > 0, integer | Requested quantity (the warehouse only accepts integer quantities; fractional values are rejected on send) |
 
 > *Extended by REQ-LOT-001: adds optional `batch_number: str | None = None` to `MovementLine`. See §4.2 and §5 of that document.*
@@ -363,7 +363,7 @@ The table below relates business flows, public interface methods, and the corres
 | Business Flow | Python Method | SOAP Operation | Notes |
 |---|---|---|---|
 | Flow 1 — Article master data | `register_article` | `sendAPDReqV01` | Master owned by calling system; warehouse is receiver only |
-| Flow 2 — Inbound/outbound orders | `send_movement_order` | `sendJobsReqV01` | `+` = pick, `-` = load |
+| Flow 2 — Inbound/outbound orders | `send_movement_order` | `sendJobsReqV01` | `+` = load, `-` = pick |
 | Flow 3 — Movement confirmations | `get_completed_movements` | `readAllJobsReqV01` (mode=1) | Polling for outcomes; includes `actual_quantity` per line |
 | Flow 4 — Stock level query | `get_inventory` | `readAllAMDReqV01` | Required to detect manual movements at the machine console |
 | *(queue monitoring)* | `get_all_orders` | `readAllJobsReqV01` (mode=0) | Diagnostics; all orders regardless of status |
@@ -473,13 +473,13 @@ Each entry must include: `timestamp`, `level`, `operation`, `duration_ms` (where
 ## 7. Constraints and Implementation Notes
 
 ### Field Constraints
-- `articleNumber`: maximum 40 characters **and strictly numeric** (digits `0-9` only).
-  The article number is a numeric code; the t-Server rejects article codes containing letters,
-  hyphens, spaces, or symbols. The module enforces this **before sending**: a non-numeric
-  `articleNumber` always raises `HanelGatewayValidationError`, regardless of
-  `validation_truncate` (an article code cannot be auto-corrected by stripping characters
-  without changing its identity). The 40-character limit follows the configurable truncate/raise
-  behaviour below.
+- `articleNumber`: maximum 40 characters **and strictly alphanumeric** (`A-Za-z0-9` only).
+  The article number is an alphanumeric code; the t-Server rejects article codes containing
+  special characters such as hyphens, spaces, or symbols. The module enforces this **before
+  sending**: a non-alphanumeric `articleNumber` always raises `HanelGatewayValidationError`,
+  regardless of `validation_truncate` (an article code cannot be auto-corrected by stripping
+  characters without changing its identity). The 40-character limit follows the configurable
+  truncate/raise behaviour below.
 - `articleName`: maximum **40 characters**. Only the length is constrained (truncate/raise,
   configurable); the value may contain spaces and other characters.
 - `jobNumber`: must be unique for each order sent. The calling system is responsible for uniqueness; the module does not maintain an internal registry.
@@ -541,7 +541,7 @@ class HanelWarehouseGateway:
 @dataclass
 class MovementLine:
     article_number: str
-    operation: str          # '+' = pick, '-' = load
+    operation: str          # '+' = load, '-' = pick
     nominal_quantity: int   # > 0; fractional values rejected on send
 
 @dataclass

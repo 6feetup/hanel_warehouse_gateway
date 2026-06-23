@@ -61,7 +61,7 @@ gateway = HanelWarehouseGateway(config)
 # Register an article
 gateway.register_article("ART-001", "Widget A")
 
-# Send a movement order (operation "+" = pick, "-" = load)
+# Send a movement order (operation "+" = load, "-" = pick)
 gateway.send_movement_order("ORD-001", [
     MovementLine(article_number="ART-001", operation="+", nominal_quantity=5.0),
 ])
