@@ -117,7 +117,7 @@ client = HanelWarehouseGateway(config)
 </soapenv:Envelope>
 ```
 
-> *This envelope applies only when `lot_management_enabled=False`. When `True`, the operation becomes `sendAPDV03` with `APDTypeV03`. See §7.4 of REQ-LOT-001.*
+> *This envelope applies only when `lot_management_enabled=False`. When `True`, the operation becomes `sendAPDReqV03` with `APDTypeV03`. See §7.4 of REQ-LOT-001.*
 
 ---
 

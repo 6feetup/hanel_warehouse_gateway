@@ -131,10 +131,10 @@ class SoapOperations:
     ) -> bool:
         """Register or update an article in the warehouse.
 
-        Uses sendAPDV03 when lot_management_enabled=True, sendAPDReqV01 otherwise.
+        Uses sendAPDReqV03 when lot_management_enabled=True, sendAPDReqV01 otherwise.
         """
         lot = self._config.lot_management_enabled
-        operation = "sendAPDV03" if lot else "sendAPDReqV01"
+        operation = "sendAPDReqV03" if lot else "sendAPDReqV01"
 
         # Charset check on the caller-supplied value, before the test_prefix is
         # prepended: the prefix is module-controlled (e.g. "TEST_") and may

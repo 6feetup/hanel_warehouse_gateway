@@ -787,12 +787,12 @@ class TestGetInventory:
 
 
 class TestRegisterArticleV03:
-    def test_lot_mode_calls_sendAPDV03(self) -> None:
-        xml = _fixture("sendAPDV03_success.xml")
+    def test_lot_mode_calls_sendAPDReqV03(self) -> None:
+        xml = _fixture("sendAPDReqV03_success.xml")
         ops, transport = _make_operations(xml, lot_management_enabled=True)
         ops.register_article("1001", "Bolt M6")
         _, operation = transport.post.call_args[0]
-        assert operation == "sendAPDV03"
+        assert operation == "sendAPDReqV03"
 
     def test_lot_mode_false_calls_sendAPDReqV01(self) -> None:
         xml = _fixture("sendAPDReqV01_success.xml")
@@ -802,14 +802,14 @@ class TestRegisterArticleV03:
         assert operation == "sendAPDReqV01"
 
     def test_batch_number_in_envelope(self) -> None:
-        xml = _fixture("sendAPDV03_success.xml")
+        xml = _fixture("sendAPDReqV03_success.xml")
         ops, transport = _make_operations(xml, lot_management_enabled=True)
         ops.register_article("1001", "Bolt M6", batch_number="LOT-X")
         envelope, _ = transport.post.call_args[0]
         assert "LOT-X" in envelope
 
     def test_batch_number_absent_when_none(self) -> None:
-        xml = _fixture("sendAPDV03_success.xml")
+        xml = _fixture("sendAPDReqV03_success.xml")
         ops, transport = _make_operations(xml, lot_management_enabled=True)
         ops.register_article("1001", "Bolt M6", batch_number=None)
         envelope, _ = transport.post.call_args[0]
@@ -823,7 +823,7 @@ class TestRegisterArticleV03:
         transport.post.assert_not_called()
 
     def test_application_error_hint_in_lot_mode(self) -> None:
-        xml = _fixture("sendAPDV03_error.xml")
+        xml = _fixture("sendAPDReqV03_error.xml")
         ops, _ = _make_operations(xml, lot_management_enabled=True)
         with pytest.raises(HanelGatewayApplicationError) as exc_info:
             ops.register_article("1001", "Bolt M6")

@@ -381,7 +381,7 @@ ENDPOINT=http://localhost:8080/HanelService
 # 1. Reset mock server state
 curl -s -X POST http://localhost:8080/admin/reset
 
-# 2. Register an article with a batch number (uses sendAPDV03)
+# 2. Register an article with a batch number (uses sendAPDReqV03)
 echo '{"article_number": "2001", "article_name": "M6 stainless bolt", "batch_number": "LOTTO-2026-A"}' | \
   uv run python scripts/hanel_cli.py register_article --endpoint $ENDPOINT
 
