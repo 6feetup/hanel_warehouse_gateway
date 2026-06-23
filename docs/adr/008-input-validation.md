@@ -4,7 +4,7 @@
 
 ## Context
 
-Specification §7 states that the `articleNumber` and `articleName` fields have a limit of 40 characters (with `articleNumber` further constrained to digits only). The behaviour on violation is configurable: truncation (with a warning) or an exception. The default and the configuration mechanism need to be formalised.
+Specification §7 states that the `articleNumber` and `articleName` fields have a limit of 40 characters (with `articleNumber` further constrained to alphanumeric characters only). The behaviour on violation is configurable: truncation (with a warning) or an exception. The default and the configuration mechanism need to be formalised.
 
 ## Decision
 
@@ -28,28 +28,28 @@ This parameter is added to `GatewayConfig` (see ADR-003).
 
 | Field | Length limit | Charset constraint | Operation |
 |---|---|---|---|
-| `article_number` | max 40 chars | **digits only** (`[0-9]`) | `register_article`, `send_movement_order` |
+| `article_number` | max 40 chars | **alphanumeric only** (`[A-Za-z0-9]`) | `register_article`, `send_movement_order` |
 | `article_name` | max 40 chars | none (spaces/symbols allowed) | `register_article` |
 | `job_number` | max 40 chars | none | `send_movement_order`, `cancel_order` |
 | `batch_number` | max 40 chars | none | `register_article`, `send_movement_order` (lot mode) |
 
 ## Character constraints
 
-The `article_number` is a numeric code. The t-Server rejects values that contain non-digit
-characters (letters, hyphens, spaces, symbols) with an opaque application error (`returnValue`).
+The `article_number` is an alphanumeric code. The t-Server rejects values that contain special
+characters (hyphens, spaces, symbols) with an opaque application error (`returnValue`).
 To surface this earlier and more clearly, the module validates the article code against
-`^[0-9]+$` **before** the request is sent.
+`^[A-Za-z0-9]+$` **before** the request is sent.
 
 This check **always raises `HanelGatewayValidationError`** on violation, *independently of*
 `validation_truncate`. Rationale: unlike an over-length field, an article code cannot be
 auto-corrected by stripping characters without changing the identity of the article — silent
 mutation would point a request at a different (or non-existent) article. The empty string is
-also rejected (the `+` quantifier requires at least one digit).
+also rejected (the `+` quantifier requires at least one character).
 
 The constraint applies to `article_number` only. `article_name`, `job_number`, and
 `batch_number` keep length-only validation. In `register_article`, the charset check runs on
 the caller-supplied value **before** the `test_prefix` is prepended, because the prefix is
-module-controlled and may legitimately contain non-digit characters (e.g. `TEST_`).
+module-controlled and may legitimately contain non-alphanumeric characters (e.g. `TEST_`).
 
 ## Implementation
 

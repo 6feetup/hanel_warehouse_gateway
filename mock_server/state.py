@@ -42,6 +42,7 @@ class ArticleMasterData:
     inventory_at_storage_location: float
     minimum_inventory: float
     batch_number: str = None  # type: ignore[assignment]
+    h10_special_field: str = None  # type: ignore[assignment]
 
 
 def _data_dir() -> str:
@@ -152,6 +153,7 @@ def _amd_to_dict(r: ArticleMasterData) -> dict:
         "inventory_at_storage_location": r.inventory_at_storage_location,
         "minimum_inventory": r.minimum_inventory,
         "batch_number": r.batch_number,
+        "h10_special_field": r.h10_special_field,
     }
 
 

@@ -106,7 +106,7 @@ uv run python scripts/hanel_cli.py register_article \
 
 Sends a movement order to the warehouse.
 
-`operation`: `"+"` = pick (take from warehouse), `"-"` = load (put into warehouse).
+`operation`: `"+"` = load (put into warehouse), `"-"` = pick (take from warehouse).
 
 **JSON input — single position:**
 ```json

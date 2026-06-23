@@ -9,7 +9,8 @@
     "container_size": 1,
     "fifo": 1,
     "inventory_at_storage_location": 150.0,
-    "minimum_inventory": 20.0
+    "minimum_inventory": 20.0,
+    "h10_special_field": "8032611721991"
   },
   {
     "article_number": "1001",
@@ -57,7 +58,8 @@
     "container_size": 1,
     "fifo": 1,
     "inventory_at_storage_location": 500.0,
-    "minimum_inventory": 50.0
+    "minimum_inventory": 50.0,
+    "h10_special_field": "4006381333931"
   },
   {
     "article_number": "1003",

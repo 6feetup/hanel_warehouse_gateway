@@ -1,6 +1,6 @@
 # ADR-016: Provisional XML Tag Names for Lot Management
 
-**Status:** Provisional
+**Status:** Accepted
 
 **Date:** 2026-06-04
 
@@ -21,8 +21,10 @@ locations need to change — no other module is affected.
 
 ## Resolution
 
-Once the WSDL is available, verify the tag name and update this ADR status to
-`Accepted` or `Superseded` as appropriate.
+Resolved on 2026-06-23. A real `readAllAMDResV04` response
+(`docs/inventory_response.xml`) confirmed the `<batchNumber>` element name, so PA-01 is
+closed and this ADR is now `Accepted`. See [ADR-018](018-inventory-article-tag-and-h10-special-field.md)
+for the related correction of the inventory record wrapper tag.
 
 ## Consequences
 

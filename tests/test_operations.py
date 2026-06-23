@@ -212,13 +212,19 @@ class TestRegisterArticle:
         assert exc_info.value.field == "article_number"
         transport.post.assert_not_called()
 
-    def test_article_number_with_letters_raises_validation_error(self) -> None:
-        # The article number is a numeric code: letters are rejected.
-        ops, transport = _make_operations()
-        with pytest.raises(HanelGatewayValidationError) as exc_info:
-            ops.register_article("ART001", "Valid Name")
-        assert exc_info.value.field == "article_number"
-        transport.post.assert_not_called()
+    def test_article_number_with_letters_is_accepted(self) -> None:
+        # The article number is an alphanumeric code: letters are accepted.
+        xml = _fixture("sendAPDReqV01_success.xml")
+        ops, transport = _make_operations(xml)
+        ops.register_article("ART001", "Valid Name")
+        transport.post.assert_called_once()
+
+    def test_article_number_alphanumeric_mixed_is_accepted(self) -> None:
+        # A code mixing letters and digits passes the charset check.
+        xml = _fixture("sendAPDReqV01_success.xml")
+        ops, transport = _make_operations(xml)
+        ops.register_article("ABC123", "Valid Name")
+        transport.post.assert_called_once()
 
     def test_article_name_may_contain_spaces_and_symbols(self) -> None:
         # The charset constraint applies only to article_number, not article_name.
@@ -571,6 +577,15 @@ class TestSendMovementOrder:
         assert exc_info.value.field == "positions[0].article_number"
         transport.post.assert_not_called()
 
+    def test_article_number_alphanumeric_is_accepted(self) -> None:
+        # An alphanumeric article code passes the charset check on a position.
+        ops, transport = _make_operations(_SUCCESS_XML)
+        lines = [
+            MovementLine(article_number="ABC123", operation="+", nominal_quantity=1.0)
+        ]
+        ops.send_movement_order("JOB-001", lines)
+        transport.post.assert_called_once()
+
     def test_order_number_with_hyphen_is_allowed(self) -> None:
         # The charset constraint applies to article_number only, not job_number.
         ops, transport = _make_operations(_SUCCESS_XML)
@@ -774,6 +789,12 @@ class TestGetInventory:
         assert results[1].lift_number == 0
         assert results[1].shelf_number == 0
         assert results[1].inventory_at_storage_location == 0.0
+
+    def test_maps_h10_special_field(self) -> None:
+        ops, _ = _make_operations(_fixture("read_inventory_response.xml"))
+        results = ops.get_inventory()
+        assert results[0].h10_special_field == "8032611721991"
+        assert results[1].h10_special_field is None
 
     def test_soap_fault_propagates(self) -> None:
         ops, _ = _make_operations(_fixture("soap_fault.xml"))

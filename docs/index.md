@@ -84,7 +84,7 @@ gateway = HanelWarehouseGateway(config)
 # Register an article
 gateway.register_article("1001", "M6 stainless bolt")
 
-# Send a pick order
+# Send a load order
 gateway.send_movement_order(
     order_number="ORD-001",
     positions=[MovementLine(article_number="1001", operation="+", nominal_quantity=5)],
@@ -102,7 +102,7 @@ for result in gateway.get_completed_movements():
 | Method | Description |
 |--------|-------------|
 | [`register_article()`](api/gateway.md) | Register or update an article in the warehouse catalogue |
-| [`send_movement_order()`](api/gateway.md) | Send a pick (`+`) or load (`-`) movement order |
+| [`send_movement_order()`](api/gateway.md) | Send a load (`+`) or pick (`-`) movement order |
 | [`get_completed_movements()`](api/gateway.md) | Retrieve completed orders |
 | [`get_all_orders()`](api/gateway.md) | Retrieve all orders in the queue |
 | [`get_inventory()`](api/gateway.md) | Retrieve current stock levels for all articles |

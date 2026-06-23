@@ -1,0 +1,1321 @@
+<?xml version='1.0' encoding='utf-8'?><soapenv:Envelope
+  xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+  ><soapenv:Body
+    ><ns2:readAllAMDResV04 xmlns:ns2="http://main.jws.com.hanel.de"
+      ><ns2:return
+        ><article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00005</articleNumber
+          ><articleName>Astuccio Aloe-beta Vitalit 50+ anni 5 x</articleName
+          ><batchNumber>0125</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>25</shelfNumber><compartmentNumber>26</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>708</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>764</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00050</articleNumber
+          ><articleName>Astuccio Aloe-Beta Lenodol crema</articleName
+          ><batchNumber>0</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>21</shelfNumber><compartmentNumber>16</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>1208</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>858</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00109</articleNumber
+          ><articleName>Astuccio Lenodol capsule 5 x 5 x 8</articleName
+          ><batchNumber>0125</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>25</shelfNumber><compartmentNumber>1</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>1308</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>388</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00134</articleNumber
+          ><articleName>Astuccio Aloeplus Artricur Pet 11+ 5 x 5</articleName
+          ><batchNumber>0125</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>25</shelfNumber><compartmentNumber>21</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>308</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>1151</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00169</articleNumber
+          ><articleName>Aloe mammario Confez. 4 siringhe 10 ml</articleName
+          ><batchNumber>0125</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>15</shelfNumber><compartmentNumber>1</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>1408</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>102</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00229</articleNumber
+          ><articleName>Epabeta 60 capsule</articleName
+          ><batchNumber>0126</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>1</shelfNumber><compartmentNumber>21</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>208</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>182</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611721991</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00237</articleNumber
+          ><articleName>Astuccio Aloeplus capsule +11 kg. 5 x 5</articleName
+          ><batchNumber>0</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>17</shelfNumber><compartmentNumber>25</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>208</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>214</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00238</articleNumber
+          ><articleName>Astuccio Epabeta 5,5x5,5x8,5</articleName
+          ><batchNumber>0</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>19</shelfNumber><compartmentNumber>13</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>708</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>334</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00267</articleNumber
+          ><articleName>Astuccio Aloeplus Otorì 125 ml - 4,3 x 4</articleName
+          ><batchNumber>0</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>27</shelfNumber><compartmentNumber>13</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>208</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>1699</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00362</articleNumber
+          ><articleName>Astuccio Aloeplus Otorì 125 ml - 4,3 x 4</articleName
+          ><batchNumber>1</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>21</shelfNumber><compartmentNumber>28</compartmentNumber
+          ><compartmentDepthNumber>5</compartmentDepthNumber
+          ><containerSize>101</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>3</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00377</articleNumber
+          ><articleName>Astuccio Aloeplus Artricur Pet 0-10 kg 4</articleName
+          ><batchNumber>0125</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>26</shelfNumber><compartmentNumber>1</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>608</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>876</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00377</articleNumber
+          ><articleName>Astuccio Aloeplus Artricur Pet 0-10 kg 4</articleName
+          ><batchNumber>0125</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>27</shelfNumber><compartmentNumber>28</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>508</containerSize><fifo>2</fifo
+          ><inventoryAtStorageLocation>109</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00378</articleNumber
+          ><articleName>Astuccio Aloeplus capsule 0-10 kg 4 x 4</articleName
+          ><batchNumber>0</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>17</shelfNumber><compartmentNumber>21</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>408</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>261</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00387</articleNumber
+          ><articleName>Caballux gel Arnica 500 ml.</articleName
+          ><batchNumber>0125</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>14</shelfNumber><compartmentNumber>20</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>1308</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>90</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>803261172377</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00402</articleNumber
+          ><articleName>Astuccio Aloeplus sciroppo gatti 100 ml</articleName
+          ><batchNumber>0</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>21</shelfNumber><compartmentNumber>28</compartmentNumber
+          ><compartmentDepthNumber>4</compartmentDepthNumber
+          ><containerSize>101</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>7</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00403</articleNumber
+          ><articleName>Astuccio Aloeplus sciroppo cani 250 ml -</articleName
+          ><batchNumber>0125</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>17</shelfNumber><compartmentNumber>17</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>408</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>30</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00404</articleNumber
+          ><articleName>Astuccio Aloeplus sciroppo cani 150 ml</articleName
+          ><batchNumber>0</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>21</shelfNumber><compartmentNumber>28</compartmentNumber
+          ><compartmentDepthNumber>2</compartmentDepthNumber
+          ><containerSize>101</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>6</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00405</articleNumber
+          ><articleName>Astuccio Aloeplus Pasta Rimuovi pelo 15</articleName
+          ><batchNumber>R</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>30</shelfNumber><compartmentNumber>21</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>208</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>168</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00407</articleNumber
+          ><articleName>Astuccio Aloeplus Dermo Spray 100 ml 4,7</articleName
+          ><batchNumber>0</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>21</shelfNumber><compartmentNumber>28</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>101</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>29</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00410</articleNumber
+          ><articleName>Astuccio Aloeplus capsule 0-10 kg 4 x 4</articleName
+          ><batchNumber>0125</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>19</shelfNumber><compartmentNumber>26</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>708</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>889</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00411</articleNumber
+          ><articleName>Astuccio Aloeplus capsule +11 kg 5 x 5 x</articleName
+          ><batchNumber>0</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>21</shelfNumber><compartmentNumber>28</compartmentNumber
+          ><compartmentDepthNumber>6</compartmentDepthNumber
+          ><containerSize>101</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>4</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00413</articleNumber
+          ><articleName>Astuccio Aloeplus Artricur Pet 0-10 kg 4</articleName
+          ><batchNumber>0125</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>19</shelfNumber><compartmentNumber>21</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>508</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>402</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00414</articleNumber
+          ><articleName>Astuccio Aloeplus Artricur Pet +11 kg 5</articleName
+          ><batchNumber>a</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>27</shelfNumber><compartmentNumber>12</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>108</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>550</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00454</articleNumber
+          ><articleName>Astuccio Aloeplus Epapet 0-10 kg 4 x 4 x</articleName
+          ><batchNumber>0</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>21</shelfNumber><compartmentNumber>28</compartmentNumber
+          ><compartmentDepthNumber>7</compartmentDepthNumber
+          ><containerSize>101</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>2</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00455</articleNumber
+          ><articleName>Astuccio Aloeplus Epapet 11+ kg. 5 x 5 x</articleName
+          ><batchNumber>0125</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>19</shelfNumber><compartmentNumber>2</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>808</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>822</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00458</articleNumber
+          ><articleName>Astuccio Aloeplus Epapet 0-10 kg 4 x 4 x</articleName
+          ><batchNumber>0</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>27</shelfNumber><compartmentNumber>25</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>308</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>736</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00459</articleNumber
+          ><articleName>Astuccio Aloeplus Epapet 11+ kg. 5 x 5 x</articleName
+          ><batchNumber>0125</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>27</shelfNumber><compartmentNumber>17</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>808</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>808</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00462</articleNumber
+          ><articleName>Astuccio Aloeplus Oftocur Pet 100 ml - 4</articleName
+          ><batchNumber>0</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>21</shelfNumber><compartmentNumber>28</compartmentNumber
+          ><compartmentDepthNumber>3</compartmentDepthNumber
+          ><containerSize>101</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>2</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00464</articleNumber
+          ><articleName>Astuccio Aloeplus Oftocur Pet 100 ml -</articleName
+          ><batchNumber>0</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>19</shelfNumber><compartmentNumber>20</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>108</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>996</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00466</articleNumber
+          ><articleName>Astuccio Aloeplus Zampet 5 x 5 x 10</articleName
+          ><batchNumber>0</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>30</shelfNumber><compartmentNumber>23</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>1008</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>367</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00475</articleNumber
+          ><articleName>Astuccio aloe-beta Aloe arborescens in c</articleName
+          ><batchNumber>0</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>22</shelfNumber><compartmentNumber>20</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>1308</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>1237</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00539</articleNumber
+          ><articleName>Astuccio Aloeplus Otorì 60 ml - 4 x 4 x</articleName
+          ><batchNumber>0125</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>27</shelfNumber><compartmentNumber>1</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>508</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>1291</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00541</articleNumber
+          ><articleName>Astuccio Aloeplus Pasta Gatti 30 ml - 4,</articleName
+          ><batchNumber>Si</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>22</shelfNumber><compartmentNumber>17</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>208</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>1035</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00542</articleNumber
+          ><articleName>Astuccio Aloeplus Pasta Gatti 30 ml - 4,</articleName
+          ><batchNumber>0125</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>17</shelfNumber><compartmentNumber>3</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>1408</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>903</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00550</articleNumber
+          ><articleName>Aloeplus Otorì detergente auricolare 60</articleName
+          ><batchNumber>0125</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>24</shelfNumber><compartmentNumber>19</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>408</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>92</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611721052</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>00555</articleNumber
+          ><articleName>Aloe-beta crema repair 50 ml NEUTRO</articleName
+          ><batchNumber>0226</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>3</shelfNumber><compartmentNumber>1</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>308</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>19</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>100002</articleNumber
+          ><articleName>Aloe-beta crema mani 75 ml</articleName
+          ><batchNumber>18C01</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>3</shelfNumber><compartmentNumber>19</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>408</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>44</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611726019</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>100003</articleNumber
+          ><articleName>Aloe-beta crema repair 50 ml</articleName
+          ><batchNumber>0226</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>3</shelfNumber><compartmentNumber>4</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>408</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>65</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611723018</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>100006</articleNumber
+          ><articleName>Aloe-beta cicatril gel 50 ml</articleName
+          ><batchNumber>0226</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>1</shelfNumber><compartmentNumber>13</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>608</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>146</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611723087</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>100008</articleNumber
+          ><articleName>Aloe-beta gel dopobarba 30 ml</articleName
+          ><batchNumber>2501</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>3</shelfNumber><compartmentNumber>15</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>208</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>56</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611723049</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>100009</articleNumber
+          ><articleName>Aloe-beta crema contorno occhi 15 ml</articleName
+          ><batchNumber>0126</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>3</shelfNumber><compartmentNumber>17</compartmentNumber
+          ><compartmentDepthNumber>4</compartmentDepthNumber
+          ><containerSize>205</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>111</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611723025</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>100010</articleNumber
+          ><articleName>Aloe-beta Gel Puro di Aloe BIO</articleName
+          ><batchNumber>0126</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>2</shelfNumber><compartmentNumber>3</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>1308</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>183</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611726002</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>100012</articleNumber
+          ><articleName>Aloe-beta scrub viso e corpo 100 ml</articleName
+          ><batchNumber>0126</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>3</shelfNumber><compartmentNumber>23</compartmentNumber
+          ><compartmentDepthNumber>3</compartmentDepthNumber
+          ><containerSize>206</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>68</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611723070</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>100013</articleNumber
+          ><articleName>Aloe-beta crema bimbi 100 ml</articleName
+          ><batchNumber>328.20</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>3</shelfNumber><compartmentNumber>9</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>101</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>11</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>100015</articleNumber
+          ><articleName>Aloe-beta Lenodol crema 100 ml.</articleName
+          ><batchNumber>0126</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>2</shelfNumber><compartmentNumber>16</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>1708</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>186</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611723117</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>100032</articleNumber
+          ><articleName>Aloe-beta gel puro - 12 bustine da 10 ml</articleName
+          ><batchNumber>2501</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>3</shelfNumber><compartmentNumber>25</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>708</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>17</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611725999</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>100035</articleNumber
+          ><articleName>Lenodol Arnica Gel</articleName
+          ><batchNumber>0524</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>14</shelfNumber><compartmentNumber>1</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>708</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>34</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611723773</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>100035</articleNumber
+          ><articleName>Lenodol Arnica Gel</articleName
+          ><batchNumber>0126</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>14</shelfNumber><compartmentNumber>11</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>308</containerSize><fifo>2</fifo
+          ><inventoryAtStorageLocation>9</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611723773</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>100036</articleNumber
+          ><articleName>Lenodol Artiglio del diavolo</articleName
+          ><batchNumber>0126</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>14</shelfNumber><compartmentNumber>14</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>604</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>77</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611723780</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>100037</articleNumber
+          ><articleName>Aloe-beta sapone artigianale</articleName
+          ><batchNumber>2501</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>3</shelfNumber><compartmentNumber>32</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>108</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>0</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611723247</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200003</articleNumber
+          ><articleName>Aloe verde gel 900 gr</articleName
+          ><batchNumber>0125</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>15</shelfNumber><compartmentNumber>25</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>108</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>4</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200008</articleNumber
+          ><articleName>Aloe lesionex 250 ml</articleName
+          ><batchNumber>0126</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>15</shelfNumber><compartmentNumber>15</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>1001</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>11</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200009</articleNumber
+          ><articleName>Aloe lesionex 450 ml</articleName
+          ><batchNumber>0126</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>15</shelfNumber><compartmentNumber>17</compartmentNumber
+          ><compartmentDepthNumber>3</compartmentDepthNumber
+          ><containerSize>206</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>1</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200014</articleNumber
+          ><articleName>Utersan lavanda Lt. 1</articleName
+          ><batchNumber>0426</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>15</shelfNumber><compartmentNumber>26</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>708</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>35</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200015</articleNumber
+          ><articleName>Aloeplus sciroppo cani 150 ml.</articleName
+          ><batchNumber>0126</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>4</shelfNumber><compartmentNumber>12</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>1108</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>6</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611721519</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200015</articleNumber
+          ><articleName>Aloeplus sciroppo cani 150 ml.</articleName
+          ><batchNumber>0226</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>5</shelfNumber><compartmentNumber>1</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>1208</containerSize><fifo>2</fifo
+          ><inventoryAtStorageLocation>105</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611721519</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200016</articleNumber
+          ><articleName>Aloeplus sciroppo gatti 100 ml.</articleName
+          ><batchNumber>0226</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>4</shelfNumber><compartmentNumber>23</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>1008</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>203</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611721014</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200018</articleNumber
+          ><articleName>Aloeplus pasta orale gatti 15 ml.</articleName
+          ><batchNumber>0126</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>23</shelfNumber><compartmentNumber>1</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>3208</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>284</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611729997</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200018</articleNumber
+          ><articleName>Aloeplus pasta orale gatti 15 ml.</articleName
+          ><batchNumber>0226</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>18</shelfNumber><compartmentNumber>1</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>3208</containerSize><fifo>2</fifo
+          ><inventoryAtStorageLocation>500</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611729997</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200019</articleNumber
+          ><articleName>Aloeplus pasta rimuovi pelo 15 ml</articleName
+          ><batchNumber>R0126</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>7</shelfNumber><compartmentNumber>11</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>1108</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>82</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611729904</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200020</articleNumber
+          ><articleName>Aloeplus dermo gel 200 gr.</articleName
+          ><batchNumber>0226</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>24</shelfNumber><compartmentNumber>1</compartmentNumber
+          ><compartmentDepthNumber>3</compartmentDepthNumber
+          ><containerSize>906</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>106</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611724428</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200021</articleNumber
+          ><articleName>Aloeplus dermo spray 100 ml</articleName
+          ><batchNumber>0126</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>24</shelfNumber><compartmentNumber>15</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>408</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>204</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611721038</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200023</articleNumber
+          ><articleName>Aloeplus sciroppo cani 250 ml.</articleName
+          ><batchNumber>0226</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>4</shelfNumber><compartmentNumber>1</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>1108</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>29</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611725029</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200024</articleNumber
+          ><articleName>Aloeplus sciroppo cani 1000 ml.</articleName
+          ><batchNumber>0126</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>24</shelfNumber><compartmentNumber>12</compartmentNumber
+          ><compartmentDepthNumber>2</compartmentDepthNumber
+          ><containerSize>307</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>6</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200026</articleNumber
+          ><articleName>Aloeplus pasta orale cani 15 ml.</articleName
+          ><batchNumber>0126</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>7</shelfNumber><compartmentNumber>22</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>508</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>92</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611729911</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200027</articleNumber
+          ><articleName>Aloeplus pasta orale gatti 30 ml.</articleName
+          ><batchNumber>0126</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>10</shelfNumber><compartmentNumber>3</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>3008</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>80</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611729980</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200050</articleNumber
+          ><articleName>Aloeplus shampoo spray cani 250 ml.</articleName
+          ><batchNumber>0126</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>11</shelfNumber><compartmentNumber>27</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>608</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>298</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611724541</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200051</articleNumber
+          ><articleName>Aloeplus shampoo spray gatti 250 ml.</articleName
+          ><batchNumber>0126</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>11</shelfNumber><compartmentNumber>1</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>308</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>47</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611724558</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200058</articleNumber
+          ><articleName>Aloeplus Artricur Pet Cani +11 Kg</articleName
+          ><batchNumber>0326</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>6</shelfNumber><compartmentNumber>25</compartmentNumber
+          ><compartmentDepthNumber>2</compartmentDepthNumber
+          ><containerSize>807</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>140</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611722226</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200059</articleNumber
+          ><articleName>Aloeplus Artricur Pet Cani e gatti 0-10</articleName
+          ><batchNumber>0226</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>6</shelfNumber><compartmentNumber>5</compartmentNumber
+          ><compartmentDepthNumber>2</compartmentDepthNumber
+          ><containerSize>207</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>101</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611722219</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200060</articleNumber
+          ><articleName>Aloeplus Capsule cani e gatti 0-10 Kg</articleName
+          ><batchNumber>0226</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>6</shelfNumber><compartmentNumber>1</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>202</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>9</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611721076</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200060</articleNumber
+          ><articleName>Aloeplus Capsule cani e gatti 0-10 Kg</articleName
+          ><batchNumber>0326</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>6</shelfNumber><compartmentNumber>1</compartmentNumber
+          ><compartmentDepthNumber>3</compartmentDepthNumber
+          ><containerSize>206</containerSize><fifo>2</fifo
+          ><inventoryAtStorageLocation>88</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611721076</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200061</articleNumber
+          ><articleName>Aloeplus Capsule +11 Kg</articleName
+          ><batchNumber>0326</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>6</shelfNumber><compartmentNumber>16</compartmentNumber
+          ><compartmentDepthNumber>5</compartmentDepthNumber
+          ><containerSize>604</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>93</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611721083</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200062</articleNumber
+          ><articleName>Aloeplus Otorì detergente auricolare 125</articleName
+          ><batchNumber>0426</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>24</shelfNumber><compartmentNumber>23</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>1008</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>109</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611721045</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200063</articleNumber
+          ><articleName>Aloeplus Epapet 0-10 Kg</articleName
+          ><batchNumber>0225</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>6</shelfNumber><compartmentNumber>3</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>203</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>23</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611721113</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200063</articleNumber
+          ><articleName>Aloeplus Epapet 0-10 Kg</articleName
+          ><batchNumber>0126</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>6</shelfNumber><compartmentNumber>3</compartmentNumber
+          ><compartmentDepthNumber>4</compartmentDepthNumber
+          ><containerSize>205</containerSize><fifo>2</fifo
+          ><inventoryAtStorageLocation>15</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611721113</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200064</articleNumber
+          ><articleName>Aloeplus Epapet +11 Kg</articleName
+          ><batchNumber>0225</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>6</shelfNumber><compartmentNumber>22</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>302</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>12</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611721120</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200064</articleNumber
+          ><articleName>Aloeplus Epapet +11 Kg</articleName
+          ><batchNumber>0126</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>6</shelfNumber><compartmentNumber>22</compartmentNumber
+          ><compartmentDepthNumber>3</compartmentDepthNumber
+          ><containerSize>306</containerSize><fifo>2</fifo
+          ><inventoryAtStorageLocation>22</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611721120</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200065</articleNumber
+          ><articleName>Aloeplus Zampet 50 ml.</articleName
+          ><batchNumber>0226</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>6</shelfNumber><compartmentNumber>7</compartmentNumber
+          ><compartmentDepthNumber>3</compartmentDepthNumber
+          ><containerSize>506</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>15</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611721090</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200066</articleNumber
+          ><articleName>Aloeplus Oftocur Pet 100 ml</articleName
+          ><batchNumber>0226</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>6</shelfNumber><compartmentNumber>12</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>408</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>158</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611721106</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200115EN</articleNumber
+          ><articleName>Aloeplus syrup dogs 150 ml.</articleName
+          ><batchNumber>0125</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>12</shelfNumber><compartmentNumber>1</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>108</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>29</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611721519</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200115EN</articleNumber
+          ><articleName>Aloeplus syrup dogs 150 ml.</articleName
+          ><batchNumber>0725</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>12</shelfNumber><compartmentNumber>2</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>208</containerSize><fifo>2</fifo
+          ><inventoryAtStorageLocation>19</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611721519</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200116EN</articleNumber
+          ><articleName>Aloeplus syrup for cats 100 ml.</articleName
+          ><batchNumber>0725</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>12</shelfNumber><compartmentNumber>4</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>508</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>105</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611721014</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200118EN</articleNumber
+          ><articleName>Aloeplus oral paste cats 15 ml.</articleName
+          ><batchNumber>0625</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>8</shelfNumber><compartmentNumber>1</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>908</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>95</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611729997</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200119EN</articleNumber
+          ><articleName>Aloeplus hairball remover 15 ml</articleName
+          ><batchNumber>R0226</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>8</shelfNumber><compartmentNumber>31</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>208</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>7</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611729904</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200119EN</articleNumber
+          ><articleName>Aloeplus hairball remover 15 ml</articleName
+          ><batchNumber>0126</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>8</shelfNumber><compartmentNumber>21</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>708</containerSize><fifo>2</fifo
+          ><inventoryAtStorageLocation>83</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611729904</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200120EN</articleNumber
+          ><articleName>Aloeplus dermo gel 200 gr.</articleName
+          ><batchNumber>0126</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>12</shelfNumber><compartmentNumber>24</compartmentNumber
+          ><compartmentDepthNumber>3</compartmentDepthNumber
+          ><containerSize>506</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>49</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200123EN</articleNumber
+          ><articleName>Aloeplus syrup dogs 250 ml.</articleName
+          ><batchNumber>0725</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>12</shelfNumber><compartmentNumber>9</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>501</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>8</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200126EN</articleNumber
+          ><articleName>Aloeplus oral paste dogs 15 ml.</articleName
+          ><batchNumber>0525</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>8</shelfNumber><compartmentNumber>14</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>108</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>3</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611729911</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200126EN</articleNumber
+          ><articleName>Aloeplus oral paste dogs 15 ml.</articleName
+          ><batchNumber>0625</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>8</shelfNumber><compartmentNumber>15</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>508</containerSize><fifo>2</fifo
+          ><inventoryAtStorageLocation>21</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611729911</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200150EN</articleNumber
+          ><articleName>Aloeplus shampoo spray dogs 250 ml.</articleName
+          ><batchNumber>0125</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>13</shelfNumber><compartmentNumber>16</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>308</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>12</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200151EN</articleNumber
+          ><articleName>Aloeplus shampoo spray cats 250 ml.</articleName
+          ><batchNumber>0125</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>13</shelfNumber><compartmentNumber>19</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>308</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>13</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200158EN</articleNumber
+          ><articleName>Aloeplus Artricur Pet Dogs +11 Kg</articleName
+          ><batchNumber>0226</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>13</shelfNumber><compartmentNumber>14</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>208</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>15</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611722226</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200159EN</articleNumber
+          ><articleName>Aloeplus Artricur Pet dogs and cats 0-10</articleName
+          ><batchNumber>0125</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>13</shelfNumber><compartmentNumber>13</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>108</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>10</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611722219</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200160EN</articleNumber
+          ><articleName>Aloeplus Capsules dogs and cats 0-10 Kg</articleName
+          ><batchNumber>0125</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>13</shelfNumber><compartmentNumber>25</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>408</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>6</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611721076</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200161EN</articleNumber
+          ><articleName>Aloeplus Capsules +11 Kg</articleName
+          ><batchNumber>0226</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>13</shelfNumber><compartmentNumber>22</compartmentNumber
+          ><compartmentDepthNumber>2</compartmentDepthNumber
+          ><containerSize>307</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>18</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611721083</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200162EN</articleNumber
+          ><articleName>Aloeplus Otorì ear cleaner 125 ml</articleName
+          ><batchNumber>0226</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>12</shelfNumber><compartmentNumber>14</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>1008</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>0</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200163EN</articleNumber
+          ><articleName>Aloeplus Epapet 0-10 Kg</articleName
+          ><batchNumber>0125</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>13</shelfNumber><compartmentNumber>8</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>108</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>23</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611721113</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200164EN</articleNumber
+          ><articleName>Aloeplus Epapet +11 Kg</articleName
+          ><batchNumber>0125</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>13</shelfNumber><compartmentNumber>11</compartmentNumber
+          ><compartmentDepthNumber>2</compartmentDepthNumber
+          ><containerSize>207</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>17</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611721120</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200165EN</articleNumber
+          ><articleName>Aloeplus Zampet 50 ml.</articleName
+          ><batchNumber>0425</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>12</shelfNumber><compartmentNumber>29</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>402</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>3</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200165EN</articleNumber
+          ><articleName>Aloeplus Zampet 50 ml.</articleName
+          ><batchNumber>0126</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>12</shelfNumber><compartmentNumber>29</compartmentNumber
+          ><compartmentDepthNumber>3</compartmentDepthNumber
+          ><containerSize>406</containerSize><fifo>2</fifo
+          ><inventoryAtStorageLocation>24</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>200166EN</articleNumber
+          ><articleName>Aloeplus Oftocur Pet 100 ml</articleName
+          ><batchNumber>0125</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>13</shelfNumber><compartmentNumber>29</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>408</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>95</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>400002</articleNumber
+          ><articleName>Aloe-beta Aloe arborescens in Capsule BI</articleName
+          ><batchNumber>0626</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>28</shelfNumber><compartmentNumber>1</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>3208</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>396</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611723001</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>400005</articleNumber
+          ><articleName>Aloe-beta Vitalit 50+ anni BIO</articleName
+          ><batchNumber>0225</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>1</shelfNumber><compartmentNumber>23</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>408</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>69</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611722998</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>400007</articleNumber
+          ><articleName>Aloe-beta Lenodol capsule BIO</articleName
+          ><batchNumber>0426</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>1</shelfNumber><compartmentNumber>1</compartmentNumber
+          ><compartmentDepthNumber>2</compartmentDepthNumber
+          ><containerSize>507</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>4</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611722981</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>400007</articleNumber
+          ><articleName>Aloe-beta Lenodol capsule BIO</articleName
+          ><batchNumber>0526</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>1</shelfNumber><compartmentNumber>1</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>501</containerSize><fifo>2</fifo
+          ><inventoryAtStorageLocation>150</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField>8032611722981</h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>400008</articleNumber
+          ><articleName>Immuno duo Aloe-beta BIO</articleName
+          ><batchNumber>0125</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>1</shelfNumber><compartmentNumber>27</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>608</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>23</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>900028</articleNumber
+          ><articleName>Astuccio Aloeplus sciroppo cani 150 ml</articleName
+          ><batchNumber>0</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>26</shelfNumber><compartmentNumber>26</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>708</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>807</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>900029</articleNumber
+          ><articleName>Astuccio Aloeplus sciroppo gatti 100 ml</articleName
+          ><batchNumber>0</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>22</shelfNumber><compartmentNumber>8</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>908</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>354</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>900030</articleNumber
+          ><articleName>Astuccio Aloeplus sciroppo cani 250 ml -</articleName
+          ><batchNumber>0</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>30</shelfNumber><compartmentNumber>9</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>1208</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>474</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>900031</articleNumber
+          ><articleName>Astuccio Aloeplus Dermo Gel 200 ml 5,3 x</articleName
+          ><batchNumber>0</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>27</shelfNumber><compartmentNumber>11</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>108</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>441</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>900032</articleNumber
+          ><articleName>Astuccio Aloeplus Dermo Spray 100 ml 4,7</articleName
+          ><batchNumber>0</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>27</shelfNumber><compartmentNumber>9</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>208</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>390</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>900038</articleNumber
+          ><articleName>Astuccio Aloeplus Pasta Gatti 15 ml - 20</articleName
+          ><batchNumber>0</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>26</shelfNumber><compartmentNumber>19</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>708</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>169</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>900039</articleNumber
+          ><articleName>Astuccio Aloeplus Pasta Rimuovi pelo 15</articleName
+          ><batchNumber>0</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>30</shelfNumber><compartmentNumber>3</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>208</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>624</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>900041</articleNumber
+          ><articleName>Astuccio Aloeplus Pasta Cani 15 ml - 20</articleName
+          ><batchNumber>0</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>19</shelfNumber><compartmentNumber>10</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>308</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>150</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>900052</articleNumber
+          ><articleName>Astuccio Aloe-beta Gel Puro</articleName
+          ><batchNumber>Si</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>17</shelfNumber><compartmentNumber>27</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>508</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>231</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>900056</articleNumber
+          ><articleName>Astuccio Aloe-beta Crema Repair 7 x 7 x</articleName
+          ><batchNumber>0</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>21</shelfNumber><compartmentNumber>1</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>1508</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>897</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>900083</articleNumber
+          ><articleName>Astuccio Aloe-Beta Crema Mani 4,5x4,5x14</articleName
+          ><batchNumber>0</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>30</shelfNumber><compartmentNumber>5</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>408</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>117</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <article xmlns="http://main.jws.com.hanel.de/xsd">
+          <articleNumber>900084</articleNumber
+          ><articleName>Astuccio Aloe-Beta Cicatril gel 5x5x10</articleName
+          ><batchNumber>0</batchNumber><liftNumber>1</liftNumber
+          ><shelfNumber>25</shelfNumber><compartmentNumber>16</compartmentNumber
+          ><compartmentDepthNumber>1</compartmentDepthNumber
+          ><containerSize>208</containerSize><fifo>1</fifo
+          ><inventoryAtStorageLocation>386</inventoryAtStorageLocation
+          ><minimumInventory>0</minimumInventory
+          ><h10SpecialField></h10SpecialField>
+        </article>
+        <ns1:returnValue xmlns:ns1="http://main.jws.com.hanel.de/xsd"
+          >0</ns1:returnValue
+        ></ns2:return
+      ></ns2:readAllAMDResV04
+    ></soapenv:Body
+  ></soapenv:Envelope
+>
