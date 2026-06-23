@@ -314,13 +314,13 @@ def send_apd_v03(
         f"<xsd:batchNumber>{batch_number}</xsd:batchNumber>" if batch_number else ""
     )
     return post_soap(envelope(
-        f"<main:sendAPDV03><main:param>"
+        f"<main:sendAPDReqV03><main:param>"
         f"<xsd:articlePoolDataRecord>"
         f"<xsd:articleNumber>{article_number}</xsd:articleNumber>"
         f"<xsd:articleName>{article_name}</xsd:articleName>"
         f"{batch_xml}"
         f"</xsd:articlePoolDataRecord>"
-        f"</main:param></main:sendAPDV03>"
+        f"</main:param></main:sendAPDReqV03>"
     ))
 
 
@@ -363,7 +363,7 @@ def read_amd_v04() -> requests.Response:
 
 
 # ---------------------------------------------------------------------------
-# sendAPDV03
+# sendAPDReqV03
 # ---------------------------------------------------------------------------
 
 class TestSendAPDV03:
@@ -377,9 +377,9 @@ class TestSendAPDV03:
         assert resp.status_code == 200
         assert get_return_value(resp.text) == 0
 
-    def test_response_tag_is_sendAPDV03Response(self):
+    def test_response_tag_is_sendAPDReqV03Response(self):
         resp = send_apd_v03("3001", "V03 Article", batch_number="LOT-X")
-        assert "sendAPDV03Response" in resp.text
+        assert "sendAPDReqV03Response" in resp.text
 
     def test_article_appears_in_state(self):
         send_apd_v03("3002", "New V03 Article", batch_number="LOT-A")

@@ -51,7 +51,7 @@ def handle_send_apd_v03(root: ET.Element, state: MockState) -> str:
                 rec.article_name = article_name
                 if batch_number is not None:
                     rec.batch_number = batch_number
-    return simple_return_response("sendAPDV03Response", 0)
+    return simple_return_response("sendAPDReqV03Response", 0)
 
 
 def handle_send_jobs(root: ET.Element, state: MockState) -> str:

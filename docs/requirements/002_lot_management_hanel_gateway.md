@@ -23,7 +23,7 @@ La tabella seguente riporta per ogni operazione V01 attualmente usata nel gatewa
 
 | Operazione attuale (V01) | Sostituto con Lot Support | Tipo messaggio input | Tipo messaggio output | Tipo oggetto dati |
 |---|---|---|---|---|
-| `sendAPDReqV01` *(register_article)* | **`sendAPDV03`** | `SendAPDReqV03` | `SendAPDResV03` | `APDTypeV03` |
+| `sendAPDReqV01` *(register_article)* | **`sendAPDReqV03`** | `SendAPDReqV03` | `SendAPDResV03` | `APDTypeV03` |
 | `sendJobsReqV01` *(send_movement_order)* | **`sendJobsV02`** | `SendJobsReqV02` | `SendJobsResV02` | `JobPositionTypeV02` |
 | `readAllJobsReqV01` mode=1 *(get_completed_movements)* | **`readAllJobsV02`** mode=1 | `ReadAllJobsReqV02` | `ReadAllJobsResV02` | `JobTypeV02` |
 | `readAllJobsReqV01` mode=0 *(get_all_orders)* | **`readAllJobsV02`** mode=0 | `ReadAllJobsReqV02` | `ReadAllJobsResV02` | `JobTypeV02` |
@@ -66,12 +66,12 @@ Nella risposta, il campo lotto per ciascuna posizione indica il lotto effettivam
 ### 4.1 `register_article` — Anagrafica articolo
 
 **Operazione SOAP attuale:** `sendAPDReqV01`  
-**Operazione SOAP target:** `sendAPDV03`
+**Operazione SOAP target:** `sendAPDReqV03`
 
 **Cambiamenti richiesti:**
 
 - REQ-LOT-01: Il metodo deve accettare un parametro opzionale `batch_number: str | None = None` per associare il record di pool articolo a un lotto specifico.
-- REQ-LOT-02: Se `lot_management_enabled=True`, il gateway deve invocare `sendAPDV03` usando `APDTypeV03` anziché `sendAPDReqV01`.
+- REQ-LOT-02: Se `lot_management_enabled=True`, il gateway deve invocare `sendAPDReqV03` usando `APDTypeV03` anziché `sendAPDReqV01`.
 - REQ-LOT-03: Se `lot_management_enabled=False`, il comportamento deve essere identico all'implementazione attuale (retrocompatibilità garantita).
 - REQ-LOT-04: La lunghezza massima di `batch_number` deve essere validata coerentemente con i vincoli di campo del t-Server (max 40 caratteri alfanumerici — da confermare dai WSDL).
 - REQ-LOT-05: Il campo `batch_number` deve essere incluso nel log strutturato a livello `INFO` quando valorizzato.
@@ -246,7 +246,7 @@ class StockRecord:
 </soapenv:Envelope>
 ```
 
-### 7.4 `sendAPDV03` (register_article con lotti)
+### 7.4 `sendAPDReqV03` (register_article con lotti)
 
 ```xml
 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
@@ -254,7 +254,7 @@ class StockRecord:
                   xmlns:xsd="http://main.jws.com.hanel.de/xsd">
   <soapenv:Header/>
   <soapenv:Body>
-    <main:sendAPDV03>
+    <main:sendAPDReqV03>
       <main:param>
         <xsd:articlePoolDataRecord>
           <xsd:articleNumber>{article_number}</xsd:articleNumber>
@@ -262,7 +262,7 @@ class StockRecord:
           <xsd:batchNumber>{batch_number}</xsd:batchNumber>  <!-- opzionale: omettere se None -->
         </xsd:articlePoolDataRecord>
       </main:param>
-    </main:sendAPDV03>
+    </main:sendAPDReqV03>
   </soapenv:Body>
 </soapenv:Envelope>
 ```
@@ -283,7 +283,7 @@ get_inventory()               → readAllAMDReqV01
 cancel_order(...)             → deleteJobReqV01
 
 # lot_management_enabled = True (nuovo comportamento)
-register_article(...)         → sendAPDV03
+register_article(...)         → sendAPDReqV03
 send_movement_order(...)      → sendJobsV02
 get_completed_movements()     → readAllJobsV02 (mode=1)
 get_all_orders()              → readAllJobsV02 (mode=0)

@@ -141,7 +141,7 @@ def build_register_article_envelope_v03(
     namespace_main: str,
     namespace_xsd: str,
 ) -> str:
-    """Build the SOAP envelope for sendAPDV03."""
+    """Build the SOAP envelope for sendAPDReqV03."""
     article_number_escaped = _xml_escape(article_number)
     article_name_escaped = _xml_escape(article_name)
     batch_xml = (
@@ -155,7 +155,7 @@ def build_register_article_envelope_v03(
         f' xmlns:xsd="{namespace_xsd}">'
         f"<soapenv:Header/>"
         f"<soapenv:Body>"
-        f"<main:sendAPDV03>"
+        f"<main:sendAPDReqV03>"
         f"<main:param>"
         f"<xsd:articlePoolDataRecord>"
         f"<xsd:articleNumber>{article_number_escaped}</xsd:articleNumber>"
@@ -163,7 +163,7 @@ def build_register_article_envelope_v03(
         f"{batch_xml}"
         f"</xsd:articlePoolDataRecord>"
         f"</main:param>"
-        f"</main:sendAPDV03>"
+        f"</main:sendAPDReqV03>"
         f"</soapenv:Body>"
         f"</soapenv:Envelope>"
     )
