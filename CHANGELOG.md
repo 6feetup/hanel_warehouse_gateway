@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.2.1](https://github.com/6feetup/hanel_warehouse_gateway/compare/v0.2.0...v0.2.1) (2026-06-23)
+
+
+### Features
+
+* **cli:** complete .env override mapping for all gateway settings ([#47](https://github.com/6feetup/hanel_warehouse_gateway/issues/47)) ([f109349](https://github.com/6feetup/hanel_warehouse_gateway/commit/f1093499aa8d316c80c4e9fc40dfd42b9633dabb))
+* fix get_inventory parsing and add h10_special_field to StockRecord ([#46](https://github.com/6feetup/hanel_warehouse_gateway/issues/46)) ([b6cf436](https://github.com/6feetup/hanel_warehouse_gateway/commit/b6cf4369d0886739171978f7b5ac408faf238882))
+
+
+### Bug Fixes
+
+* rename SOAP operation sendAPDV03 to sendAPDReqV03 ([#44](https://github.com/6feetup/hanel_warehouse_gateway/issues/44)) ([cdeea6d](https://github.com/6feetup/hanel_warehouse_gateway/commit/cdeea6d3a97796e520391fa44eb3ebc5fc0e8f59))
+
 ## [0.2.0](https://github.com/6feetup/hanel_warehouse_gateway/compare/v0.1.7...v0.2.0) (2026-06-15)
 
 
