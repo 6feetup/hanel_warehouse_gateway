@@ -10,6 +10,7 @@
     "fifo": 1,
     "inventory_at_storage_location": 150.0,
     "minimum_inventory": 20.0,
+    "batch_number": "LOT-2024-A",
     "h10_special_field": "8032611721991"
   },
   {
@@ -22,7 +23,8 @@
     "container_size": 1,
     "fifo": 2,
     "inventory_at_storage_location": 80.0,
-    "minimum_inventory": 20.0
+    "minimum_inventory": 20.0,
+    "batch_number": "LOT-2024-B"
   },
   {
     "article_number": "1002",
@@ -34,7 +36,8 @@
     "container_size": 2,
     "fifo": 1,
     "inventory_at_storage_location": 15.0,
-    "minimum_inventory": 30.0
+    "minimum_inventory": 30.0,
+    "batch_number": "LOT-2024-C"
   },
   {
     "article_number": "1002",
@@ -59,6 +62,7 @@
     "fifo": 1,
     "inventory_at_storage_location": 500.0,
     "minimum_inventory": 50.0,
+    "batch_number": "LOT-2024-D",
     "h10_special_field": "4006381333931"
   },
   {
@@ -71,6 +75,7 @@
     "container_size": 1,
     "fifo": 2,
     "inventory_at_storage_location": 300.0,
-    "minimum_inventory": 50.0
+    "minimum_inventory": 50.0,
+    "batch_number": "LOT-2024-E"
   }
 ]

@@ -495,6 +495,17 @@ class TestReadAllAMDV04:
         resp = read_amd_v04()
         assert "readAllAMDResV04" in resp.text
 
+    def test_batch_number_present_in_response(self):
+        resp = read_amd_v04()
+        root = ET.fromstring(resp.text)
+        batch_nodes = root.findall(f".//{{{NS_XSD}}}batchNumber")
+        assert len(batch_nodes) >= 1
+        assert any(n.text for n in batch_nodes)
+
+    def test_v01_inventory_does_not_include_batch_tag(self):
+        resp = read_amd()
+        assert "batchNumber" not in resp.text
+
 
 # ---------------------------------------------------------------------------
 # Backward compatibility: V01 and V02 on the same mock state
